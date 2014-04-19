@@ -1,0 +1,15 @@
+#############
+## Windows detritus
+#############
+
+Thumbs.db
+ehthumbs.db
+
+Desktop.ini
+
+#############
+## NetBeans
+#############
+
+build/
+dist/
