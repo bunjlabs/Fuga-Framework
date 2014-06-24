@@ -5,6 +5,7 @@
  */
 package com.sweetieframework.foundation.network;
 
+import com.sweetieframework.SweetieServer;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -13,12 +14,17 @@ import io.netty.handler.codec.http.HttpResponseEncoder;
 
 
 class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
-
+    private final SweetieServer server;
+    
+    HttpServerInitializer(SweetieServer server) {
+        this.server = server;
+    }
+    
     @Override
     public void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline p = ch.pipeline();
         p.addLast("decoder", new HttpRequestDecoder());
         p.addLast("encoder", new HttpResponseEncoder());
-        p.addLast("handler", new HttpServerHandler());
+        p.addLast("handler", new HttpServerHandler(server));
     }
 }

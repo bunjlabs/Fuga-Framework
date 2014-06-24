@@ -4,11 +4,11 @@
  * and open the template in the editor.
  */
 
-package com.sweetieframework.foundation;
+package com.sweetieframework.handlers;
 
 import io.netty.handler.codec.http.HttpRequest;
  
-public abstract class UriHandlerBased{
+public abstract class Handler {
  
     public abstract void process(HttpRequest request, StringBuilder buff);
  

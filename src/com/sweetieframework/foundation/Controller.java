@@ -6,10 +6,8 @@
 
 package com.sweetieframework.foundation;
 
-import java.lang.annotation.*;
- 
-@Target(value= ElementType.TYPE)
-@Retention(value= RetentionPolicy.RUNTIME)
-public @interface Mapped {
-    String uri();
+import com.sweetieframework.handlers.Handler;
+
+public abstract class Controller extends Handler {
+
 }

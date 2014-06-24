@@ -19,8 +19,8 @@ public class AppLauncher {
      * @throws java.lang.Exception
      */
     public static void main(String[] args) throws Exception {
-        HttpServer httpserver = new HttpServer(8080);
-        httpserver.start();
+        //HttpServer httpserver = new HttpServer(8080);
+        //httpserver.start();
     }
     
 }
