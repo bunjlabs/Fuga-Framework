@@ -1,12 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.sweetieframework.foundation.network;
 
-import com.sweetieframework.foundation.Mapped;
-import com.sweetieframework.foundation.UriHandlerBased;
+import com.sweetieframework.SweetieServer;
+import com.sweetieframework.handlers.Handler;
+import com.sweetieframework.handlers.Mapped;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -21,35 +17,18 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.util.CharsetUtil;
-import java.lang.annotation.Annotation;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 
+    private static final Logger log = Logger.getLogger(HttpServer.class.getName());
     private HttpRequest request;
     private final StringBuilder buf = new StringBuilder();
-    private Map<String, UriHandlerBased> handlers = new HashMap<>();
+    private SweetieServer server;
 
-    public HttpServerHandler() {
-        if (handlers.isEmpty()) {
-            System.out.println("handlers.isEmpty()");
-            /*for (Class c : ReflectionTools.getClasses("com.sweetieframework.handlers")) {
-             Annotation annotation = c.getAnnotation(Mapped.class);
-             if (annotation != null) {
-             handlers.put(((Mapped) annotation).uri(), (UriHandlerBased) c.newInstance());
-             }
-             */
-            try {
-                Class c = ClassLoader.getSystemClassLoader().loadClass("com.sweetieframework.handlers.SomeExampleHandler");
-                Annotation annotation = c.getAnnotation(Mapped.class);
-                if (annotation != null) {
-                    handlers.put(((Mapped) annotation).uri(), (UriHandlerBased) c.newInstance());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+    HttpServerHandler(SweetieServer server) {
+        this.server = server;
 
     }
 
@@ -60,13 +39,13 @@ class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        UriHandlerBased handler = null;
+        Handler handler = null;
         if (msg instanceof HttpRequest) {
             HttpRequest httprequest = this.request = (HttpRequest) msg;
             QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httprequest.getUri());
             buf.setLength(0);
             String context = queryStringDecoder.path();
-            handler = handlers.get(context);
+            handler = server.getHandlersMap().getMatchedByUri(context);
             if (handler != null) {
                 handler.process(httprequest, buf);
             }
@@ -89,13 +68,13 @@ class HttpServerHandler extends SimpleChannelInboundHandler<Object> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        cause.printStackTrace();
+        log.log(Level.SEVERE, "HttpServerHandler exception", cause);
         ctx.close();
     }
 
     @Override
     protected void messageReceived(ChannelHandlerContext ctx, Object msg) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet.");
+        // Nothing
     }
 
 }
