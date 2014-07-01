@@ -6,7 +6,7 @@
 
 package com.sweetieframework.foundation.network;
 
-import com.sweetieframework.SweetieServer;
+import com.sweetieframework.SweetieApp;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -19,9 +19,9 @@ public class HttpServer {
 
     private static final Logger log = Logger.getLogger(HttpServer.class.getName());
     private final SocketAddress addr;
-    private final SweetieServer server;
+    private final SweetieApp server;
  
-    public HttpServer(SocketAddress addr, SweetieServer server) {
+    public HttpServer(SocketAddress addr, SweetieApp server) {
         this.addr = addr;
         this.server = server;
     }

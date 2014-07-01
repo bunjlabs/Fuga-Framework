@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class HandlersMap {
+public class Router {
 
     private final Map<Pattern, Handler> handlers = new HashMap<>();
 
