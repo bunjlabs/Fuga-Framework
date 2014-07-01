@@ -1,17 +1,18 @@
 package com.sweetieframework.examples.helloworld.controllers;
 
 import com.sweetieframework.foundation.Controller;
+import com.sweetieframework.foundation.Response;
 import com.sweetieframework.handlers.Mapped;
 import io.netty.handler.codec.http.HttpRequest;
 
 
 
 @Mapped(uri = "/")
-public class HelloWorldHandler extends Controller {
+public class HelloWorldIndexController extends Controller {
 
     @Override
-    public void process(HttpRequest request, StringBuilder buff) {
-        buff.append("Hello World!");
+    public Response process(HttpRequest request) {
+        return ans("<h1>Hello World!</h1>").setContentType("text/html");
     }
 
 }
