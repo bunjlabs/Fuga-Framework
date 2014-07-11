@@ -10,21 +10,18 @@ import java.nio.file.Files;
 
 public class Response {
 
-    private final ResponseType type;
     private int status;
     private InputStream stream;
     private String contentType;
     private long contentLength;
 
     public Response() {
-        type = ResponseType.Null;
         status = 200;
         contentType = "application/octet-stream";   // or anything else
         contentLength = 0;
     }
 
     public Response(String s) {
-        type = ResponseType.Text;
         status = 200;
         stream = new ByteArrayInputStream(s.getBytes());
         contentType = "text/html";  // we assume that the html will be more often
@@ -32,7 +29,6 @@ public class Response {
     }
 
     public Response(File f) {
-        type = ResponseType.File;
         status = 200;
         try {
             stream = new FileInputStream(f);
@@ -43,10 +39,10 @@ public class Response {
         } catch (IOException ex) {
             // TODO: and IO exception too
         }
+        // maybe necessary to redirect request to 404NotFoundController?
     }
 
     public Response(InputStream is) {
-        type = ResponseType.Stream;
         status = 200;
         stream = is;
         contentType = "application/octet-stream";
@@ -66,10 +62,6 @@ public class Response {
     public Response setContentLength(long contentLength) {
         this.contentLength = contentLength;
         return this;
-    }
-
-    public ResponseType getResponseType() {
-        return type;
     }
 
     public int getStatus() {
