@@ -1,6 +1,8 @@
 package com.sweetieframework.foundation.network;
 
 import com.sweetieframework.SweetieApp;
+import com.sweetieframework.foundation.Request;
+import com.sweetieframework.foundation.RequestMethodUtil;
 import com.sweetieframework.foundation.Response;
 import com.sweetieframework.foundation.controllers.Default404NotFoundController;
 import com.sweetieframework.handlers.HandlerMatched;
@@ -43,14 +45,19 @@ class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
     @Override
     public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) {
         HttpRequest httprequest = this.request = (HttpRequest) msg;
+
         QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httprequest.getUri());
-        String context = queryStringDecoder.path();
-        HandlerMatched handlerMatched = server.getRouter().getMatchedByUri(context);
+        HandlerMatched handlerMatched = server.getRouter().getMatchedByUri(queryStringDecoder.path());
+
+        Request reuqest = new Request(RequestMethodUtil.valueOf(httprequest.getMethod().name()),
+                httprequest.getUri(), ctx.channel().remoteAddress(), queryStringDecoder.parameters());
+
         if (handlerMatched != null) {
-            resp = handlerMatched.getHandler().process(httprequest, handlerMatched.getMatches());
+            resp = handlerMatched.getHandler().process(reuqest, handlerMatched.getMatches());
         } else {
-            resp = new Default404NotFoundController().process(httprequest, null);
+            resp = new Default404NotFoundController().process(reuqest, null);
         }
+        
         HttpResponse response = new DefaultHttpResponse(
                 HttpVersion.HTTP_1_1,
                 ((LastHttpContent) msg).getDecoderResult().isSuccess()

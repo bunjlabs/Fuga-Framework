@@ -1,11 +1,11 @@
 package com.sweetieframework.handlers;
 
+import com.sweetieframework.foundation.Request;
 import com.sweetieframework.foundation.Response;
-import io.netty.handler.codec.http.HttpRequest;
 import java.util.List;
  
 public abstract class Handler {
  
-    public abstract Response process(HttpRequest request, List<String> matches);
+    public abstract Response process(Request request, List<String> matches);
     
 }

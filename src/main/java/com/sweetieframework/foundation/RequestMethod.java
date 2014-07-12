@@ -5,3 +5,4 @@ public enum RequestMethod {
     GET,
     POST
 }
+
