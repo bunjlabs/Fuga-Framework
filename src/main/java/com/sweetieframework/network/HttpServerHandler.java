@@ -1,11 +1,9 @@
-package com.sweetieframework.foundation.network;
+package com.sweetieframework.network;
 
 import com.sweetieframework.SweetieApp;
 import com.sweetieframework.foundation.Request;
 import com.sweetieframework.foundation.RequestMethodUtil;
 import com.sweetieframework.foundation.Response;
-import com.sweetieframework.foundation.controllers.Default404NotFoundController;
-import com.sweetieframework.handlers.HandlerMatched;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -47,29 +45,30 @@ class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
         HttpRequest httprequest = this.request = (HttpRequest) msg;
 
         QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httprequest.getUri());
-        HandlerMatched handlerMatched = server.getRouter().getMatchedByUri(queryStringDecoder.path());
 
         Request reuqest = new Request(RequestMethodUtil.valueOf(httprequest.getMethod().name()),
-                httprequest.getUri(), ctx.channel().remoteAddress(), queryStringDecoder.parameters());
+                httprequest.getUri(), queryStringDecoder.path(),
+                ctx.channel().remoteAddress(), null,
+                queryStringDecoder.parameters(), null);
 
-        if (handlerMatched != null) {
-            resp = handlerMatched.getHandler().process(reuqest, handlerMatched.getMatches());
-        } else {
-            resp = new Default404NotFoundController().process(reuqest, null);
-        }
-        
+        resp = server.getRouter().forward(reuqest);
+
         HttpResponse response = new DefaultHttpResponse(
                 HttpVersion.HTTP_1_1,
                 ((LastHttpContent) msg).getDecoderResult().isSuccess()
                 && resp != null
-                ? HttpResponseStatus.valueOf(resp.getStatus()) : HttpResponseStatus.BAD_REQUEST);
+                        ? HttpResponseStatus.valueOf(resp.getStatus()) : HttpResponseStatus.BAD_REQUEST);
+
         response.headers().set(HttpHeaders.Names.CONTENT_TYPE, resp != null ? resp.getContentType() : "text/plain");
+
         if (resp.getContentLength() >= 0) {
             response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, resp.getContentLength());
         }
+
         if (!HttpHeaders.isKeepAlive(request)) {
             response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
         }
+
         response.headers().set(HttpHeaders.Names.SERVER, "Sweetie/0.0.1.Alpha"); // how it's beautiful!
 
         ctx.write(response);

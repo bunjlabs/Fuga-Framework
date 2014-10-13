@@ -1,4 +1,4 @@
-package com.sweetieframework.foundation.network;
+package com.sweetieframework.network;
 
 import com.sweetieframework.SweetieApp;
 import io.netty.channel.ChannelInitializer;

@@ -1,7 +1,7 @@
 package com.sweetieframework;
 
-import com.sweetieframework.foundation.network.HttpServer;
-import com.sweetieframework.handlers.Router;
+import com.sweetieframework.network.HttpServer;
+import com.sweetieframework.router.Router;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -19,6 +19,7 @@ public class SweetieApp {
     public Router getRouter() {
         return hmap;
     }
+
 
     public void getStarted() throws Exception {
         httpserver = new HttpServer(addr, this);
