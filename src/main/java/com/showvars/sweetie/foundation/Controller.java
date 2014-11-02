@@ -1,4 +1,4 @@
-package com.sweetieframework.foundation;
+package com.showvars.sweetie.foundation;
 
 import java.io.File;
 import java.io.InputStream;
@@ -21,11 +21,15 @@ public abstract class Controller {
         return new Response(is);
     }
     
+    protected static Response nothing() {
+        return new Response().setStatus(204);
+    }
+    
     protected static Response redirect(String url) {
-        return new Response().setStatus(302);
+        return new Response().setStatus(301);
     }
     
     protected static Response temporaryRedirect(String uri) {
-        return new Response();
+        return new Response().setStatus(302);
     }
 }

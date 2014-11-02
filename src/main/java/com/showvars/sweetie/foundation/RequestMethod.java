@@ -1,4 +1,4 @@
-package com.sweetieframework.foundation;
+package com.showvars.sweetie.foundation;
 
 public enum RequestMethod {
 

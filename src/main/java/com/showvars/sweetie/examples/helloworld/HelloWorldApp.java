@@ -1,6 +1,6 @@
-package com.sweetieframework.examples.helloworld;
+package com.showvars.sweetie.examples.helloworld;
 
-import com.sweetieframework.SweetieApp;
+import com.showvars.sweetie.SweetieApp;
 import java.io.InputStreamReader;
 
 public class HelloWorldApp {

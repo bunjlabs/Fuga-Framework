@@ -1,4 +1,4 @@
-package com.sweetieframework.foundation;
+package com.showvars.sweetie.foundation;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;

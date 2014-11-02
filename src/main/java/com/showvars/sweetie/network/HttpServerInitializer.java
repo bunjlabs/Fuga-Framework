@@ -1,6 +1,6 @@
-package com.sweetieframework.network;
+package com.showvars.sweetie.network;
 
-import com.sweetieframework.SweetieApp;
+import com.showvars.sweetie.SweetieApp;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;

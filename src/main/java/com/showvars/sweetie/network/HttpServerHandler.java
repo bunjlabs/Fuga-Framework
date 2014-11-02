@@ -1,13 +1,15 @@
-package com.sweetieframework.network;
+package com.showvars.sweetie.network;
 
-import com.sweetieframework.SweetieApp;
-import com.sweetieframework.foundation.Request;
-import com.sweetieframework.foundation.RequestMethodUtil;
-import com.sweetieframework.foundation.Response;
+import com.showvars.sweetie.SweetieApp;
+import com.showvars.sweetie.foundation.Request;
+import com.showvars.sweetie.foundation.RequestMethod;
+import com.showvars.sweetie.foundation.Response;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.http.Cookie;
+import io.netty.handler.codec.http.CookieDecoder;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpChunkedInput;
@@ -19,10 +21,11 @@ import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.stream.ChunkedStream;
+import java.util.HashMap;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-//TODO: This is a most problematic place. This code must be done correctly!
 class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     private static final Logger log = Logger.getLogger(HttpServer.class.getName());
@@ -46,11 +49,26 @@ class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
         QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httprequest.getUri());
 
-        Request reuqest = new Request(RequestMethodUtil.valueOf(httprequest.getMethod().name()),
+        Request reuqest = new Request(
+                RequestMethod.valueOf(httprequest.getMethod().name()),
                 httprequest.getUri(), queryStringDecoder.path(),
-                ctx.channel().remoteAddress(), null,
-                queryStringDecoder.parameters(), null);
+                ctx.channel().remoteAddress());
 
+        reuqest.setParameters(queryStringDecoder.parameters());
+
+        String cookieString = httprequest.headers().get(HttpHeaders.Names.COOKIE);
+        if (cookieString != null) {
+            Set<Cookie> cookies = CookieDecoder.decode(cookieString);
+            HashMap<String, Cookie> cookiesMap = new HashMap<>();
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("SweeiteSession")) {
+                    cookie.getValue();
+                    continue;
+                }
+                cookiesMap.put(cookie.getName(), cookie);
+            }
+            reuqest.setCookies(cookiesMap);
+        }
         resp = server.getRouter().forward(reuqest);
 
         HttpResponse response = new DefaultHttpResponse(

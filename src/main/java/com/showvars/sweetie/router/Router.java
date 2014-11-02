@@ -1,12 +1,11 @@
-package com.sweetieframework.router;
+package com.showvars.sweetie.router;
 
-import com.sweetieframework.foundation.Request;
-import com.sweetieframework.foundation.RequestMethod;
-import com.sweetieframework.foundation.RequestMethodUtil;
-import com.sweetieframework.foundation.Response;
-import com.sweetieframework.foundation.controllers.Default404NotFoundController;
-import com.sweetieframework.foundation.controllers.DefaultExceptionController;
-import com.sweetieframework.network.HttpServer;
+import com.showvars.sweetie.foundation.Request;
+import com.showvars.sweetie.foundation.RequestMethod;
+import com.showvars.sweetie.foundation.Response;
+import com.showvars.sweetie.foundation.controllers.Default404NotFoundController;
+import com.showvars.sweetie.foundation.controllers.DefaultExceptionController;
+import com.showvars.sweetie.network.HttpServer;
 import java.io.BufferedReader;
 import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
@@ -58,7 +57,7 @@ public class Router {
 
                     }
 
-                    addRoute(RequestMethodUtil.valueOf(m.group(1)),
+                    addRoute(RequestMethod.valueOf(m.group(1)),
                             Pattern.compile(m.group(2)),
                             new Route(Class.forName(m.group(3)).getMethod(m.group(5), classes), paramlist));
 
@@ -85,7 +84,7 @@ public class Router {
                     }
                     
                     return (Response) e.getValue().getMethod().invoke(null, args);
-                } catch (Exception ex) {
+                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                     return DefaultExceptionController.process(request, ex);
                 }
             }

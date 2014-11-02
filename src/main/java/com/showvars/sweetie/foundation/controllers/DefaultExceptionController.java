@@ -1,8 +1,8 @@
-package com.sweetieframework.foundation.controllers;
+package com.showvars.sweetie.foundation.controllers;
 
-import com.sweetieframework.foundation.Controller;
-import com.sweetieframework.foundation.Request;
-import com.sweetieframework.foundation.Response;
+import com.showvars.sweetie.foundation.Controller;
+import com.showvars.sweetie.foundation.Request;
+import com.showvars.sweetie.foundation.Response;
 
 public class DefaultExceptionController extends Controller {
 

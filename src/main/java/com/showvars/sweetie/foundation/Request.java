@@ -1,10 +1,12 @@
-package com.sweetieframework.foundation;
+package com.showvars.sweetie.foundation;
 
+import io.netty.handler.codec.http.Cookie;
 import java.net.SocketAddress;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class Request {
 
@@ -12,36 +14,25 @@ public class Request {
     private String uri;
     private String path;
     private SocketAddress socketAddress;
-    private Map<String, List<String>> getParameters;
-    private Map<String, List<String>> postParameters;
-    private List<String> matches;
+    private final Map<String, List<String>> getParameters;
+    private final Map<String, List<String>> postParameters;
+    private final Map<String, String> session;
+    private final Map<String, Cookie> cookies;
 
     public Request(RequestMethod method,
             String uri,
             String path,
-            SocketAddress socketAddress,
-            List<String> matches,
-            Map<String, List<String>> getparams,
-            Map<String, List<String>> postparams) {
+            SocketAddress socketAddress) {
         this.requestMethod = method;
         this.uri = uri;
         this.path = path;
         this.socketAddress = socketAddress;
 
         this.getParameters = new HashMap<>();
-        if (getparams != null) {
-            this.getParameters.putAll(getparams);
-        }
-
         this.postParameters = new HashMap<>();
-        if (postparams != null) {
-            this.postParameters.putAll(postparams);
-        }
+        this.session = new HashMap<>();
+        this.cookies = new HashMap<>();
 
-        this.matches = new ArrayList<>();
-        if (matches != null) {
-            this.matches.addAll(matches);
-        }
     }
 
     public RequestMethod getRequestMethod() {
@@ -68,8 +59,12 @@ public class Request {
         return postParameters;
     }
 
-    public List<String> getMatches() {
-        return matches;
+    public Map<String, String> getSession() {
+        return session;
+    }
+    
+    public Map<String, Cookie> getCookies() {
+        return cookies;
     }
 
     public void setMethod(RequestMethod method) {
@@ -88,15 +83,31 @@ public class Request {
         this.socketAddress = socketAddress;
     }
 
-    public void setParameters(Map<String, List<String>> getparams) {
-        this.getParameters = getparams;
+    public void setParameters(Map<String, List<String>> getParameters) {
+        if (getParameters != null) {
+            this.getParameters.clear();
+            this.getParameters.putAll(getParameters);
+        }
     }
 
     public void setPostParameters(Map<String, List<String>> postparams) {
-        this.postParameters = postparams;
+        if (postparams != null) {
+            this.postParameters.clear();
+            this.postParameters.putAll(postparams);
+        }
+    }
+    
+    public void setSession(Map<String, String> session) {
+        if (session != null) {
+            this.session.clear();
+            this.session.putAll(session);
+        }
     }
 
-    public void setMatches(List<String> matches) {
-        this.matches = matches;
+    public void setCookies(Map<String, Cookie> cookies) {
+        if (cookies != null) {
+            this.cookies.clear();
+            this.cookies.putAll(cookies);
+        }
     }
 }

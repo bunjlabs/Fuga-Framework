@@ -1,8 +1,8 @@
-package com.sweetieframework.examples.helloworld.controllers;
+package com.showvars.sweetie.examples.helloworld.controllers;
 
-import com.sweetieframework.foundation.Controller;
-import com.sweetieframework.foundation.Request;
-import com.sweetieframework.foundation.Response;
+import com.showvars.sweetie.foundation.Controller;
+import com.showvars.sweetie.foundation.Request;
+import com.showvars.sweetie.foundation.Response;
 import java.util.List;
 import java.util.Map;
 

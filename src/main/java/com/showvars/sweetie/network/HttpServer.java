@@ -1,6 +1,6 @@
-package com.sweetieframework.network;
+package com.showvars.sweetie.network;
 
-import com.sweetieframework.SweetieApp;
+import com.showvars.sweetie.SweetieApp;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
