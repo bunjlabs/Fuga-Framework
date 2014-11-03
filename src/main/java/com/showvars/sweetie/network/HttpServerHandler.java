@@ -1,6 +1,7 @@
 package com.showvars.sweetie.network;
 
 import com.showvars.sweetie.SweetieApp;
+import com.showvars.sweetie.foundation.Context;
 import com.showvars.sweetie.foundation.Request;
 import com.showvars.sweetie.foundation.RequestMethod;
 import com.showvars.sweetie.foundation.Response;
@@ -29,12 +30,12 @@ import java.util.logging.Logger;
 class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     private static final Logger log = Logger.getLogger(HttpServer.class.getName());
-    private final SweetieApp server;
-    private HttpRequest request;
+    private final SweetieApp app;
+    private HttpRequest httprequest;
     private Response resp;
 
-    HttpServerHandler(SweetieApp server) {
-        this.server = server;
+    HttpServerHandler(SweetieApp app) {
+        this.app = app;
 
     }
 
@@ -45,16 +46,16 @@ class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) {
-        HttpRequest httprequest = this.request = (HttpRequest) msg;
+        this.httprequest = (HttpRequest) msg;
 
         QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httprequest.getUri());
 
-        Request reuqest = new Request(
+        Request request = new Request(
                 RequestMethod.valueOf(httprequest.getMethod().name()),
                 httprequest.getUri(), queryStringDecoder.path(),
                 ctx.channel().remoteAddress());
 
-        reuqest.setParameters(queryStringDecoder.parameters());
+        request.setParameters(queryStringDecoder.parameters());
 
         String cookieString = httprequest.headers().get(HttpHeaders.Names.COOKIE);
         if (cookieString != null) {
@@ -67,9 +68,11 @@ class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
                 }
                 cookiesMap.put(cookie.getName(), cookie);
             }
-            reuqest.setCookies(cookiesMap);
+            request.setCookies(cookiesMap);
         }
-        resp = server.getRouter().forward(reuqest);
+        
+        Context sctx = new Context(request, app);
+        resp = app.getRouter().forward(sctx);
 
         HttpResponse response = new DefaultHttpResponse(
                 HttpVersion.HTTP_1_1,
@@ -83,7 +86,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
             response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, resp.getContentLength());
         }
 
-        if (!HttpHeaders.isKeepAlive(request)) {
+        if (!HttpHeaders.isKeepAlive(httprequest)) {
             response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
         }
 
@@ -91,13 +94,14 @@ class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
         ctx.write(response);
 
-        ChannelFuture sendContentFuture = ctx.write(new HttpChunkedInput(
-                new ChunkedStream(resp.getStream(), 8192)),
-                ctx.newProgressivePromise());
-
+        if (resp.getStream() != null) {
+            ChannelFuture sendContentFuture = ctx.write(new HttpChunkedInput(
+                    new ChunkedStream(resp.getStream(), 8192)),
+                    ctx.newProgressivePromise());
+        }
         ChannelFuture lastContentFuture = ctx.writeAndFlush(LastHttpContent.EMPTY_LAST_CONTENT);
 
-        if (!HttpHeaders.isKeepAlive(request)) {
+        if (!HttpHeaders.isKeepAlive(httprequest)) {
             lastContentFuture.addListener(ChannelFutureListener.CLOSE);
         }
 

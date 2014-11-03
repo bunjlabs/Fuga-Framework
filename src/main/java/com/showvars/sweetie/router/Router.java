@@ -1,5 +1,6 @@
 package com.showvars.sweetie.router;
 
+import com.showvars.sweetie.foundation.Context;
 import com.showvars.sweetie.foundation.Request;
 import com.showvars.sweetie.foundation.RequestMethod;
 import com.showvars.sweetie.foundation.Response;
@@ -10,7 +11,6 @@ import java.io.BufferedReader;
 import java.io.Reader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,26 +71,33 @@ public class Router {
 
     }
 
-    public Response forward(Request request) {
+    public Response forward(Context ctx) {
         Matcher m;
-        for (Map.Entry<Pattern, Route> e : routes.get(request.getRequestMethod()).entrySet()) {
-            if ((m = e.getKey().matcher(request.getPath())).matches()) {
+        for (Map.Entry<Pattern, Route> e : routes.get(ctx.getRequest().getRequestMethod()).entrySet()) {
+            if ((m = e.getKey().matcher(ctx.getRequest().getPath())).matches()) {
                 try {
                     Object[] args = new Object[e.getValue().getParameters().size() + 1];
-                    args[0] = request;
-                    for(int i = 1; i < args.length; i++) {
+                    args[0] = ctx;
+                    for (int i = 1; i < args.length; i++) {
                         MethodParameter mp = e.getValue().getParameters().get(i - 1);
                         args[i] = mp.cast(m.group(mp.getCaptureGroup()));
                     }
-                    
+
                     return (Response) e.getValue().getMethod().invoke(null, args);
                 } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                    return DefaultExceptionController.process(request, ex);
+                    Throwable cause = ex.getCause();
+                    if (cause == null) {
+                        return DefaultExceptionController.process(ctx, ex);
+                    } else if (cause instanceof Exception) {
+                        return DefaultExceptionController.process(ctx, (Exception) cause);
+                    } else {
+                        return DefaultExceptionController.process(ctx, ex);
+                    }
                 }
             }
         }
 
-        return Default404NotFoundController.process(request);
+        return Default404NotFoundController.process(ctx);
     }
 
     private static Class getClassTypeBySimpleName(String name) throws ClassNotFoundException {

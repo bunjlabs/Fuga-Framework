@@ -2,6 +2,7 @@ package com.showvars.sweetie;
 
 import com.showvars.sweetie.network.HttpServer;
 import com.showvars.sweetie.router.Router;
+import com.showvars.sweetie.templates.TemplateEngine;
 import io.netty.handler.codec.http.Cookie;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -16,7 +17,7 @@ public class SweetieApp {
     private final SocketAddress addr;
     private final Map<UUID, HashMap<String, Cookie>> sessions;
     private HttpServer httpserver;
-    
+    private final TemplateEngine templateEngine = new TemplateEngine();
 
     private SweetieApp(SocketAddress addr) {
         this.addr = addr;

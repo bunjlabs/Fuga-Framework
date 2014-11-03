@@ -1,1 +1,0 @@
-GET     /(.*)   com.sweetieframework.examples.helloworld.controllers.HelloWorldIndexController.index(1:String)

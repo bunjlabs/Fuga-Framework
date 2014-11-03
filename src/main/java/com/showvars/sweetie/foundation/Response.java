@@ -24,7 +24,7 @@ public class Response {
     public Response(String s) {
         status = 200;
         stream = new ByteArrayInputStream(s.getBytes());
-        contentType = "text/html";  // we assume that the html will be more often
+        contentType = "text/html";  // I assume that the html will be more often
         contentLength = s.length();
     }
 
