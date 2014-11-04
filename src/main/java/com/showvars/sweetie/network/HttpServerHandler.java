@@ -74,6 +74,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
                 if (cookie.getName().equals("SWEETIESESSIONID")) {
                     Session session = app.getSession(UUID.fromString(cookie.getValue()));
                     if (session != null) {
+                        session.update();
                         request.setSession(session);
                         needNewSession = false;
                     }

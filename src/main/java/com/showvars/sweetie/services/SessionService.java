@@ -22,7 +22,7 @@ public class SessionService extends Service {
         sessions.entrySet().stream().forEach((e) -> {
             Session session = e.getValue();
             long currentTime = new Date().getTime();
-            if (currentTime - session.getCreationTime() >= session.getTimeout() * 60000) {
+            if (currentTime - session.getUpdateTime() >= session.getTimeout() * 60000) {
                 sessions.remove(e.getKey());
             }
         });

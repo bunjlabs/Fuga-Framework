@@ -5,15 +5,19 @@ import java.util.HashMap;
 
 public class Session extends HashMap<String, Object> {
 
-    private final long creationTime;
+    private long updateTime;
     private int timeout = 30; // 30 minutes
 
     public Session() {
-        creationTime = new Date().getTime();
+        updateTime = new Date().getTime();
     }
 
-    public long getCreationTime() {
-        return creationTime;
+    public long getUpdateTime() {
+        return updateTime;
+    }
+    
+    public void update() {
+        updateTime = new Date().getTime();
     }
 
     public long getTimeout() {
