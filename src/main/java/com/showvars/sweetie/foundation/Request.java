@@ -9,32 +9,39 @@ import java.util.Map;
 public class Request {
 
     private RequestMethod requestMethod;
+    private String host;
     private String uri;
     private String path;
     private SocketAddress socketAddress;
     private final Map<String, List<String>> getParameters;
     private final Map<String, List<String>> postParameters;
-    private final Map<String, String> session;
-    private final Map<String, Cookie> cookies;
+    private Session session;
+    private Cookies cookies;
 
     public Request(RequestMethod method,
+            String host,
             String uri,
             String path,
             SocketAddress socketAddress) {
         this.requestMethod = method;
+        this.host = host;
         this.uri = uri;
         this.path = path;
         this.socketAddress = socketAddress;
 
         this.getParameters = new HashMap<>();
         this.postParameters = new HashMap<>();
-        this.session = new HashMap<>();
-        this.cookies = new HashMap<>();
+        this.session = new Session();
+        this.cookies = new Cookies();
 
     }
 
     public RequestMethod getRequestMethod() {
         return requestMethod;
+    }
+
+    public String getHost() {
+        return host;
     }
 
     public String getUri() {
@@ -57,16 +64,20 @@ public class Request {
         return postParameters;
     }
 
-    public Map<String, String> getSession() {
+    public Session getSession() {
         return session;
     }
-    
-    public Map<String, Cookie> getCookies() {
+
+    public Cookies getCookies() {
         return cookies;
     }
 
     public void setMethod(RequestMethod method) {
         this.requestMethod = method;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
     }
 
     public void setUri(String uri) {
@@ -94,18 +105,12 @@ public class Request {
             this.postParameters.putAll(postparams);
         }
     }
-    
-    public void setSession(Map<String, String> session) {
-        if (session != null) {
-            this.session.clear();
-            this.session.putAll(session);
-        }
+
+    public void setSession(Session session) {
+        this.session = session;
     }
 
-    public void setCookies(Map<String, Cookie> cookies) {
-        if (cookies != null) {
-            this.cookies.clear();
-            this.cookies.putAll(cookies);
-        }
+    public void setCookies(Cookies cookies) {
+        this.cookies = cookies;
     }
 }

@@ -14,6 +14,6 @@ public class DefaultExceptionController extends Controller {
         for (StackTraceElement el : ste) {
             sb.append(el.toString()).append("\n");
         }
-        return ok("<h3>" + e.toString() + "</h3><pre>" + sb.toString() + "</pre>");
+        return ok("<code>" + e.toString() + "</code><br><pre>" + sb.toString() + "</pre>");
     }
 }

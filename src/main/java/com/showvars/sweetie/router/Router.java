@@ -49,7 +49,7 @@ public class Router {
                     String[] parameters = m.group(6) == null ? new String[0] : m.group(6).replaceAll("\\s", "").split("\\,");
                     List<MethodParameter> paramlist = new ArrayList<>();
                     Class[] classes = new Class[parameters.length + 1];
-                    classes[0] = Request.class;
+                    classes[0] = Context.class;
                     for (int i = 0; i < parameters.length; i++) {
                         String[] ss = parameters[i].split(":");
                         classes[i + 1] = getClassTypeBySimpleName(ss[1]);
@@ -64,6 +64,8 @@ public class Router {
                 } catch (ClassNotFoundException | NoSuchMethodException | SecurityException ex) {
                     log.log(Level.SEVERE, null, ex);
                 }
+            } else if (line.trim().length() <= 0) {
+                // Nothing...
             } else {
                 log.log(Level.SEVERE, "Syntax error in \"{0}\"", line);
             }

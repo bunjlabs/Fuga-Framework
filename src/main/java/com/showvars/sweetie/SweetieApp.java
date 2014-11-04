@@ -1,9 +1,10 @@
 package com.showvars.sweetie;
 
+import com.showvars.sweetie.foundation.Session;
 import com.showvars.sweetie.network.HttpServer;
 import com.showvars.sweetie.router.Router;
+import com.showvars.sweetie.templates.TemplateApi;
 import com.showvars.sweetie.templates.TemplateEngine;
-import io.netty.handler.codec.http.Cookie;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -15,9 +16,9 @@ public class SweetieApp {
 
     private final Router hmap = new Router();
     private final SocketAddress addr;
-    private final Map<UUID, HashMap<String, Cookie>> sessions;
+    private final Map<UUID, Session> sessions;
     private HttpServer httpserver;
-    private final TemplateEngine templateEngine = new TemplateEngine();
+    private final TemplateEngine templateEngine = new TemplateEngine(new TemplateApi(this));
 
     private SweetieApp(SocketAddress addr) {
         this.addr = addr;
@@ -34,8 +35,16 @@ public class SweetieApp {
         httpserver.start();
     }
     
-    public Map<String, Cookie> getSession(UUID uuid) {
+    public Session getSession(UUID uuid) {
         return sessions.get(uuid);
+    }
+    
+    public void putSession(UUID uuid, Session session) {
+        sessions.put(uuid, session);
+    }
+    
+    public TemplateEngine getTemplateEngine() {
+        return templateEngine;
     }
 
     public static SweetieApp prepare() {

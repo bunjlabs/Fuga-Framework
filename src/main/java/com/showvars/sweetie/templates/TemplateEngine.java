@@ -11,6 +11,11 @@ import java.util.Map;
 public class TemplateEngine {
 
     private final Map<String, Template> templates = new HashMap<>();
+    private final TemplateApi api;
+
+    public TemplateEngine(TemplateApi api) {
+        this.api = api;
+    }
 
     public void render(String name, PrintStream output, Context ctx, Object obj) throws TemplateNotFoundException, TemplateRenderException {
         Template tpl;
@@ -20,7 +25,7 @@ public class TemplateEngine {
             if (is == null) {
                 throw new TemplateNotFoundException();
             }
-            tpl.compile(new InputStreamReader(is));
+            tpl.compile(new InputStreamReader(is), api);
             templates.put(name, tpl);
         }
         tpl.render(output, ctx, obj);
@@ -41,12 +46,4 @@ public class TemplateEngine {
         return renderToString(name, ctx, null);
     }
 
-    private static TemplateEngine instance;
-
-    public static TemplateEngine getInstance() {
-        if (instance == null) {
-            instance = new TemplateEngine();
-        }
-        return instance;
-    }
 }

@@ -49,10 +49,10 @@ public abstract class Controller {
     }
 
     protected static String view(Context ctx, String name, Object obj) throws TemplateNotFoundException, TemplateRenderException {
-        return TemplateEngine.getInstance().renderToString(name, ctx, obj);
+        return ctx.getApp().getTemplateEngine().renderToString(name, ctx, obj);
     }
 
     protected static String view(Context ctx, String name) throws TemplateNotFoundException, TemplateRenderException {
-        return TemplateEngine.getInstance().renderToString(name, ctx);
+        return ctx.getApp().getTemplateEngine().renderToString(name, ctx);
     }
 }
