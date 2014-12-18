@@ -1,97 +1,123 @@
 package com.showvars.sweetie.templates;
 
-import com.showvars.sweetie.foundation.Context;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.Reader;
-import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.script.Invocable;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 public class Template {
 
     private static final Pattern codePattern = Pattern.compile("(\\{%([\\s\\S]*?)%\\})|(\\{#([^\\n\\r]*?)#\\})");
+    private static final Pattern namePattern = Pattern.compile("[a-zA-Z0-9_-]+");
+    private final String tid;
+    private final String templateClassName;
+    private final Map<String, String> blocks = new HashMap<>();
+    private String input;
 
-    private final ScriptEngineManager factory = new ScriptEngineManager();
-    private final ScriptEngine engine = factory.getEngineByName("JavaScript");
-
-    public void compile(String input, TemplateApi api) throws TemplateRenderException {
-        compile(new StringReader(input), api);
+    public Template(String input) {
+        this.tid = UUID.randomUUID().toString().replaceAll("-", "_");
+        this.templateClassName = "Template_" + tid;
+        this.input = input;
     }
 
-    public void compile(Reader input, TemplateApi api) throws TemplateRenderException {
+    public String compile(ScriptEngine engine) throws TemplateRenderException {
+
+        StringBuilder jsCode = new StringBuilder();
+        StringBuilder tplCode = new StringBuilder();
+
+        String extendName = "";
+
+        jsCode.append(templateClassName).append("=function(stream){this.stream=stream;};");
+        jsCode.append(templateClassName).append(".prototype.render=function(context, data){");
+
+        if (input.startsWith("@extend ")) {
+            extendName = input.substring(8, input.indexOf('\n')).trim();
+            input = input.substring(input.indexOf('\n') + 1);
+        }
+
+        jsCode.append(parseBlock(false));
+
+        jsCode.append("};");
+        for (Map.Entry<String, String> e : blocks.entrySet()) {
+            jsCode.append(templateClassName).append(".prototype.block_").append(e.getKey()).append("=function(){");
+            jsCode.append(e.getValue());
+            jsCode.append("};");
+        }
+        jsCode.append(templateClassName).append(".prototype.extend=function(context, data){");
+        jsCode.append("return '").append(extendName).append("';");
+        jsCode.append("};");
+        jsCode.append("process_").append(tid).append(" = function(stream, context, data) { ")
+                .append("var tpl = new ").append(templateClassName)
+                .append("(stream); tpl.render(context, data);")
+                .append("};");
+
         try {
-            StringBuilder b = new StringBuilder();
-            BufferedReader in = new BufferedReader(input);
-            
-            b.append("Template=function(stream){this.stream=stream;};");
-            b.append("Template.prototype.render=function(context, data){");
+            engine.eval(jsCode.toString());
+        } catch (ScriptException ex) {
+            throw new TemplateRenderException(ex.getLocalizedMessage());
+        }
+        return tid;
 
-            String line;
-            while ((line = in.readLine()) != null) {
-                if (line.trim().length() <= 0) {
-                    continue;
+    }
+
+    private String parseBlock(boolean inBlock) throws TemplateRenderException {
+        StringBuilder jsCode = new StringBuilder();
+        while (input.length() > 0) {
+            Matcher m = codePattern.matcher(input);
+            if (m.find()) {
+                String text = input.substring(0, m.start());
+                if (text.length() > 0) {
+                    text = escapeSpaces(text);
+                    jsCode.append("this.stream.print('").append(text).append("');");
                 }
-                if (codePattern.matcher(line).find()) {
-                    while (line.length() > 0) {
-                        Matcher m = codePattern.matcher(line);
-
-                        boolean finded = m.find();
-                        int matchStartIndex = finded ? m.start() : line.length();
-                        int matchLength = finded ? m.end() - m.start() : 0;
-
-                        String part = line.substring(0, matchStartIndex);
-
-                        if (part.length() > 0) {
-                            b.append("this.stream.print('").append(part).append("');");
+                if (m.group(2) != null) {
+                    String codeBlock = m.group(2).trim();
+                    if (codeBlock.startsWith("block ")) {
+                        if (inBlock) {
+                            throw new TemplateRenderException("Unexpected block start");
                         }
-
-                        line = line.substring(matchStartIndex);
-
-                        String codeBlock = line.substring(0, matchLength);
-
-                        Matcher cm = codePattern.matcher(codeBlock);
-                        if (cm.matches()) {
-                            if (cm.group(2) != null) {
-                                b.append(cm.group(2).trim());
-                            } else {
-                                b.append("this.stream.print(").append(cm.group(4).trim()).append(");");
-                            }
+                        String blockName = codeBlock.substring(6);
+                        if (!namePattern.matcher(blockName).matches()) {
+                            throw new TemplateRenderException("Disallowed block name");
                         }
-
-                        line = line.substring(matchLength);
+                        input = input.substring(m.end());
+                        blocks.put(blockName, parseBlock(true));
+                    } else if (codeBlock.startsWith("endblock")) {
+                        if (!inBlock) {
+                            throw new TemplateRenderException("Unexpected block end");
+                        }
+                        input = input.substring(m.end());
+                        return jsCode.toString();
+                    } else {
+                        jsCode.append(m.group(2).trim());
+                        input = input.substring(m.end());
                     }
-                    b.append("this.stream.println();");
                 } else {
-                    b.append("this.stream.println('").append(line).append("');");
+                    jsCode.append("this.stream.print(").append(m.group(4).trim()).append(");");
+                    input = input.substring(m.end());
+                }
+
+            } else {
+                if (input.length() > 0) {
+                    input = escapeSpaces(input);
+                    jsCode.append("this.stream.print('").append(input).append("');");
+                    input = "";
                 }
             }
-            b.append("};");
-            b.append("process = function(stream, context, data) { ")
-                    .append("var tpl = new Template(stream); tpl.render(context, data);")
-                    .append("};");
-
-            engine.put("api", api);
-            engine.put("source", b.toString());
-            engine.eval(b.toString());
-
-        } catch (IOException | ScriptException ex) {
-            throw new TemplateRenderException(ex.getLocalizedMessage());
         }
+        return jsCode.toString();
     }
 
-    public void render(PrintStream ps, Context ctx, Object obj) throws TemplateRenderException {
-        try {
-            Invocable inv = (Invocable) engine;
-            inv.invokeFunction("process", ps, ctx, obj);
-        } catch (ScriptException | NoSuchMethodException ex) {
-            throw new TemplateRenderException(ex.getLocalizedMessage());
-        }
+    private static String escapeSpaces(String input) {
+        return input.replaceAll("\\\\", "\\\\\\\\")
+                .replaceAll("\\t", "\\\\t")
+                .replaceAll("\\n", "\\\\n")
+                .replaceAll("\\r", "\\\\r")
+                .replaceAll("\\f", "\\\\f")
+                .replaceAll("\\'", "\\\\'")
+                .replaceAll("\\\"", "\\\\\""); // and it's works as needed
     }
 }

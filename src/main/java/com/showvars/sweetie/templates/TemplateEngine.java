@@ -1,34 +1,65 @@
 package com.showvars.sweetie.templates;
 
 import com.showvars.sweetie.foundation.Context;
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 public class TemplateEngine {
 
-    private final Map<String, Template> templates = new HashMap<>();
+    private static final Pattern codePattern = Pattern.compile("(\\{%([\\s\\S]*?)%\\})|(\\{#([^\\n\\r]*?)#\\})");
+
+    private final Map<String, String> templates = new HashMap<>();
     private final TemplateApi api;
+
+    private final ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 
     public TemplateEngine(TemplateApi api) {
         this.api = api;
+        engine.put("api", api);
+    }
+
+    public String compile(String input) throws TemplateRenderException {
+        return new Template(input).compile(engine);
     }
 
     public void render(String name, PrintStream output, Context ctx, Object obj) throws TemplateNotFoundException, TemplateRenderException {
-        Template tpl;
-        if ((tpl = templates.get(name)) == null) {
-            tpl = new Template();
+        String tid;
+        if ((tid = templates.get(name)) == null) {
             InputStream is = TemplateEngine.class.getResourceAsStream("/" + name);
+
             if (is == null) {
-                throw new TemplateNotFoundException();
+                throw new TemplateNotFoundException("Enable to read resource: /" + name);
             }
-            tpl.compile(new InputStreamReader(is), api);
-            templates.put(name, tpl);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            StringBuilder input = new StringBuilder();
+            String line;
+            try {
+                while ((line = reader.readLine()) != null) {
+                    input.append(line).append("\n");
+                }
+            } catch (IOException ex) {
+                throw new TemplateNotFoundException("Enable to read resource: /" + name);
+            }
+            tid = compile(input.toString());
+            templates.put(name, tid);
         }
-        tpl.render(output, ctx, obj);
+        try {
+            Invocable inv = (Invocable) engine;
+            inv.invokeFunction("process_" + tid, output, ctx, obj);
+        } catch (ScriptException | NoSuchMethodException ex) {
+            throw new TemplateRenderException(ex.getLocalizedMessage());
+        }
 
     }
 

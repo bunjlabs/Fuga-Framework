@@ -41,11 +41,11 @@ public abstract class Controller {
     }
 
     protected static Response redirect(String url) {
-        return new Response().setStatus(301);
+        return new Response().setStatus(301).setHeader("Location", url);
     }
 
-    protected static Response temporaryRedirect(String uri) {
-        return new Response().setStatus(302);
+    protected static Response temporaryRedirect(String url) {
+        return new Response().setStatus(302).setHeader("Location", url);
     }
 
     protected static String view(Context ctx, String name, Object obj) throws TemplateNotFoundException, TemplateRenderException {

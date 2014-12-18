@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class Response {
 
@@ -14,6 +16,7 @@ public class Response {
     private InputStream stream;
     private String contentType;
     private long contentLength;
+    private Map<String, String> headers = new TreeMap<>();
 
     public Response() {
         status = 200;
@@ -62,6 +65,15 @@ public class Response {
     public Response setContentLength(long contentLength) {
         this.contentLength = contentLength;
         return this;
+    }
+
+    public Response setHeader(String name, String value) {
+        headers.put(name, value);
+        return this;
+    }
+    
+    public Map<String, String> getHeaders() {
+        return headers;
     }
 
     public int getStatus() {
