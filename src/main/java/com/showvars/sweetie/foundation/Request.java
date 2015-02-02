@@ -99,11 +99,19 @@ public class Request {
         }
     }
 
+    public void updateParameters(Map<String, List<String>> postparams) {
+        this.getParameters.putAll(postparams);
+    }
+
     public void setPostParameters(Map<String, List<String>> postparams) {
         if (postparams != null) {
             this.postParameters.clear();
             this.postParameters.putAll(postparams);
         }
+    }
+
+    public void updatePostParameters(Map<String, List<String>> postparams) {
+        this.postParameters.putAll(postparams);
     }
 
     public void setSession(Session session) {
