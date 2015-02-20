@@ -14,8 +14,8 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.CookieDecoder;
 import io.netty.handler.codec.http.DefaultCookie;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.DefaultHttpResponse;
+import io.netty.handler.codec.http.DefaultLastHttpContent;
 import io.netty.handler.codec.http.HttpChunkedInput;
 import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -213,8 +213,11 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
         ctx.write(response);
 
-        ChannelFuture sendContentFuture = ctx.writeAndFlush(new HttpChunkedInput(new ChunkedStream(resp.getStream())));
+        ctx.write(new HttpChunkedInput(new ChunkedStream(resp.getStream())));
+        //ChannelFuture sendContentFuture = ctx.writeAndFlush(new HttpChunkedInput(new ChunkedStream(resp.getStream())));
 
+        LastHttpContent fs = new DefaultLastHttpContent();
+        ChannelFuture sendContentFuture = ctx.writeAndFlush(fs);
         if (!HttpHeaders.isKeepAlive(httprequest)) {
             sendContentFuture.addListener(ChannelFutureListener.CLOSE);
         }

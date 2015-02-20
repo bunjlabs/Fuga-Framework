@@ -87,6 +87,7 @@ public class Router {
 
                     return (Response) e.getValue().getMethod().invoke(null, args);
                 } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                    ex.getCause().printStackTrace();
                     Throwable cause = ex.getCause();
                     if (cause == null) {
                         return DefaultExceptionController.process(ctx, ex);

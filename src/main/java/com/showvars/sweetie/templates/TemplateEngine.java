@@ -29,17 +29,16 @@ public class TemplateEngine {
         engine.put("api", api);
     }
 
-    public String compile(String input) throws TemplateRenderException {
-        return new Template(input).compile(engine);
-    }
-
-    public void render(String name, PrintStream output, Context ctx, Object obj) throws TemplateNotFoundException, TemplateRenderException {
+    //public String compile(String input) throws TemplateRenderException {
+    //    return new Template(this, input).compile(engine);
+    //}
+    public String compile(String name) throws TemplateNotFoundException, TemplateRenderException {
         String tid;
         if ((tid = templates.get(name)) == null) {
-            InputStream is = TemplateEngine.class.getResourceAsStream("/" + name);
+            InputStream is = TemplateEngine.class.getResourceAsStream("/views/" + name);
 
             if (is == null) {
-                throw new TemplateNotFoundException("Enable to read resource: /" + name);
+                throw new TemplateNotFoundException("Enable to read resource: /views/" + name);
             }
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             StringBuilder input = new StringBuilder();
@@ -49,11 +48,20 @@ public class TemplateEngine {
                     input.append(line).append("\n");
                 }
             } catch (IOException ex) {
-                throw new TemplateNotFoundException("Enable to read resource: /" + name);
+                throw new TemplateNotFoundException("Enable to read resource: /views/" + name);
             }
-            tid = compile(input.toString());
+            tid = new Template(this, input.toString()).compile(engine); //compile(input.toString());
             templates.put(name, tid);
         }
+        return tid;
+    }
+
+    public String getTid(String name) {
+        return templates.get(name);
+    }
+
+    public void render(String name, PrintStream output, Context ctx, Object obj) throws TemplateNotFoundException, TemplateRenderException {
+        String tid = compile(name);
         try {
             Invocable inv = (Invocable) engine;
             inv.invokeFunction("process_" + tid, output, ctx, obj);
