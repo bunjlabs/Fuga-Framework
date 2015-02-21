@@ -1,13 +1,8 @@
 package com.showvars.sweetie.templates;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.script.ScriptEngine;
@@ -23,11 +18,15 @@ public class Template {
     private final TemplateEngine templateEngine;
     private String input;
 
-    public Template(TemplateEngine templateEngine, String input) {
-        this.tid = UUID.randomUUID().toString().replaceAll("-", "_");
+    public Template(TemplateEngine templateEngine, String tid, String input) {
+        this.tid = tid; //UUID.randomUUID().toString().replaceAll("-", "_");
         this.templateClassName = "Template_" + tid;
         this.templateEngine = templateEngine;
         this.input = input;
+    }
+    
+    public String getTid() {
+        return tid;
     }
 
     public String compile(ScriptEngine engine) throws TemplateRenderException, TemplateNotFoundException {
@@ -46,7 +45,7 @@ public class Template {
 
         jsCode.append(templateClassName).append("=function(stream){this.stream=stream;};");
 
-        jsCode.append(templateClassName).append(".prototype.render=function(context,data){");
+        jsCode.append(templateClassName).append(".prototype.render=function(context,data,api){");
         jsCode.append(parseBlock(false));
         jsCode.append("};");
 
@@ -55,26 +54,16 @@ public class Template {
         }
 
         for (Map.Entry<String, String> e : blocks.entrySet()) {
-            jsCode.append(templateClassName).append(".prototype.block_").append(e.getKey()).append("=function(){");
+            jsCode.append(templateClassName).append(".prototype.block_").append(e.getKey()).append("=function(context,data,api){");
             jsCode.append(e.getValue());
             jsCode.append("};");
         }
 
-        //jsCode.append(templateClassName).append(".prototype.extend=function(context,data){");
-        //jsCode.append("return '").append(extendClassName).append("';");
-        //jsCode.append("};");
-        jsCode.append("process_").append(tid).append("=function(stream,context,data) { ")
+        jsCode.append("process_").append(tid).append("=function(stream,context,data,api) { ")
                 .append("var tpl=new ").append(templateClassName)
-                .append("(stream);tpl.render(context, data);")
+                .append("(stream);tpl.render(context,data,api);")
                 .append("};");
 
-        /*ry {
-         BufferedOutputStream b = new BufferedOutputStream(new FileOutputStream(templateClassName + ".html"));
-         b.write(jsCode.toString().getBytes());
-         b.close();
-         } catch (IOException ex) {
-         throw new TemplateRenderException(ex.getLocalizedMessage());
-         }*/
         try {
             engine.eval(jsCode.toString());
         } catch (ScriptException ex) {
@@ -106,7 +95,7 @@ public class Template {
                         }
                         input = input.substring(m.end());
                         blocks.put(blockName, parseBlock(true));
-                        jsCode.append("this.block_").append(blockName).append("();");
+                        jsCode.append("this.block_").append(blockName).append("(context,data,api);");
                     } else if (codeBlock.startsWith("endblock")) {
                         if (!inBlock) {
                             throw new TemplateRenderException("Unexpected block end");
@@ -141,5 +130,9 @@ public class Template {
                 .replaceAll("\\f", "\\\\f")
                 .replaceAll("\\'", "\\\\'")
                 .replaceAll("\\\"", "\\\\\""); // and it's works as needed
+    }
+
+    public static String generateTid() {
+        return UUID.randomUUID().toString().replaceAll("-", "_");
     }
 }

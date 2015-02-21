@@ -1,14 +1,17 @@
 package com.showvars.sweetie.router;
 
 import com.showvars.sweetie.foundation.Context;
-import com.showvars.sweetie.foundation.Request;
 import com.showvars.sweetie.foundation.RequestMethod;
 import com.showvars.sweetie.foundation.Response;
 import com.showvars.sweetie.foundation.controllers.Default404NotFoundController;
 import com.showvars.sweetie.foundation.controllers.DefaultExceptionController;
 import com.showvars.sweetie.network.HttpServer;
 import java.io.BufferedReader;
-import java.io.Reader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,8 +42,20 @@ public class Router {
         routes.get(requestMethod).put(pattern, route);
     }
 
-    public void load(Reader r) {
-        BufferedReader br = new BufferedReader(r);
+    public void load(File file) throws FileNotFoundException {
+        load(new FileInputStream(file));
+    }
+
+    public void load(String path) throws FileNotFoundException {
+        load(new FileInputStream(path));
+    }
+
+    public void loadFromResources(String path) {
+        load(Router.class.getResourceAsStream(path));
+    }
+
+    public void load(InputStream input) {
+        BufferedReader br = new BufferedReader(new InputStreamReader(input));
 
         br.lines().forEach((String line) -> {
             Matcher m;

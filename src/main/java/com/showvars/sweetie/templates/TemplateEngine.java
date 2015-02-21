@@ -1,15 +1,17 @@
 package com.showvars.sweetie.templates;
 
+import com.showvars.sweetie.SweetieApp;
+import com.showvars.sweetie.configuration.SweetieConfiguration;
 import com.showvars.sweetie.foundation.Context;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -17,54 +19,61 @@ import javax.script.ScriptException;
 
 public class TemplateEngine {
 
-    private static final Pattern codePattern = Pattern.compile("(\\{%([\\s\\S]*?)%\\})|(\\{#([^\\n\\r]*?)#\\})");
-
-    private final Map<String, String> templates = new HashMap<>();
-    private final TemplateApi api;
-
+    private final Map<String, Template> templates = new HashMap<>();
     private final ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
 
-    public TemplateEngine(TemplateApi api) {
-        this.api = api;
-        engine.put("api", api);
+    private final SweetieApp app;
+    private final SweetieConfiguration config;
+
+    public TemplateEngine(SweetieApp app) {
+        this.app = app;
+        config = app.getConfiguration();
     }
 
-    //public String compile(String input) throws TemplateRenderException {
-    //    return new Template(this, input).compile(engine);
-    //}
     public String compile(String name) throws TemplateNotFoundException, TemplateRenderException {
-        String tid;
-        if ((tid = templates.get(name)) == null) {
-            InputStream is = TemplateEngine.class.getResourceAsStream("/views/" + name);
-
-            if (is == null) {
-                throw new TemplateNotFoundException("Enable to read resource: /views/" + name);
-            }
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            StringBuilder input = new StringBuilder();
-            String line;
-            try {
-                while ((line = reader.readLine()) != null) {
-                    input.append(line).append("\n");
-                }
-            } catch (IOException ex) {
-                throw new TemplateNotFoundException("Enable to read resource: /views/" + name);
-            }
-            tid = new Template(this, input.toString()).compile(engine); //compile(input.toString());
-            templates.put(name, tid);
+        if (templates.containsKey(name) && !config.getBoolean("sweetie.templates.alwaysrecompile", false)) {
+            return templates.get(name).getTid();
         }
-        return tid;
-    }
 
-    public String getTid(String name) {
-        return templates.get(name);
+        InputStream is;
+        try {
+            if (config.getBoolean("sweetie.templates.loadfromresources", true)) {
+                is = TemplateEngine.class.getResourceAsStream("/" + config.get("sweetie.templates.path", "") + "/" + name);
+            } else {
+                is = new FileInputStream(name);
+            }
+        } catch (IOException ex) {
+            throw new TemplateNotFoundException("Unable to load: " + name);
+        }
+        if (is == null) {
+            throw new TemplateNotFoundException("Unable to load: " + name);
+        }
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+        StringBuilder input = new StringBuilder();
+        String line;
+        try {
+            while ((line = reader.readLine()) != null) {
+                input.append(line).append("\n");
+            }
+        } catch (IOException ex) {
+            throw new TemplateNotFoundException("Unable to load: " + name);
+        }
+        String tid
+                = config.getBoolean("sweetie.templates.alwaysrecompile", false)
+                && templates.containsKey(name)
+                        ? templates.get(name).getTid() : Template.generateTid();
+        Template t = new Template(this, tid, input.toString());
+        t.compile(engine);
+        templates.put(name, t);
+
+        return tid;
     }
 
     public void render(String name, PrintStream output, Context ctx, Object obj) throws TemplateNotFoundException, TemplateRenderException {
         String tid = compile(name);
         try {
             Invocable inv = (Invocable) engine;
-            inv.invokeFunction("process_" + tid, output, ctx, obj);
+            inv.invokeFunction("process_" + tid, output, ctx, obj, new TemplateApi(app, ctx));
         } catch (ScriptException | NoSuchMethodException ex) {
             throw new TemplateRenderException(ex.getLocalizedMessage());
         }
