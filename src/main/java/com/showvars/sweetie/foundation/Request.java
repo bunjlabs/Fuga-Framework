@@ -31,7 +31,7 @@ public class Request {
 
         this.getParameters = new HashMap<>();
         this.postParameters = new HashMap<>();
-        this.session = new Session();
+        this.session = new Session(null);
         this.cookies = new Cookies();
 
     }

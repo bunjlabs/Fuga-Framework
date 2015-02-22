@@ -58,6 +58,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
     private Response resp;
     private HttpPostRequestDecoder decoder;
     private Collection<Cookie> cookiesUpload;
+    private String lastSessionId = "";
 
     HttpServerHandler(SweetieApp app) {
         this.app = app;
@@ -88,37 +89,49 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
             request.setParameters(queryStringDecoder.parameters());
 
-            boolean needNewSession = true;
-
             Cookies cookiesDownload = new Cookies();
             cookiesUpload = new ArrayList<>();
 
             String cookieString = httprequest.headers().get(HttpHeaders.Names.COOKIE);
+            List<String> sessions = new ArrayList<>();
             if (cookieString != null) {
                 for (Cookie cookie : CookieDecoder.decode(cookieString)) {
                     if (cookie.getName().equals("SWEETIESESSIONID")) {
-                        Session session = app.getSession(UUID.fromString(cookie.getValue()));
-                        if (session != null) {
-                            session.update();
-                            request.setSession(session);
-                            needNewSession = false;
-                        }
+                        sessions.add(cookie.getValue());
                         continue;
                     }
                     cookiesDownload.put(cookie.getName(), cookie);
                 }
-
             }
             request.setCookies(cookiesDownload);
-
-            if (needNewSession) {
-                Session session = new Session();
-                UUID sessionId = UUID.randomUUID();
-
-                app.putSession(sessionId, session);
+            if (!lastSessionId.isEmpty()) {
+                sessions.add(lastSessionId);
+            }
+            Session session = null;
+            for (String cookie : sessions) {
+                Session sessionTmp = app.getSession(UUID.fromString(cookie));
+                if (sessionTmp != null) {
+                    if (session != null) {
+                        if (session.getUpdateTime() < sessionTmp.getUpdateTime()) {
+                            session = sessionTmp;
+                        }
+                    } else {
+                        session = sessionTmp;
+                    }
+                }
+            }
+            if (session != null) {
                 request.setSession(session);
+                lastSessionId = session.getSessionId().toString();
+                cookiesUpload.add(new DefaultCookie("SWEETIESESSIONID", session.getSessionId().toString()));
+            } else {
+                session = new Session(UUID.randomUUID());
 
-                cookiesUpload.add(new DefaultCookie("SWEETIESESSIONID", sessionId.toString()));
+                app.putSession(session.getSessionId(), session);
+                request.setSession(session);
+                lastSessionId = session.getSessionId().toString();
+                
+                cookiesUpload.add(new DefaultCookie("SWEETIESESSIONID", session.getSessionId().toString()));
             }
             if (httprequest.getMethod().equals(HttpMethod.GET)) {
                 writeResponse(ctx, msg);
@@ -207,15 +220,18 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
         if (HttpHeaders.isKeepAlive(httprequest)) {
             response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+        } else {
+            response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
         }
 
         response.headers().set(HttpHeaders.Names.SERVER, "Sweetie/0.0.1.Alpha"); // how it's beautiful!
 
         ctx.write(response);
 
-        ctx.write(new HttpChunkedInput(new ChunkedStream(resp.getStream())));
-        //ChannelFuture sendContentFuture = ctx.writeAndFlush(new HttpChunkedInput(new ChunkedStream(resp.getStream())));
-
+        if (resp.getStream() != null) {
+            ctx.write(new HttpChunkedInput(new ChunkedStream(resp.getStream())));
+            //ChannelFuture sendContentFuture = ctx.writeAndFlush(new HttpChunkedInput(new ChunkedStream(resp.getStream())));
+        }
         LastHttpContent fs = new DefaultLastHttpContent();
         ChannelFuture sendContentFuture = ctx.writeAndFlush(fs);
         if (!HttpHeaders.isKeepAlive(httprequest)) {
