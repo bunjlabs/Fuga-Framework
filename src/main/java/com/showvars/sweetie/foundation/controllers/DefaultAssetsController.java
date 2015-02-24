@@ -11,14 +11,17 @@ import java.net.URL;
 
 public class DefaultAssetsController extends Controller {
 
-
     public static Response get(Context ctx, String path) {
         URL u = DefaultAssetsController.class.getResource("/assets/" + path);
         if (u == null) {
             return Default404NotFoundController.process(ctx);
         }
-
-        File asset = new File(DefaultAssetsController.class.getResource("/assets/" + path).getFile());
+        File asset;
+        if (ctx.getApp().getConfiguration().getBoolean("sweetie.resources.external", false)) {
+            asset = new File(ctx.getApp().getConfiguration().get("sweetie.resources.path", ".") + "/assets/" + path);
+        } else {
+            asset = new File(DefaultAssetsController.class.getResource("/assets/" + path).getFile());
+        }
         String mime = MimeTypeUtils.getMimeTypeByExt(asset.getName().substring(asset.getName().lastIndexOf('.') + 1));
         try {
             return ok(new FileInputStream(asset))

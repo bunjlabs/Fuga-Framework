@@ -5,6 +5,7 @@ import com.showvars.sweetie.configuration.SweetieConfiguration;
 import com.showvars.sweetie.foundation.Context;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,10 +38,10 @@ public class TemplateEngine {
 
         InputStream is;
         try {
-            if (config.getBoolean("sweetie.templates.loadfromresources", true)) {
-                is = TemplateEngine.class.getResourceAsStream("/" + config.get("sweetie.templates.path", "") + "/" + name);
+            if (config.getBoolean("sweetie.resources.external", false)) {
+                is = new FileInputStream(config.get("sweetie.resources.path", ".") + File.separator + "views" + File.separator + name);
             } else {
-                is = new FileInputStream(name);
+                is = TemplateEngine.class.getResourceAsStream("/views/" + name);
             }
         } catch (IOException ex) {
             throw new TemplateNotFoundException("Unable to load: " + name);
