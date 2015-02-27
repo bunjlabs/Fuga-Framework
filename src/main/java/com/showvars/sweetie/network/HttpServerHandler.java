@@ -6,7 +6,7 @@ import com.showvars.sweetie.foundation.Cookies;
 import com.showvars.sweetie.foundation.Request;
 import com.showvars.sweetie.foundation.RequestMethod;
 import com.showvars.sweetie.foundation.Response;
-import com.showvars.sweetie.foundation.Session;
+import com.showvars.sweetie.sessions.Session;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -96,15 +96,15 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             List<String> sessions = new ArrayList<>();
             if (cookieString != null) {
                 for (Cookie cookie : CookieDecoder.decode(cookieString)) {
-                    if (cookie.getName().equals("SWEETIESESSIONID")) {
+                    /*if (cookie.getName().equals("SWEETIESESSIONID")) {
                         sessions.add(cookie.getValue());
                         continue;
-                    }
+                    }*/
                     cookiesDownload.put(cookie.getName(), cookie);
                 }
             }
             request.setCookies(cookiesDownload);
-            if (!lastSessionId.isEmpty()) {
+            /*if (!lastSessionId.isEmpty()) {
                 sessions.add(lastSessionId);
             }
             Session session = null;
@@ -132,7 +132,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                 lastSessionId = session.getSessionId().toString();
                 
                 cookiesUpload.add(new DefaultCookie("SWEETIESESSIONID", session.getSessionId().toString()));
-            }
+            }*/
             if (httprequest.getMethod().equals(HttpMethod.GET)) {
                 writeResponse(ctx, msg);
                 reset();
@@ -209,11 +209,23 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
         response.headers().set(HttpHeaders.Names.TRANSFER_ENCODING, HttpHeaders.Values.CHUNKED);
         response.headers().set(HttpHeaders.Names.CONTENT_TYPE, resp != null ? resp.getContentType() : "text/plain");
-        for (Map.Entry<String, String> e : resp.getHeaders().entrySet()) {
+        
+        resp.getHeaders().entrySet().stream().forEach((e) -> {
             response.headers().set(e.getKey(), e.getValue());
+        });
+        
+        sctx.getRequest().getCookies().values().stream().forEach((c) -> {
+            cookiesUpload.add(c);
+        });
+        
+        Session session;
+        if((session = sctx.getSession()) != null) {
+            cookiesUpload.add(new DefaultCookie("SWEETIESESSIONID", session.getSessionId().toString()));
         }
+        
         response.headers().set(HttpHeaders.Names.SET_COOKIE, ServerCookieEncoder.encode(cookiesUpload));
-
+        //response.headers().set(HttpHeaders.Names.SET_COOKIE, ServerCookieEncoder.encode(sctx.getRequest().getCookies()));
+        
         if (resp.getContentLength() >= 0) {
             response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, resp.getContentLength());
         }

@@ -1,17 +1,17 @@
 package com.showvars.sweetie;
 
 import com.showvars.sweetie.configuration.SweetieConfiguration;
-import com.showvars.sweetie.foundation.Session;
+import com.showvars.sweetie.sessions.Session;
 import com.showvars.sweetie.network.HttpServer;
 import com.showvars.sweetie.router.Router;
 import com.showvars.sweetie.services.ServiceManager;
-import com.showvars.sweetie.services.SessionService;
+import com.showvars.sweetie.sessions.SessionManager;
+import com.showvars.sweetie.sessions.SessionService;
 import com.showvars.sweetie.templates.TemplateEngine;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class SweetieApp {
@@ -19,7 +19,7 @@ public class SweetieApp {
     private final SweetieConfiguration config;
     private final Router hmap = new Router();
     private final SocketAddress addr;
-    private final Map<UUID, Session> sessions;
+    private final SessionManager sessionManager;
     private final HttpServer httpserver;
     private final TemplateEngine templateEngine;
     private final ServiceManager serviceManager;
@@ -28,7 +28,7 @@ public class SweetieApp {
     private SweetieApp() {
         this.config = new SweetieConfiguration();
         this.addr = new InetSocketAddress(config.get("sweetie.http.bindhost", "localhost"), config.getInt("sweetie.http.bindport", 8080));
-        this.sessions = new HashMap<>();
+        this.sessionManager = new SessionManager(this);
         this.httpserver = new HttpServer(addr, this);
         this.templateEngine = new TemplateEngine(this);
         this.serviceManager = new ServiceManager(this);
@@ -50,16 +50,8 @@ public class SweetieApp {
         return serviceManager;
     }
 
-    public Session getSession(UUID uuid) {
-        return sessions.get(uuid);
-    }
-
-    public Map<UUID, Session> getSessions() {
-        return sessions;
-    }
-
-    public void putSession(UUID uuid, Session session) {
-        sessions.put(uuid, session);
+    public SessionManager getSessionManager() {
+        return sessionManager;
     }
 
     public Object getObject(String name) {

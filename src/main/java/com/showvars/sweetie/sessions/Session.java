@@ -1,4 +1,4 @@
-package com.showvars.sweetie.foundation;
+package com.showvars.sweetie.sessions;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -58,9 +58,6 @@ public class Session extends HashMap<String, Object> {
         return ivalue.equals(value);
     }
 
-    /**
-     * @return the sessionId
-     */
     public UUID getSessionId() {
         return sessionId;
     }

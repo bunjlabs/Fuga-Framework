@@ -83,16 +83,16 @@ public abstract class Controller {
         
         public static String generateFormId(Context ctx, String formName) {
             String fid = UUID.randomUUID().toString();
-            ctx.getRequest().getSession().put("__formid__" + formName, fid);
+            ctx.getSession().put("__formid__" + formName, fid);
             return fid;
         }
         
         public static boolean testFormId(Context ctx, String formName, String fid) {
-            Object lastfid = ctx.getRequest().getSession().get("__formid__" + formName);
+            Object lastfid = ctx.getSession().get("__formid__" + formName);
             if (lastfid == null) {
                 return false;
             }
-            ctx.getRequest().getSession().remove("__formid__" + formName);
+            ctx.getSession().remove("__formid__" + formName);
             return fid.equals((String) lastfid);
         }
     }
