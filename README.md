@@ -1,12 +1,13 @@
 Sweetie
 =======
 
-Маленький Java MVC веб-фреймворк для больших задач.
+Small Java Web Framework for big projects.
 
 
-## Установка
+## Installation
 
-Для начала использования фреймворка Sweetie необходимо загрузить и импортировать основной проект в вашу IDE и в кофигурационном файле `pom.xml` добавить следующую зависимость maven:
+First of all whe need to download and import Sweetie Framework in your IDE, create new maven project and add dependence in `pom.xml`:
+
 ```
 <dependency>
   <groupId>${project.groupId}</groupId>
@@ -15,12 +16,13 @@ Sweetie
 </dependency>
 ```
 
-## Использование
+## Using
 
-Каждое приложение как минимум должно содержать в себе главный класс запускающий приложение, контроллер и файл маршрутов.
+Every web application must contain at least main class, one controller and routes map.
 
-Создадим простейший контроллер, возвращающий каждому клиенту строку "Привет мир!":
-~~~
+Let's create simple cotroller thar returns `Hello world!` for every client:
+
+```
 package com.example.controllers;
 
 import com.showvars.sweetie.foundation.Context;
@@ -30,18 +32,21 @@ import com.showvars.sweetie.foundation.Response;
 public class HelloWorldController extends Controller {
 
     public static Response index(Context ctx) throws Exception {
-        return ok("Привет мир!");
+        return ok("Hello world!");
     }
 
 }
-~~~
+```
 
-И забиндим этот контроллер на любой запрос от пользователя в списке маршрутов. Создадим файл с `helloworld.routesmap` в папке `resources/routes/` со следующим содержимым:
+Now we need to add this controller to routes map. Create file `helloworld.routesmap` in `resources/routes/` and add this:
+
 ```
 GET     /   com.example.controllers.HelloWorldController.index()
 ```
 
-Теперь запустим наше приложение. Для этого создадим главный класс примерно с таким содержимым:
+
+Create main class:
+
 ```
 package com.example;
 
@@ -59,4 +64,4 @@ public class HelloWorldApp {
 }
 ```
 
-Компилируем и запускаем. Теперь, если ввести в браузере адрес `http://localhost:8080/`, то на экран выведится наше "Привет мир!".
+Compile and run. After that open link `http://localhost:8080/` in your browser where you can see Hello world!.
