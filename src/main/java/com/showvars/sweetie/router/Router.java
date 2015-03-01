@@ -79,7 +79,7 @@ public class Router {
                 } catch (ClassNotFoundException | NoSuchMethodException | SecurityException ex) {
                     log.log(Level.SEVERE, null, ex);
                 }
-            } else if (line.trim().length() <= 0) {
+            } else if (line.trim().length() <= 0 || line.trim().startsWith("#")) {
                 // Nothing...
             } else {
                 log.log(Level.SEVERE, "Syntax error in \"{0}\"", line);
