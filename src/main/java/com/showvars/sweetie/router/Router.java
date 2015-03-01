@@ -30,7 +30,7 @@ public class Router {
     private final Map<RequestMethod, Map<Pattern, Route>> routes = new TreeMap<>();
 
     private final Pattern routeMapPattern = Pattern.compile(
-            "^(GET|POST|PUT|DELETE|HEAD)\\s+(\\S+)\\s+(\\w+(\\.\\w+)+)\\.(\\w+)\\(((\\d+\\:\\w+)(\\,\\s*(\\d+\\:\\w+))*)?\\)");
+            "^(GET|POST|PUT|DELETE|HEAD|OPTIONS)\\s+(\\S+)\\s+(\\w+(\\.\\w+)+)\\.(\\w+)\\(((\\d+\\:\\w+)(\\,\\s*(\\d+\\:\\w+))*)?\\)");
 
     public Router() {
         for (RequestMethod rm : RequestMethod.values()) {

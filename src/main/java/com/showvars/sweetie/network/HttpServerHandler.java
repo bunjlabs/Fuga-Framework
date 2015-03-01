@@ -44,7 +44,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -96,43 +95,11 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             List<String> sessions = new ArrayList<>();
             if (cookieString != null) {
                 for (Cookie cookie : CookieDecoder.decode(cookieString)) {
-                    /*if (cookie.getName().equals("SWEETIESESSIONID")) {
-                        sessions.add(cookie.getValue());
-                        continue;
-                    }*/
                     cookiesDownload.put(cookie.getName(), cookie);
                 }
             }
             request.setCookies(cookiesDownload);
-            /*if (!lastSessionId.isEmpty()) {
-                sessions.add(lastSessionId);
-            }
-            Session session = null;
-            for (String cookie : sessions) {
-                Session sessionTmp = app.getSession(UUID.fromString(cookie));
-                if (sessionTmp != null) {
-                    if (session != null) {
-                        if (session.getUpdateTime() < sessionTmp.getUpdateTime()) {
-                            session = sessionTmp;
-                        }
-                    } else {
-                        session = sessionTmp;
-                    }
-                }
-            }
-            if (session != null) {
-                request.setSession(session);
-                lastSessionId = session.getSessionId().toString();
-                cookiesUpload.add(new DefaultCookie("SWEETIESESSIONID", session.getSessionId().toString()));
-            } else {
-                session = new Session(UUID.randomUUID());
 
-                app.putSession(session.getSessionId(), session);
-                request.setSession(session);
-                lastSessionId = session.getSessionId().toString();
-                
-                cookiesUpload.add(new DefaultCookie("SWEETIESESSIONID", session.getSessionId().toString()));
-            }*/
             if (httprequest.getMethod().equals(HttpMethod.GET)) {
                 writeResponse(ctx, msg);
                 reset();
@@ -224,7 +191,6 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
         }
         
         response.headers().set(HttpHeaders.Names.SET_COOKIE, ServerCookieEncoder.encode(cookiesUpload));
-        //response.headers().set(HttpHeaders.Names.SET_COOKIE, ServerCookieEncoder.encode(sctx.getRequest().getCookies()));
         
         if (resp.getContentLength() >= 0) {
             response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, resp.getContentLength());
@@ -242,7 +208,6 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
         if (resp.getStream() != null) {
             ctx.write(new HttpChunkedInput(new ChunkedStream(resp.getStream())));
-            //ChannelFuture sendContentFuture = ctx.writeAndFlush(new HttpChunkedInput(new ChunkedStream(resp.getStream())));
         }
         LastHttpContent fs = new DefaultLastHttpContent();
         ChannelFuture sendContentFuture = ctx.writeAndFlush(fs);
