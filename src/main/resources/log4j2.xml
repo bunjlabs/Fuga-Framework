@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" name="Sweetie" packages="">
+    <Appenders>
+        <File name="DebugFile" fileName="logs/debug.log">
+            <PatternLayout>
+                <Pattern>%d %level %c{1} - %m%n</Pattern>
+            </PatternLayout>
+        </File>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout>
+                <Pattern>%d{HH:mm:ss.SSS} %level %c{1} - %m%n</Pattern>
+            </PatternLayout>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="debug">
+            <AppenderRef ref="Console" level="info" />
+            <AppenderRef ref="DebugFile"/>
+        </Root>
+    </Loggers>
+</Configuration>

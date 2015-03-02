@@ -6,22 +6,33 @@ import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class HttpServer {
 
-    private static final Logger log = Logger.getLogger(HttpServer.class.getName());
+    private static final Logger log = LogManager.getLogger(HttpServer.class);
     private final SocketAddress addr;
     private final SweetieApp server;
- 
+
     public HttpServer(SocketAddress addr, SweetieApp server) {
         this.addr = addr;
         this.server = server;
     }
-    
+
     public void start() throws Exception {
-        log.info("Starting up HTTP server");
+        if (addr instanceof InetSocketAddress) {
+            InetSocketAddress inetAddr = (InetSocketAddress) addr;
+            log.info("Starting up HTTP server at {}{}{}/",
+                    "http://",
+                    inetAddr.getHostString(),
+                    inetAddr.getPort() == 80 ? "" : ":" + inetAddr.getPort());
+        } else {
+            log.info("Starting up HTTP server");
+        }
+
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {

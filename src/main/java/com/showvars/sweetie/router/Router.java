@@ -5,11 +5,11 @@ import com.showvars.sweetie.foundation.RequestMethod;
 import com.showvars.sweetie.foundation.Response;
 import com.showvars.sweetie.foundation.controllers.Default404NotFoundController;
 import com.showvars.sweetie.foundation.controllers.DefaultExceptionController;
-import com.showvars.sweetie.network.HttpServer;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
@@ -18,14 +18,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Router {
 
-    private static final Logger log = Logger.getLogger(HttpServer.class.getName());
+    private static final Logger log = LogManager.getLogger(Router.class);
 
     private final Map<RequestMethod, Map<Pattern, Route>> routes = new TreeMap<>();
 
@@ -42,19 +42,37 @@ public class Router {
         routes.get(requestMethod).put(pattern, route);
     }
 
-    public void load(File file) throws FileNotFoundException {
-        load(new FileInputStream(file));
+    public void load(File file) {
+        try {
+            load(new FileInputStream(file));
+            log.info("Routes loaded from: {}", file.getPath());
+        } catch (FileNotFoundException ex) {
+            log.catching(ex);
+        }
     }
 
-    public void load(String path) throws FileNotFoundException {
-        load(new FileInputStream(path));
+    public void load(String path) {
+        try {
+            load(new FileInputStream(path));
+            log.info("Routes loaded from: {}", path);
+        } catch (FileNotFoundException ex) {
+            log.catching(ex);
+        }
     }
 
     public void loadFromResources(String path) {
-        load(Router.class.getResourceAsStream(path));
+        try {
+            load(Router.class.getResourceAsStream(path));
+            log.info("Routes loaded from resources: {}", path);
+        } catch (NullPointerException ex) {
+            log.catching(ex);
+        }
     }
 
-    public void load(InputStream input) {
+    public void load(InputStream input) throws NullPointerException {
+        if (input == null) {
+            throw new NullPointerException();
+        }
         BufferedReader br = new BufferedReader(new InputStreamReader(input));
 
         br.lines().forEach((String line) -> {
@@ -77,12 +95,12 @@ public class Router {
                             new Route(Class.forName(m.group(3)).getMethod(m.group(5), classes), paramlist));
 
                 } catch (ClassNotFoundException | NoSuchMethodException | SecurityException ex) {
-                    log.log(Level.SEVERE, null, ex);
+                    log.catching(ex);
                 }
             } else if (line.trim().length() <= 0 || line.trim().startsWith("#")) {
                 // Nothing...
             } else {
-                log.log(Level.SEVERE, "Syntax error in \"{0}\"", line);
+                log.error("Syntax error in {}", line);
             }
         });
 
@@ -121,8 +139,10 @@ public class Router {
     private static Class getClassTypeBySimpleName(String name) throws ClassNotFoundException {
         switch (name) {
             case "String":
+            case "string":
                 return String.class;
             case "int":
+            case "integer":
                 return int.class;
             case "long":
                 return long.class;

@@ -5,25 +5,49 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class SweetieConfiguration {
 
+    private static final Logger log = LogManager.getLogger(SweetieConfiguration.class);
+
     private final Properties p = new Properties();
 
-    public void load(InputStream input) throws IOException {
-        p.load(input);
+    public void load(InputStream input) {
+        try {
+            p.load(input);
+            log.info("Configuration loaded from stream");
+        } catch (IOException ex) {
+            log.catching(ex);
+        }
     }
 
-    public void load(File file) throws IOException {
-        load(new FileInputStream(file));
+    public void load(File file) {
+        try {
+            p.load(new FileInputStream(file));
+            log.info("Configuration loaded from: {}", file.getPath());
+        } catch (IOException ex) {
+            log.catching(ex);
+        }
     }
 
-    public void load(String path) throws IOException {
-        load(new FileInputStream(path));
+    public void load(String path) {
+        try {
+            p.load(new FileInputStream(path));
+            log.info("Configuration loaded from: {}", path);
+        } catch (IOException ex) {
+            log.catching(ex);
+        }
     }
 
-    public void loadFromResoures(String path) throws IOException {
-        load(SweetieConfiguration.class.getResourceAsStream("/" + path));
+    public void loadFromResoures(String path) {
+        try {
+            p.load(SweetieConfiguration.class.getResourceAsStream("/" + path));
+            log.info("Configuration loaded from resources: {}", "/" + path);
+        } catch (IOException ex) {
+            log.catching(ex);
+        }
     }
 
     public void set(String name, String value) {
