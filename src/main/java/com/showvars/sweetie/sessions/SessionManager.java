@@ -26,7 +26,7 @@ public class SessionManager {
     }
 
     public void process(Context ctx) {
-        Cookie sessionCookie = ctx.getRequest().getCookies().get("SWEETIESESSIONID");
+        Cookie sessionCookie = ctx.getRequest().getCookie("SWEETIESESSIONID");
         Session session;
         if (sessionCookie == null || (session = sessions.get(UUID.fromString(sessionCookie.getValue()))) == null) {
             UUID sessionId = UUID.randomUUID();

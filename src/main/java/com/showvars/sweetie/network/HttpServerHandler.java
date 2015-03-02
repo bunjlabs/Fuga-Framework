@@ -41,6 +41,7 @@ import io.netty.handler.stream.ChunkedStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -87,7 +88,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             
             request.setParameters(queryStringDecoder.parameters());
             
-            Cookies cookiesDownload = new Cookies();
+            Map<String, Cookie> cookiesDownload = new HashMap<>();
             cookiesUpload = new ArrayList<>();
             
             String cookieString = httprequest.headers().get(HttpHeaders.Names.COOKIE);
@@ -96,7 +97,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                     cookiesDownload.put(cookie.getName(), cookie);
                 });
             }
-            request.setCookies(cookiesDownload);
+            request.setCookiesDownload(cookiesDownload);
             
             if (httprequest.getMethod().equals(HttpMethod.GET)) {
                 writeResponse(ctx, msg);
@@ -182,7 +183,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             response.headers().set(e.getKey(), e.getValue());
         });
         
-        sctx.getRequest().getCookies().values().stream().forEach((c) -> {
+        sctx.getRequest().getCookiesUpload().values().stream().forEach((c) -> {
             cookiesUpload.add(c);
         });
         

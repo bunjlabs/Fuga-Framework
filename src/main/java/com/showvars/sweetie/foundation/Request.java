@@ -1,6 +1,6 @@
 package com.showvars.sweetie.foundation;
 
-import com.showvars.sweetie.sessions.Session;
+import io.netty.handler.codec.http.Cookie;
 import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +15,9 @@ public class Request {
     private SocketAddress socketAddress;
     private final Map<String, List<String>> getParameters;
     private final Map<String, List<String>> postParameters;
-    private Cookies cookies;
+    //private Cookies cookies;
+    private Map<String, Cookie> cookiesDownload;
+    private Map<String, Cookie> cookiesUpload;
 
     public Request(RequestMethod method,
             String host,
@@ -30,7 +32,9 @@ public class Request {
 
         this.getParameters = new HashMap<>();
         this.postParameters = new HashMap<>();
-        this.cookies = new Cookies();
+
+        this.cookiesDownload = new HashMap<>();
+        this.cookiesUpload = new HashMap<>();
 
     }
 
@@ -62,8 +66,16 @@ public class Request {
         return postParameters;
     }
 
-    public Cookies getCookies() {
-        return cookies;
+    public Cookie getCookie(String name) {
+        return cookiesDownload.get(name);
+    }
+
+    public Map<String, Cookie> getCookiesDownload() {
+        return cookiesDownload;
+    }
+
+    public Map<String, Cookie> getCookiesUpload() {
+        return cookiesUpload;
     }
 
     public void setMethod(RequestMethod method) {
@@ -108,7 +120,11 @@ public class Request {
         this.postParameters.putAll(postparams);
     }
 
-    public void setCookies(Cookies cookies) {
-        this.cookies = cookies;
+    public void setCookie(Cookie cookie) {
+        this.cookiesUpload.put(cookie.getName(), cookie);
+    }
+
+    public void setCookiesDownload(Map<String, Cookie> cookies) {
+        cookiesDownload = cookies;
     }
 }
