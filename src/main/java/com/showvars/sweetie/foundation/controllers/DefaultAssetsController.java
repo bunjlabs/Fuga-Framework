@@ -14,7 +14,7 @@ public class DefaultAssetsController extends Controller {
     public static Response get(Context ctx, String path) {
         URL u = DefaultAssetsController.class.getResource("/assets/" + path);
         if (u == null) {
-            return Default404NotFoundController.process(ctx);
+            return notFound();
         }
         File asset;
         if (ctx.getApp().getConfiguration().getBoolean("sweetie.resources.external", false)) {
@@ -28,7 +28,7 @@ public class DefaultAssetsController extends Controller {
                     .setContentLength(asset.length())
                     .setContentType(mime != null ? mime : "application/octet-stream");
         } catch (IOException ex) {
-            return Default404NotFoundController.process(ctx);
+            return notFound();
         }
     }
 

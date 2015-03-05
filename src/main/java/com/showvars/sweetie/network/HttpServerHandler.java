@@ -2,18 +2,15 @@ package com.showvars.sweetie.network;
 
 import com.showvars.sweetie.SweetieApp;
 import com.showvars.sweetie.foundation.Context;
-import com.showvars.sweetie.foundation.Cookies;
 import com.showvars.sweetie.foundation.Request;
 import com.showvars.sweetie.foundation.RequestMethod;
 import com.showvars.sweetie.foundation.Response;
-import com.showvars.sweetie.sessions.Session;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.CookieDecoder;
-import io.netty.handler.codec.http.DefaultCookie;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.DefaultLastHttpContent;
 import io.netty.handler.codec.http.HttpChunkedInput;
@@ -49,56 +46,58 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
-    
+
     private static final Logger log = LogManager.getLogger(HttpServerHandler.class);
     private static final HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
     private final SweetieApp app;
     private HttpRequest httprequest;
-    private Request request;
+    private Request.Builder requestBuilder;
     private Response resp;
     private HttpPostRequestDecoder decoder;
     private Collection<Cookie> cookiesUpload;
-    
+
     HttpServerHandler(SweetieApp app) {
         this.app = app;
-        
+
     }
-    
+
     private void reset() {
         httprequest = null;
-        request = null;
+        requestBuilder = null;
         resp = null;
         decoder = null;
         cookiesUpload = null;
     }
-    
+
     @Override
     public void channelRead0(ChannelHandlerContext ctx, HttpObject msg) throws Exception {
-        
+
         if (msg instanceof HttpRequest) {
             this.httprequest = (HttpRequest) msg;
-            
+
+            requestBuilder = new Request.Builder();
+
             QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httprequest.getUri());
-            
-            request = new Request(
-                    RequestMethod.valueOf(httprequest.getMethod().name()),
-                    httprequest.headers().get("HOST"),
-                    httprequest.getUri(), queryStringDecoder.path(),
-                    ctx.channel().remoteAddress());
-            
-            request.setParameters(queryStringDecoder.parameters());
-            
+
             Map<String, Cookie> cookiesDownload = new HashMap<>();
             cookiesUpload = new ArrayList<>();
-            
+
             String cookieString = httprequest.headers().get(HttpHeaders.Names.COOKIE);
             if (cookieString != null) {
                 CookieDecoder.decode(cookieString).stream().forEach((cookie) -> {
                     cookiesDownload.put(cookie.getName(), cookie);
                 });
             }
-            request.setCookiesDownload(cookiesDownload);
-            
+
+            requestBuilder.requestMethod(RequestMethod.valueOf(httprequest.getMethod().name()))
+                    .host(httprequest.headers().get("HOST"))
+                    .uri(httprequest.getUri())
+                    .path(queryStringDecoder.path())
+                    .socketAddress(ctx.channel().remoteAddress())
+                    .query(queryStringDecoder.parameters())
+                    .cookiesDownload(cookiesDownload)
+                    .cookiesUpload(new HashMap<>());
+
             if (httprequest.getMethod().equals(HttpMethod.GET)) {
                 writeResponse(ctx, msg);
                 reset();
@@ -115,7 +114,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                 return;
             }
         }
-        
+
         if (decoder != null) {
             if (msg instanceof HttpContent) {
                 HttpContent chunk = (HttpContent) msg;
@@ -131,11 +130,11 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                     writeResponse(ctx, msg);
                     reset();
                 }
-                
+
             }
         }
     }
-    
+
     private void readHttpDataChunkByChunk() {
         Map<String, List<String>> postmap = new TreeMap<>();
         try {
@@ -156,58 +155,59 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                     }
                 }
             }
-            
+
         } catch (EndOfDataDecoderException e) { // it's ok
         }
-        request.updatePostParameters(postmap);
+        requestBuilder.parameters(postmap);
     }
-    
+
     private void writeResponse(ChannelHandlerContext ctx, HttpObject msg) {
-        
+
+        Request request = requestBuilder.build();
+
         Context sctx = new Context(request, app);
-        
+
         log.debug("Access from {}: {}{}", request.getSocketAddress(), request.getHost(), request.getUri());
-        
+
         resp = app.getRouter().forward(sctx);
-        
+
         HttpResponse response = new DefaultHttpResponse(
                 HttpVersion.HTTP_1_1,
                 true // ((LastHttpContent) msg).getDecoderResult().isSuccess()
                 && resp != null
                         ? HttpResponseStatus.valueOf(resp.getStatus()) : HttpResponseStatus.BAD_REQUEST);
-        
+
         response.headers().set(HttpHeaders.Names.TRANSFER_ENCODING, HttpHeaders.Values.CHUNKED);
         response.headers().set(HttpHeaders.Names.CONTENT_TYPE, resp != null ? resp.getContentType() : "text/plain");
-        
+
         resp.getHeaders().entrySet().stream().forEach((e) -> {
             response.headers().set(e.getKey(), e.getValue());
         });
-        
+
         sctx.getRequest().getCookiesUpload().values().stream().forEach((c) -> {
             cookiesUpload.add(c);
         });
-        
-        Session session;
-        if ((session = sctx.getSession()) != null) {
-            cookiesUpload.add(new DefaultCookie("SWEETIESESSIONID", session.getSessionId().toString()));
-        }
-        
+
+        //Session session;
+        //if ((session = sctx.getSession()) != null) {
+        //    cookiesUpload.add(new DefaultCookie("SWEETIESESSIONID", session.getSessionId().toString()));
+        //}
         response.headers().set(HttpHeaders.Names.SET_COOKIE, ServerCookieEncoder.encode(cookiesUpload));
-        
+
         if (resp.getContentLength() >= 0) {
             response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, resp.getContentLength());
         }
-        
+
         if (HttpHeaders.isKeepAlive(httprequest)) {
             response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
         } else {
             response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
         }
-        
+
         response.headers().set(HttpHeaders.Names.SERVER, "Sweetie/0.0.1.Alpha"); // how it's beautiful!
 
         ctx.write(response);
-        
+
         if (resp.getStream() != null) {
             ctx.write(new HttpChunkedInput(new ChunkedStream(resp.getStream())));
         }
@@ -217,11 +217,11 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             sendContentFuture.addListener(ChannelFutureListener.CLOSE);
         }
     }
-    
+
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         log.catching(cause);
         ctx.close();
     }
-    
+
 }
