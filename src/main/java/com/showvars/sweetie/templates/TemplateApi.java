@@ -3,6 +3,7 @@ package com.showvars.sweetie.templates;
 import com.showvars.sweetie.SweetieApp;
 import com.showvars.sweetie.foundation.Context;
 import java.nio.charset.Charset;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 public class TemplateApi {
 
@@ -23,7 +24,7 @@ public class TemplateApi {
         if (!app.getConfiguration().getBoolean("sweetie.templates.assets.external", false)) {
             return that("assets/" + path);
         } else {
-            return app.getConfiguration().get("sweetie.templates.assets.path", that()) + "assets/" + path;
+            return app.getConfiguration().get("sweetie.templates.assets.path", that()) + path;
         }
     }
 
@@ -50,5 +51,15 @@ public class TemplateApi {
         }
 
         return str.getBytes(Charset.forName("UTF-8"));
+    }
+
+    public String escape(Object... args) {
+        StringBuilder sb = new StringBuilder();
+
+        for (Object a : args) {
+            sb.append(a != null ? a : "");
+        }
+
+        return StringEscapeUtils.escapeHtml4(sb.toString());
     }
 }
