@@ -1,6 +1,7 @@
 Sweetie 
 =======
 [![Build Status](https://travis-ci.org/IntCode/Sweetie.svg?branch=master)](https://travis-ci.org/IntCode/Sweetie)
+[![Dependency Status](https://www.versioneye.com/user/projects/55b60eb7653762001a000007/badge.svg?style=flat)](https://www.versioneye.com/user/projects/55b60eb7653762001a000007)
 
 Small Java Web Framework for big projects.
 
