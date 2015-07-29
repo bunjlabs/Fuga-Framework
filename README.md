@@ -1,7 +1,9 @@
 Fuga Framework
 =======
-
 Small Java Web Framework for big projects.
+
+[![Build Status](https://travis-ci.org/IntCode/Fuga-Framework.svg?branch=master)](https://travis-ci.org/IntCode/Fuga-Framework)
+[![Dependency Status](https://www.versioneye.com/user/projects/55b8dac9653762001700136e/badge.svg?style=flat)](https://www.versioneye.com/user/projects/55b8dac9653762001700136e)
 
 
 ## Installation
