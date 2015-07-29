@@ -32,7 +32,7 @@ public abstract class FugaApp {
         this.templateEngine = new TemplateEngine(this);
         this.serviceManager = new ServiceManager(this);
         this.objects = new HashMap<>();
-
+        
     }
 
     public Router getRouter() {
@@ -40,6 +40,8 @@ public abstract class FugaApp {
     }
 
     public void start() throws Exception {
+        prepare();
+        
         serviceManager.registerService(new SessionService(this), 15, TimeUnit.SECONDS);
 
         httpserver.start();

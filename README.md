@@ -1,19 +1,17 @@
-Sweetie 
+Fuga Framework
 =======
-[![Build Status](https://travis-ci.org/IntCode/Sweetie.svg?branch=master)](https://travis-ci.org/IntCode/Sweetie)
-[![Dependency Status](https://www.versioneye.com/user/projects/55b60eb7653762001a000007/badge.svg?style=flat)](https://www.versioneye.com/user/projects/55b60eb7653762001a000007)
 
 Small Java Web Framework for big projects.
 
 
 ## Installation
 
-First of all whe need to download and import Sweetie Framework in your IDE, create new maven project and add dependence in `pom.xml`:
+First of all whe need to download and import Fuga Framework in your IDE, create new maven project and add dependence in `pom.xml`:
 
 ```
 <dependency>
   <groupId>${project.groupId}</groupId>
-  <artifactId>sweetie</artifactId>
+  <artifactId>fugaframework</artifactId>
   <version>${project.version}</version>
 </dependency>
 ```
@@ -27,9 +25,9 @@ Let's create simple cotroller thar returns `Hello world!` for every client:
 ```
 package com.example.controllers;
 
-import com.showvars.sweetie.foundation.Context;
-import com.showvars.sweetie.foundation.Controller;
-import com.showvars.sweetie.foundation.Response;
+import com.showvars.fugaframework.foundation.Context;
+import com.showvars.fugaframework.foundation.Controller;
+import com.showvars.fugaframework.foundation.Response;
 
 public class HelloWorldController extends Controller {
 
@@ -52,15 +50,18 @@ Create main class:
 ```
 package com.example;
 
-import com.showvars.sweetie.SweetieApp;
+import com.showvars.fugaframework.FugaApp;
 import java.io.InputStreamReader;
 
-public class HelloWorldApp {
+public class HelloWorldApp extends FugaApp{
 
+	@Override
+	public void prepare() {
+	    getRouter().load(new InputStreamReader(HelloWorldApp.class.getResourceAsStream("/routes/helloworld.routesmap")));
+	}
+	
     public static void main(String[] args) throws Exception {
-        SweetieApp ss = SweetieApp.prepare();
-        ss.getRouter().load(new InputStreamReader(HelloWorldApp.class.getResourceAsStream("/routes/helloworld.routesmap")));
-        ss.getStarted();
+        new HelloWorldApp().start();
     }
 
 }

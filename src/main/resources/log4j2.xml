@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="warn" name="Sweetie" packages="">
+<Configuration status="warn" name="FugaFramework" packages="">
     <Appenders>
         <File name="DebugFile" fileName="logs/debug.log">
             <PatternLayout>
