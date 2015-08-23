@@ -179,7 +179,12 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
         response.headers().set(HttpHeaders.Names.TRANSFER_ENCODING, HttpHeaders.Values.CHUNKED);
         response.headers().set(HttpHeaders.Names.CONTENT_TYPE, resp != null ? resp.getContentType() : "text/plain");
-
+        
+        // Disable cache by default
+        response.headers().set(HttpHeaders.Names.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+        response.headers().set(HttpHeaders.Names.PRAGMA, "no-cache");
+        response.headers().set(HttpHeaders.Names.EXPIRES, "0");
+        
         resp.getHeaders().entrySet().stream().forEach((e) -> {
             response.headers().set(e.getKey(), e.getValue());
         });
