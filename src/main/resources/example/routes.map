@@ -1,0 +1,13 @@
+/* Routes map for example Fuga App */
+
+use com.showvars.fugaframework.example.controllers
+
+GET {
+    ExampleController.skip()
+    
+    GET $/(index) ExampleController.index(1:String, "223":int)
+    GET $/(\d+) ExampleController.index(1:String, "223":int)
+}
+
+
+
