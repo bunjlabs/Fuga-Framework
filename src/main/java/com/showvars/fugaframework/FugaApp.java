@@ -43,7 +43,7 @@ public abstract class FugaApp {
     }
 
     public void start() throws Exception {
-        log.info("Fuga Framework 0.2.1-alpha");
+        log.info("Fuga Framework 0.2.1-SNAPSHOT");
         
         prepare();
 
