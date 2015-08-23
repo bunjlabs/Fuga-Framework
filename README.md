@@ -43,7 +43,9 @@ public class HelloWorldController extends Controller {
 Now we need to add this controller to routes map. Create file `helloworld.routesmap` in `resources/routes/` and add this:
 
 ```
-GET     /   com.example.controllers.HelloWorldController.index()
+use com.example.controllers
+
+GET $/ HelloWorldController.index()
 ```
 
 
@@ -53,20 +55,19 @@ Create main class:
 package com.example;
 
 import com.showvars.fugaframework.FugaApp;
-import java.io.InputStreamReader;
 
 public class HelloWorldApp extends FugaApp{
 
 	@Override
 	public void prepare() {
-	    getRouter().load(new InputStreamReader(HelloWorldApp.class.getResourceAsStream("/routes/helloworld.routesmap")));
+		getRouter().loadFromResources("/routes/helloworld.routesmap");
 	}
 	
-    public static void main(String[] args) throws Exception {
-        new HelloWorldApp().start();
-    }
+	public static void main(String[] args) throws Exception {
+		new HelloWorldApp().start();
+	}
 
 }
 ```
 
-Compile and run. After that open link `http://localhost:8080/` in your browser where you can see Hello world!.
+Compile and run. After that open link `http://localhost:8080/` in your browser and there you can see Hello world!.
