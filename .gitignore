@@ -8,9 +8,16 @@ ehthumbs.db
 Desktop.ini
 
 #############
-## NetBeans
+## Maven App
 #############
 
 build/
 dist/
-/target/
+target/
+
+
+#############
+## Fuga Framework
+#############
+
+logs/
