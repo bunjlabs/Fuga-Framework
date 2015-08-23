@@ -7,18 +7,25 @@ import com.showvars.fugaframework.utils.MimeTypeUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URL;
 
-public class DefaultAssetsController extends Controller {
+public class DefaultController extends Controller {
 
-    public static Response get(Context ctx, String path) {
+    public static Response notFound(Context ctx) {
+        String path = ctx.getApp().getConfiguration().get("fuga.404.redirect", null);
+        if (path != null) {
+            return temporaryRedirect(Controller.Urls.that(ctx, path));
+        }
+        return notFound("404 Not Found");
+    }
+
+    public static Response asset(Context ctx, String path) {
         File asset;
         if (ctx.getApp().getConfiguration().getBoolean("fuga.resources.external", false)) {
             asset = new File(ctx.getApp().getConfiguration().get("fuga.resources.path", ".") + "/assets/" + path);
         } else {
-            asset = new File(DefaultAssetsController.class.getResource("/assets/" + path).getFile());
+            asset = new File(DefaultController.class.getResource("/assets/" + path).getFile());
         }
-        if(!asset.isFile() || !asset.exists() || !asset.canRead()) {
+        if (!asset.isFile() || !asset.exists() || !asset.canRead()) {
             return notFound();
         }
         String mime = MimeTypeUtils.getMimeTypeByExt(asset.getName().substring(asset.getName().lastIndexOf('.') + 1));
@@ -31,4 +38,14 @@ public class DefaultAssetsController extends Controller {
         }
     }
 
+    public static Response exception(Context ctx, Exception e) {
+        StackTraceElement[] ste = e.getStackTrace();
+
+        StringBuilder sb = new StringBuilder();
+
+        for (StackTraceElement el : ste) {
+            sb.append(el.toString()).append("\n");
+        }
+        return ok("<code>" + e.toString() + "</code><br><pre>" + sb.toString() + "</pre>");
+    }
 }

@@ -12,27 +12,30 @@ import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public abstract class FugaApp {
 
+    private static final Logger log = LogManager.getLogger(FugaApp.class);
     private final Configuration config;
     private final Router hmap = new Router();
-    private final SocketAddress addr;
     private final SessionManager sessionManager;
-    private final HttpServer httpserver;
     private final TemplateEngine templateEngine;
     private final ServiceManager serviceManager;
     private final Map<String, Object> objects;
+    private HttpServer httpserver;
+    private SocketAddress addr;
 
-    private FugaApp() {
+    public FugaApp() {
         this.config = new Configuration();
-        this.addr = new InetSocketAddress(config.get("fuga.http.bindhost", "localhost"), config.getInt("fuga.http.bindport", 8080));
+
         this.sessionManager = new SessionManager(this);
-        this.httpserver = new HttpServer(addr, this);
+
         this.templateEngine = new TemplateEngine(this);
         this.serviceManager = new ServiceManager(this);
         this.objects = new HashMap<>();
-        
+
     }
 
     public Router getRouter() {
@@ -40,10 +43,13 @@ public abstract class FugaApp {
     }
 
     public void start() throws Exception {
-        prepare();
+        log.info("Fuga Framework 0.2.1-alpha");
         
-        serviceManager.registerService(new SessionService(this), 15, TimeUnit.SECONDS);
+        prepare();
 
+        serviceManager.registerService(new SessionService(this), 15, TimeUnit.SECONDS);
+        addr = new InetSocketAddress(config.get("fuga.http.bindhost", "localhost"), config.getInt("fuga.http.bindport", 8080));
+        httpserver = new HttpServer(addr, this);
         httpserver.start();
     }
 

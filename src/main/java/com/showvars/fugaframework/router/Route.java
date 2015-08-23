@@ -5,11 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Route {
-
     private final Method method;
-    private final List<MethodParameter> parameters;
+    private final List<RouteParameter> parameters;
 
-    public Route(Method method, List<MethodParameter> parameters) {
+    public Route(Method method, List<RouteParameter> parameters) {
         this.method = method;
         this.parameters = new ArrayList<>();
         if (parameters != null) {
@@ -21,7 +20,7 @@ public class Route {
         return method;
     }
 
-    public List<MethodParameter> getParameters() {
+    public List<RouteParameter> getParameters() {
         return parameters;
     }
 }
