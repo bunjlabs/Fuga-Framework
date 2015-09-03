@@ -3,6 +3,8 @@ package com.showvars.fugaframework.foundation.controllers;
 import com.showvars.fugaframework.foundation.Context;
 import com.showvars.fugaframework.foundation.Controller;
 import com.showvars.fugaframework.foundation.Response;
+import com.showvars.fugaframework.templates.TemplateNotFoundException;
+import com.showvars.fugaframework.templates.TemplateRenderException;
 import com.showvars.fugaframework.utils.MimeTypeUtils;
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,5 +49,9 @@ public class DefaultController extends Controller {
             sb.append(el.toString()).append("\n");
         }
         return ok("<code>" + e.toString() + "</code><br><pre>" + sb.toString() + "</pre>");
+    }
+    
+    public static Response viewTemplate(Context ctx, String name) throws TemplateNotFoundException, TemplateRenderException {
+        return ok(view(ctx, name));
     }
 }

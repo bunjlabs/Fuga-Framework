@@ -2,6 +2,7 @@ package com.showvars.fugaframework.router;
 
 import com.showvars.fugaframework.foundation.Context;
 import com.showvars.fugaframework.foundation.RequestMethod;
+import com.showvars.fugaframework.foundation.controllers.DefaultController;
 import static com.showvars.fugaframework.router.Tokenizer.*;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -14,15 +15,24 @@ public class RouteMapLoader {
 
     private Tokenizer t;
     private final List<String> uses = new ArrayList<>();
+    private static final Class defaultController = DefaultController.class;
 
     public RouteMapLoader() {
-        uses.add("com.showvars.fugaframework.foundation.controllers.DefaultController");
+        uses.add("");
     }
 
     private Class tryLoadClass(String name) {
         try {
-            return Class.forName(name);
+            return Class.forName(name.startsWith(".") ? name.substring(1) : name);
         } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    private Method tryGetMethod(Class c, String name, Class[] classes) {
+        try {
+            return c.getMethod(name, classes);
+        } catch (NoSuchMethodException | SecurityException ex) {
             return null;
         }
     }
@@ -77,35 +87,6 @@ public class RouteMapLoader {
             }
         }
 
-        if (classMethodFull.trim().isEmpty()) {
-            throw new Exception("Method name cannot be empty!");
-        }
-        int lio = classMethodFull.lastIndexOf('.');
-        String className = "";
-        String classMethod;
-
-        if (lio < 0) {
-            classMethod = classMethodFull;
-        } else {
-            className = classMethodFull.substring(0, lio);
-            classMethod = classMethodFull.substring(lio + 1);
-        }
-
-        Class c = null;
-        for (String use : uses) {
-            if ((c = tryLoadClass(use + "." + className)) != null) {
-                break;
-            }
-        }
-
-        if (c == null) {
-            c = tryLoadClass(className);
-        }
-
-        if (c == null) {
-            throw new Exception("Class not found: " + className);
-        }
-
         Class[] classes = new Class[parameters.size() + 1];
         classes[0] = Context.class;
 
@@ -113,9 +94,42 @@ public class RouteMapLoader {
             classes[i] = getClassTypeBySimpleName(parameters.get(i - 1).getDataType());
         }
 
-        Method m = c.getMethod(classMethod, classes);
+        if (classMethodFull.trim().isEmpty()) {
+            throw new Exception("Method name cannot be empty!");
+        }
 
-        return new Route(m, parameters);
+        int lio = classMethodFull.lastIndexOf('.');
+        String className = "";
+        String classMethod;
+
+        if (lio < 0) {
+            classMethod = classMethodFull;
+
+            switch (classMethod) {
+                case "view":
+                    return new Route(tryGetMethod(defaultController, "viewTemplate", classes), parameters);
+                case "asset":
+                    return new Route(tryGetMethod(defaultController, "asset", classes), parameters);
+                case "notFound":
+                    return new Route(tryGetMethod(defaultController, "notFound", classes), parameters);
+            }
+        }
+
+        className = classMethodFull.substring(0, lio);
+        classMethod = classMethodFull.substring(lio + 1);
+
+        Class c;
+        Method m;
+        for (String use : uses) {
+            if ((c = tryLoadClass(className.isEmpty() ? use : use + "." + className)) != null) {
+                if ((m = tryGetMethod(c, classMethod, classes)) != null) {
+                    return new Route(m, parameters);
+                }
+            }
+        }
+
+        throw new Exception("Method not found: " + className + "." + classMethod);
+
     }
 
     private Extension extension() throws Exception {
@@ -172,7 +186,7 @@ public class RouteMapLoader {
         t = new Tokenizer(new InputStreamReader(input));
 
         t.next();
-        
+
         return extensionList();
 
     }
