@@ -9,5 +9,5 @@ GET {
     GET $/(\d+) ExampleController.index(1:String, "223":int)
 }
 
-
+POST $/post ExampleController.post()
 

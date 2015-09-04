@@ -5,6 +5,8 @@ import com.showvars.fugaframework.foundation.Context;
 import com.showvars.fugaframework.foundation.Request;
 import com.showvars.fugaframework.foundation.RequestMethod;
 import com.showvars.fugaframework.foundation.Response;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -50,14 +52,16 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
     private static final Logger log = LogManager.getLogger(HttpServerHandler.class);
     private static final HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
     private final FugaApp app;
+    private final ByteBuf content;
     private HttpRequest httprequest;
     private Request.Builder requestBuilder;
     private Response resp;
-    private HttpPostRequestDecoder decoder;
+    private boolean decoder;
     private Collection<Cookie> cookiesUpload;
 
     HttpServerHandler(FugaApp app) {
         this.app = app;
+        content = Unpooled.buffer();
 
     }
 
@@ -65,8 +69,10 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
         httprequest = null;
         requestBuilder = null;
         resp = null;
-        decoder = null;
+        decoder = false;
         cookiesUpload = null;
+        content.discardReadBytes();
+        content.clear();
     }
 
     @Override
@@ -96,46 +102,79 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                     .socketAddress(ctx.channel().remoteAddress())
                     .query(queryStringDecoder.parameters())
                     .cookiesDownload(cookiesDownload)
-                    .cookiesUpload(new HashMap<>());
+                    .cookiesUpload(new HashMap<>())
+                    .content(content);
 
             if (httprequest.getMethod().equals(HttpMethod.GET)) {
                 writeResponse(ctx, msg);
                 reset();
                 return;
             }
-            try {
-                decoder = new HttpPostRequestDecoder(factory, httprequest);
-            } catch (ErrorDataDecoderException ex) {
-                log.catching(ex);
-                writeResponse(ctx, msg);
-                return;
-            } catch (IncompatibleDataDecoderException ex) {
-                writeResponse(ctx, msg);
-                return;
-            }
+            decoder = true;
+            /*try {
+             decoder = new HttpPostRequestDecoder(factory, httprequest);
+             } catch (ErrorDataDecoderException ex) {
+             log.catching(ex);
+             writeResponse(ctx, msg);
+             return;
+             } catch (IncompatibleDataDecoderException ex) {
+             log.catching(ex);
+             writeResponse(ctx, msg);
+             return;
+             }*/
         }
 
-        if (decoder != null) {
-            if (msg instanceof HttpContent) {
-                HttpContent chunk = (HttpContent) msg;
+        if (msg instanceof HttpContent && decoder) {
+
+            HttpContent httpContent = (HttpContent) msg;
+            content.writeBytes(httpContent.content());
+            if (httprequest != null && (httprequest.headers().contains("Content-Type", "form-data", true)
+                    || httprequest.headers().contains("Content-Type", "x-www-form-urlencoded", true))) {
+                HttpPostRequestDecoder postDecoder = new HttpPostRequestDecoder(httprequest);
                 try {
-                    decoder.offer(chunk);
+                    postDecoder.offer(httpContent);
                 } catch (ErrorDataDecoderException ex) {
                     log.catching(ex);
                     writeResponse(ctx, msg);
+                    reset();
                     return;
                 }
-                readHttpDataChunkByChunk();
-                if (chunk instanceof LastHttpContent) {
-                    writeResponse(ctx, msg);
-                    reset();
-                }
-
+                readHttpDataChunkByChunk(postDecoder);
             }
+            if (httpContent instanceof LastHttpContent) {
+                writeResponse(ctx, msg);
+                reset();
+                return;
+            }
+
         }
+        /*if (decoder != null) {
+         if (msg instanceof HttpContent) {
+
+         HttpContent chunk = (HttpContent) msg;
+         if (chunk instanceof LastHttpContent) {
+         writeResponse(ctx, msg);
+         reset();
+         } else {
+         requestBuilder.content(chunk.content());
+         try {
+         decoder.offer(chunk);
+         } catch (ErrorDataDecoderException ex) {
+         log.catching(ex);
+         writeResponse(ctx, msg);
+         return;
+         }
+         readHttpDataChunkByChunk();
+         if (chunk instanceof LastHttpContent) {
+         writeResponse(ctx, msg);
+         reset();
+         }
+         }
+         }
+         }*/
     }
 
-    private void readHttpDataChunkByChunk() {
+    private void readHttpDataChunkByChunk(HttpPostRequestDecoder decoder) {
         Map<String, List<String>> postmap = new TreeMap<>();
         try {
             while (decoder.hasNext()) {
@@ -179,12 +218,12 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
         response.headers().set(HttpHeaders.Names.TRANSFER_ENCODING, HttpHeaders.Values.CHUNKED);
         response.headers().set(HttpHeaders.Names.CONTENT_TYPE, resp != null ? resp.getContentType() : "text/plain");
-        
+
         // Disable cache by default
         response.headers().set(HttpHeaders.Names.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
         response.headers().set(HttpHeaders.Names.PRAGMA, "no-cache");
         response.headers().set(HttpHeaders.Names.EXPIRES, "0");
-        
+
         resp.getHeaders().entrySet().stream().forEach((e) -> {
             response.headers().set(e.getKey(), e.getValue());
         });

@@ -1,5 +1,6 @@
 package com.showvars.fugaframework.foundation;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.Cookie;
 import java.net.SocketAddress;
 import java.util.List;
@@ -16,6 +17,7 @@ public class Request {
     private final Map<String, List<String>> parameters;
     private final Map<String, Cookie> cookiesDownload;
     private final Map<String, Cookie> cookiesUpload;
+    private final ByteBuf content;
 
     public static class Builder {
 
@@ -28,6 +30,7 @@ public class Request {
         private Map<String, List<String>> parameters;
         private Map<String, Cookie> cookiesDownload;
         private Map<String, Cookie> cookiesUpload;
+        private ByteBuf content;
 
         public Builder requestMethod(RequestMethod requestMethod) {
             this.requestMethod = requestMethod;
@@ -74,6 +77,11 @@ public class Request {
             return this;
         }
 
+        public Builder content(ByteBuf content) {
+            this.content = content;
+            return this;
+        }
+
         public Request build() {
             return new Request(this);
         }
@@ -89,6 +97,7 @@ public class Request {
         this.parameters = builder.parameters;
         this.cookiesDownload = builder.cookiesDownload;
         this.cookiesUpload = builder.cookiesUpload;
+        this.content = builder.content;
     }
 
     public RequestMethod getRequestMethod() {
@@ -133,5 +142,9 @@ public class Request {
 
     public void setCookie(Cookie cookie) {
         this.cookiesUpload.put(cookie.getName(), cookie);
+    }
+
+    public ByteBuf getContent() {
+        return content;
     }
 }

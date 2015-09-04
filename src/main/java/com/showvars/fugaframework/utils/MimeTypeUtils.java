@@ -17,6 +17,7 @@ public class MimeTypeUtils {
         mimeTypes.put("bmp", "image/x-ms-bmp");
         mimeTypes.put("js", "application/x-javascript");
         mimeTypes.put("svg", "image/svg+xml");
+        mimeTypes.put("mp4", "video/mp4");
     }
 
     public static String getMimeTypeByExt(String ext) {
