@@ -9,6 +9,8 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class RouteMapLoader {
@@ -37,12 +39,12 @@ public class RouteMapLoader {
         }
     }
 
-    private RouteParameter parameter() throws Exception {
+    private RouteParameter parameter() throws RoutesMapLoadException {
         String value;
         String type = "String";
 
         if (t.ttype != TK_INTEGER && t.ttype != TK_STRCONST) {
-            throw new Exception("Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
+            throw new RoutesMapLoadException("Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
         }
 
         boolean isConst = t.ttype == TK_STRCONST;
@@ -53,7 +55,7 @@ public class RouteMapLoader {
         if (t.ttype == ':') {
             t.next();
             if (t.ttype != TK_WORD) {
-                throw new Exception("Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
+                throw new RoutesMapLoadException("Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
             }
             type = t.sval;
             t.next();
@@ -65,11 +67,11 @@ public class RouteMapLoader {
         }
     }
 
-    private Route route() throws Exception {
+    private Route route() throws RoutesMapLoadException {
         String classMethodFull = t.sval;
         t.next();
         if (t.ttype != '(') {
-            throw new Exception("Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
+            throw new RoutesMapLoadException("Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
         }
         t.next();
 
@@ -91,11 +93,15 @@ public class RouteMapLoader {
         classes[0] = Context.class;
 
         for (int i = 1; i < classes.length; i++) {
-            classes[i] = getClassTypeBySimpleName(parameters.get(i - 1).getDataType());
+            try {
+                classes[i] = getClassTypeBySimpleName(parameters.get(i - 1).getDataType());
+            } catch (ClassNotFoundException ex) {
+                throw new RoutesMapLoadException(ex);
+            }
         }
 
         if (classMethodFull.trim().isEmpty()) {
-            throw new Exception("Method name cannot be empty!");
+            throw new RoutesMapLoadException("Method name cannot be empty!");
         }
 
         int lio = classMethodFull.lastIndexOf('.');
@@ -128,11 +134,11 @@ public class RouteMapLoader {
             }
         }
 
-        throw new Exception("Method not found: " + className + "." + classMethod);
+        throw new RoutesMapLoadException("Method not found: " + className + "." + classMethod);
 
     }
 
-    private Extension extension() throws Exception {
+    private Extension extension() throws RoutesMapLoadException {
         RequestMethod method = null;
         Pattern pattern = null;
 
@@ -152,14 +158,14 @@ public class RouteMapLoader {
         }
     }
 
-    private List<Extension> extensionList() throws Exception {
+    private List<Extension> extensionList() throws RoutesMapLoadException {
         List<Extension> list = new ArrayList<>();
         while (t.ttype != Tokenizer.TK_EOF) {
             switch (t.ttype) {
                 case TK_USE: {
                     t.next();
                     if (t.ttype != TK_WORD) {
-                        throw new Exception("Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
+                        throw new RoutesMapLoadException("Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
                     }
                     uses.add(t.sval);
                     t.next();
@@ -182,7 +188,7 @@ public class RouteMapLoader {
         return list;
     }
 
-    public List<Extension> load(InputStream input) throws Exception {
+    public List<Extension> load(InputStream input) throws RoutesMapLoadException {
         t = new Tokenizer(new InputStreamReader(input));
 
         t.next();

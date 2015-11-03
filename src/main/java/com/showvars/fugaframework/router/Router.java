@@ -11,7 +11,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,13 +19,13 @@ public class Router {
 
     private static final Logger log = LogManager.getLogger(Router.class);
 
-    private List<Extension> extensions;
+    private List<Extension> extensions = null;
 
     public void load(File file) {
         try {
             load(new FileInputStream(file));
             log.info("Routes loaded from: {}", file.getPath());
-        } catch (Exception ex) {
+        } catch (FileNotFoundException | NullPointerException | RoutesMapLoadException ex) {
             log.catching(ex);
         }
     }
@@ -35,7 +34,7 @@ public class Router {
         try {
             load(new FileInputStream(path));
             log.info("Routes loaded from: {}", path);
-        } catch (Exception ex) {
+        } catch (FileNotFoundException | NullPointerException | RoutesMapLoadException ex) {
             log.catching(ex);
         }
     }
@@ -44,12 +43,12 @@ public class Router {
         try {
             load(Router.class.getResourceAsStream("/" + path));
             log.info("Routes loaded from resources: {}", path);
-        } catch (Exception ex) {
+        } catch (NullPointerException | RoutesMapLoadException ex) {
             log.catching(ex);
         }
     }
 
-    public void load(InputStream input) throws NullPointerException, Exception {
+    public void load(InputStream input) throws NullPointerException, RoutesMapLoadException {
         if (input == null) {
             throw new NullPointerException();
         }
@@ -62,15 +61,29 @@ public class Router {
     }
 
     public Response forward(Context ctx) {
-
-        Response resp = forward(ctx, extensions);
+        if (extensions == null || extensions.isEmpty()) {
+            return DefaultController.exception(ctx, new RoutesMapException("Empty routes map"));
+        }
+        
+        Response resp;
+        
+        try {
+            resp = forward(ctx, extensions);
+        } catch (RoutesMapException ex) {
+            return DefaultController.exception(ctx, ex);
+        }
+        
         if (resp != null) {
             return resp;
         }
+        
         return DefaultController.notFound(ctx);
     }
 
-    private Response forward(Context ctx, List<Extension> exts)  {
+    private Response forward(Context ctx, List<Extension> exts) throws RoutesMapException {
+        if (exts == null) {
+            throw new RoutesMapException("Extensions sublist is null");
+        }
         Matcher m;
         for (Extension ext : exts) {
             if (ext.getRequestMethod() != null && ext.getRequestMethod() != ctx.getRequest().getRequestMethod()) {

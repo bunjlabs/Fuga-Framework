@@ -41,7 +41,7 @@ public class Configuration {
         }
     }
 
-    public void loadFromResoures(String path) {
+    public void loadFromResources(String path) {
         try {
             p.load(Configuration.class.getResourceAsStream("/" + path));
             log.info("Configuration loaded from resources: {}", "/" + path);
