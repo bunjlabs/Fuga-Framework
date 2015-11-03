@@ -18,7 +18,7 @@ public class Configuration {
         try {
             p.load(input);
             log.info("Configuration loaded from stream");
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             log.catching(ex);
         }
     }
@@ -27,7 +27,7 @@ public class Configuration {
         try {
             p.load(new FileInputStream(file));
             log.info("Configuration loaded from: {}", file.getPath());
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             log.catching(ex);
         }
     }
@@ -36,7 +36,7 @@ public class Configuration {
         try {
             p.load(new FileInputStream(path));
             log.info("Configuration loaded from: {}", path);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             log.catching(ex);
         }
     }
@@ -45,7 +45,7 @@ public class Configuration {
         try {
             p.load(Configuration.class.getResourceAsStream("/" + path));
             log.info("Configuration loaded from resources: {}", "/" + path);
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             log.catching(ex);
         }
     }

@@ -42,7 +42,7 @@ public class Router {
 
     public void loadFromResources(String path) {
         try {
-            load(Router.class.getResourceAsStream(path));
+            load(Router.class.getResourceAsStream("/" + path));
             log.info("Routes loaded from resources: {}", path);
         } catch (Exception ex) {
             log.catching(ex);
