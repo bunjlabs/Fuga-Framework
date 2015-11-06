@@ -39,6 +39,7 @@ import io.netty.handler.codec.http.multipart.InterfaceHttpData.HttpDataType;
 import io.netty.handler.stream.ChunkedStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -85,13 +86,17 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
             QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httprequest.getUri());
 
-            Map<String, Cookie> cookiesDownload = new HashMap<>();
+            Map<String, List<Cookie>> cookiesDownload = new HashMap<>();
             cookiesUpload = new ArrayList<>();
 
             String cookieString = httprequest.headers().get(HttpHeaders.Names.COOKIE);
             if (cookieString != null) {
                 CookieDecoder.decode(cookieString).stream().forEach((cookie) -> {
-                    cookiesDownload.put(cookie.getName(), cookie);
+                    if (cookiesDownload.containsKey(cookie.getName())) {
+                        cookiesDownload.get(cookie.getName()).add(cookie);
+                    } else {
+                        cookiesDownload.put(cookie.getName(), new ArrayList<>(Arrays.asList(cookie)));
+                    }
                 });
             }
 

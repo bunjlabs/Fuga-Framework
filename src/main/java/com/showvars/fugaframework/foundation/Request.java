@@ -15,7 +15,7 @@ public class Request {
     private final SocketAddress socketAddress;
     private final Map<String, List<String>> query;
     private final Map<String, List<String>> parameters;
-    private final Map<String, Cookie> cookiesDownload;
+    private final Map<String, List<Cookie>> cookiesDownload;
     private final Map<String, Cookie> cookiesUpload;
     private final ByteBuf content;
 
@@ -28,7 +28,7 @@ public class Request {
         private SocketAddress socketAddress;
         private Map<String, List<String>> query;
         private Map<String, List<String>> parameters;
-        private Map<String, Cookie> cookiesDownload;
+        private Map<String, List<Cookie>> cookiesDownload;
         private Map<String, Cookie> cookiesUpload;
         private ByteBuf content;
 
@@ -67,7 +67,7 @@ public class Request {
             return this;
         }
 
-        public Builder cookiesDownload(Map<String, Cookie> cookiesDownload) {
+        public Builder cookiesDownload(Map<String, List<Cookie>> cookiesDownload) {
             this.cookiesDownload = cookiesDownload;
             return this;
         }
@@ -129,10 +129,16 @@ public class Request {
     }
 
     public Cookie getCookie(String name) {
-        return cookiesDownload.get(name);
+        List<Cookie> cookies = cookiesDownload.get(name);
+
+        if (cookies == null) {
+            return null;
+        }
+
+        return cookies.get(0);
     }
 
-    public Map<String, Cookie> getCookiesDownload() {
+    public Map<String, List<Cookie>> getCookiesDownload() {
         return cookiesDownload;
     }
 

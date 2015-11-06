@@ -54,4 +54,10 @@
         </dependency>
     </dependencies>
     
+    <distributionManagement>
+        <repository>
+            <id>local.repo</id>
+            <url>file:///home/show/repo</url>
+        </repository>
+    </distributionManagement>
 </project>
