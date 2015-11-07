@@ -2,6 +2,8 @@ package com.showvars.fugaframework.templates;
 
 import com.showvars.fugaframework.FugaApp;
 import com.showvars.fugaframework.foundation.Context;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import org.apache.commons.lang3.StringEscapeUtils;
 
@@ -62,4 +64,19 @@ public class TemplateApi {
 
         return StringEscapeUtils.escapeHtml4(sb.toString());
     }
+
+    public String urlencode(Object... args) {
+        StringBuilder sb = new StringBuilder();
+
+        for (Object a : args) {
+            sb.append(a != null ? a : "");
+        }
+
+        try {
+            return URLEncoder.encode(sb.toString(), "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            return "";
+        }
+    }
+
 }

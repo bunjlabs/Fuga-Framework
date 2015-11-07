@@ -46,7 +46,9 @@ public class SessionManager {
 
             sessions.put(sessionId, session);
 
-            ctx.getRequest().setCookie(new DefaultCookie("FUGASESSIONID", session.getSessionId().toString()));
+            DefaultCookie sessionCookie = new DefaultCookie("FUGASESSIONID", session.getSessionId().toString());
+            sessionCookie.setPath("/");
+            ctx.getRequest().setCookie(sessionCookie);
         }
         ctx.setSession(session);
     }
