@@ -64,6 +64,16 @@ public class TemplateApi {
 
         return StringEscapeUtils.escapeHtml4(sb.toString());
     }
+    
+    public String nltobr(Object... args) {
+        StringBuilder sb = new StringBuilder();
+
+        for (Object a : args) {
+            sb.append(a != null ? a : "");
+        }
+
+        return sb.toString().replaceAll("\n", "<br>");
+    }
 
     public String urlencode(Object... args) {
         StringBuilder sb = new StringBuilder();
