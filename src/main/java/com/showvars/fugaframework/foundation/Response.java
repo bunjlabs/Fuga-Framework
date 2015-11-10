@@ -71,7 +71,7 @@ public class Response {
         headers.put(name, value);
         return this;
     }
-    
+
     public Map<String, String> getHeaders() {
         return headers;
     }
@@ -92,4 +92,33 @@ public class Response {
         return contentLength;
     }
 
+    public Response asText() {
+        this.contentType = "text/plain";
+        return this;
+    }
+
+    public Response asHtml() {
+        this.contentType = "text/html";
+        return this;
+    }
+
+    public Response asJson() {
+        this.contentType = "application/json";
+        return this;
+    }
+
+    public Response asXml() {
+        this.contentType = "text/xml";
+        return this;
+    }
+    
+    public Response asJavascript() {
+        this.contentType = "application/javascript";
+        return this;
+    }
+    
+    public Response asCss() {
+        this.contentType = "text/css";
+        return this;
+    }
 }
