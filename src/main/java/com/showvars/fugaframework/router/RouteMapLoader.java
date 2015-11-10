@@ -9,8 +9,6 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 public class RouteMapLoader {
@@ -154,6 +152,8 @@ public class RouteMapLoader {
                 return new Extension(method, pattern, extensionList());
             } else if (t.ttype == TK_WORD) {
                 return new Extension(method, pattern, route());
+            } else {
+                throw new RoutesMapLoadException("Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
             }
         }
     }
