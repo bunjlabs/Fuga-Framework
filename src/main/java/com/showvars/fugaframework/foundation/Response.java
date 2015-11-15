@@ -10,7 +10,7 @@ import java.nio.file.Files;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class Response {
+public final class Response {
 
     private int status;
     private InputStream stream;
@@ -38,9 +38,9 @@ public class Response {
             contentType = Files.probeContentType(f.toPath());
             contentLength = f.length();
         } catch (FileNotFoundException ex) {
-            // TODO: file not found exception catching
+            setStatus(404);
         } catch (IOException ex) {
-            // TODO: and IO exception too
+            setStatus(404);
         }
         // maybe necessary to redirect request to 404NotFoundController?
     }

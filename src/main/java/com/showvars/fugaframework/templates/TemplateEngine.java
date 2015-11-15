@@ -32,7 +32,7 @@ public class TemplateEngine {
     }
 
     public String compile(String name) throws TemplateNotFoundException, TemplateRenderException {
-        if (templates.containsKey(name) && !config.getBoolean("fuga.templates.alwaysrecompile", false)) {
+        if (templates.containsKey(name) && !config.getBoolean("fuga.templates.recompile", false)) {
             return templates.get(name).getTid();
         }
 
@@ -60,7 +60,7 @@ public class TemplateEngine {
             throw new TemplateNotFoundException("Unable to load: " + name);
         }
         String tid
-                = config.getBoolean("fuga.templates.alwaysrecompile", false)
+                = config.getBoolean("fuga.templates.recompile", false)
                 && templates.containsKey(name)
                         ? templates.get(name).getTid() : Template.generateTid();
         Template t = new Template(this, tid, input.toString());

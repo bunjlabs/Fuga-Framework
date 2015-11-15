@@ -84,6 +84,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
             requestBuilder = new Request.Builder();
 
+            // Decode URI GET query parameters
             QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httprequest.getUri());
 
             Map<String, List<Cookie>> cookiesDownload = new HashMap<>();
@@ -116,26 +117,17 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                 return;
             }
             decoder = true;
-            /*try {
-             decoder = new HttpPostRequestDecoder(factory, httprequest);
-             } catch (ErrorDataDecoderException ex) {
-             log.catching(ex);
-             writeResponse(ctx, msg);
-             return;
-             } catch (IncompatibleDataDecoderException ex) {
-             log.catching(ex);
-             writeResponse(ctx, msg);
-             return;
-             }*/
         }
 
         if (msg instanceof HttpContent && decoder) {
-
             HttpContent httpContent = (HttpContent) msg;
+            
             content.writeBytes(httpContent.content());
+            
             if (httprequest != null && (httprequest.headers().contains("Content-Type", "form-data", true)
                     || httprequest.headers().contains("Content-Type", "x-www-form-urlencoded", true))) {
                 HttpPostRequestDecoder postDecoder = new HttpPostRequestDecoder(httprequest);
+                
                 try {
                     postDecoder.offer(httpContent);
                 } catch (ErrorDataDecoderException ex) {
@@ -144,39 +136,16 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                     reset();
                     return;
                 }
+                
                 readHttpDataChunkByChunk(postDecoder);
             }
+            
             if (httpContent instanceof LastHttpContent) {
                 writeResponse(ctx, msg);
                 reset();
                 return;
             }
-
         }
-        /*if (decoder != null) {
-         if (msg instanceof HttpContent) {
-
-         HttpContent chunk = (HttpContent) msg;
-         if (chunk instanceof LastHttpContent) {
-         writeResponse(ctx, msg);
-         reset();
-         } else {
-         requestBuilder.content(chunk.content());
-         try {
-         decoder.offer(chunk);
-         } catch (ErrorDataDecoderException ex) {
-         log.catching(ex);
-         writeResponse(ctx, msg);
-         return;
-         }
-         readHttpDataChunkByChunk();
-         if (chunk instanceof LastHttpContent) {
-         writeResponse(ctx, msg);
-         reset();
-         }
-         }
-         }
-         }*/
     }
 
     private void readHttpDataChunkByChunk(HttpPostRequestDecoder decoder) {
@@ -206,7 +175,6 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
     }
 
     private void writeResponse(ChannelHandlerContext ctx, HttpObject msg) {
-
         Request request = requestBuilder.build();
 
         Context sctx = new Context(request, app);
@@ -232,15 +200,11 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
         resp.getHeaders().entrySet().stream().forEach((e) -> {
             response.headers().set(e.getKey(), e.getValue());
         });
+        
+        response.headers().set(HttpHeaders.Names.SERVER, "Fuga Web Server/0.0.1.Alpha"); // how it's beautiful!
 
-        sctx.getRequest().getCookiesUpload().values().stream().forEach((c) -> {
-            cookiesUpload.add(c);
-        });
-
-        //Session session;
-        //if ((session = sctx.getSession()) != null) {
-        //    cookiesUpload.add(new DefaultCookie("FUGASESSIONID", session.getSessionId().toString()));
-        //}
+        // Set cookies
+        cookiesUpload.addAll(sctx.getRequest().getCookiesUpload().values());
         response.headers().set(HttpHeaders.Names.SET_COOKIE, ServerCookieEncoder.encode(cookiesUpload));
 
         if (resp.getContentLength() >= 0) {
@@ -253,13 +217,13 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
         }
 
-        response.headers().set(HttpHeaders.Names.SERVER, "Fuga Web Server/0.0.1.Alpha"); // how it's beautiful!
-
+        
         ctx.write(response);
 
         if (resp.getStream() != null) {
             ctx.write(new HttpChunkedInput(new ChunkedStream(resp.getStream())));
         }
+        
         LastHttpContent fs = new DefaultLastHttpContent();
         ChannelFuture sendContentFuture = ctx.writeAndFlush(fs);
         if (!HttpHeaders.isKeepAlive(httprequest)) {

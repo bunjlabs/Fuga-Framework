@@ -103,7 +103,7 @@ public class RouteMapLoader {
         }
 
         int lio = classMethodFull.lastIndexOf('.');
-        String className = "";
+        String className;
         String classMethod;
 
         if (lio < 0) {

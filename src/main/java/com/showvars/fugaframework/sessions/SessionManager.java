@@ -30,6 +30,7 @@ public class SessionManager {
     public void process(Context ctx) {
         List<Cookie> sessionCookieList = ctx.getRequest().getCookiesDownload().get("FUGASESSIONID");
         Session session = null;
+        
         boolean flag = false;
         if (sessionCookieList != null) {
             for (Cookie sessionCookie : sessionCookieList) {

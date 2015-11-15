@@ -14,7 +14,7 @@ public class DefaultController extends Controller {
 
     public static Response notFound(Context ctx) {
         String path = ctx.getApp().getConfiguration().get("fuga.404.redirect", null);
-        if (path != null) {
+        if (path != null && !path.isEmpty()) {
             return temporaryRedirect(Controller.Urls.that(ctx, path));
         }
         return notFound("404 Not Found");
@@ -23,7 +23,7 @@ public class DefaultController extends Controller {
     public static Response asset(Context ctx, String path) {
         File asset;
         if (ctx.getApp().getConfiguration().getBoolean("fuga.resources.external", false)) {
-            asset = new File(ctx.getApp().getConfiguration().get("fuga.resources.path", ".") + "/assets/" + path);
+            asset = new File(ctx.getApp().getConfiguration().get("fuga.resources.path", "./") + "/assets/" + path);
         } else {
             asset = new File(DefaultController.class.getResource("/assets/" + path).getFile());
         }

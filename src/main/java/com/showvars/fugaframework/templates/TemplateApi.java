@@ -35,12 +35,9 @@ public class TemplateApi {
         if (args.length > 0 && args[0] != null && args[0] instanceof String) {
             path = (String) args[0];
         }
-        //String port = app.getConfiguration().getInt("fuga.http.bindport", 8080) == 80
-        //        ? "" : ":" + app.getConfiguration().getInt("fuga.http.bindport", 8080);
         StringBuilder sb = new StringBuilder();
         sb.append("http://")
                 .append(ctx.getRequest().getHost())
-                //.append(port)
                 .append("/")
                 .append(path);
         return sb.toString();

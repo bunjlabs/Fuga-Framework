@@ -47,7 +47,7 @@ public abstract class FugaApp {
         
         prepare();
 
-        serviceManager.registerService(new SessionService(this), 15, TimeUnit.SECONDS);
+        serviceManager.registerService(new SessionService(this), config.getInt("fuga.sessions.refreshtime", 15), TimeUnit.SECONDS);
         addr = new InetSocketAddress(config.get("fuga.http.bindhost", "localhost"), config.getInt("fuga.http.bindport", 8080));
         httpserver = new HttpServer(addr, this);
         httpserver.start();
