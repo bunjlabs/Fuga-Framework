@@ -9,8 +9,12 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Map;
 import java.util.TreeMap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public final class Response {
+
+    private final Logger log = LogManager.getLogger(Response.class);
 
     private int status;
     private InputStream stream;
@@ -19,37 +23,29 @@ public final class Response {
     private Map<String, String> headers = new TreeMap<>();
 
     public Response() {
-        status = 200;
         contentType = "application/octet-stream";   // or anything else
-        contentLength = 0;
-    }
-
-    public Response(String s) {
-        status = 200;
-        stream = new ByteArrayInputStream(s.getBytes());
-        contentType = "text/html";  // I assume that the html will be more often
-        contentLength = s.length();
-    }
-
-    public Response(File f) {
-        status = 200;
-        try {
-            stream = new FileInputStream(f);
-            contentType = Files.probeContentType(f.toPath());
-            contentLength = f.length();
-        } catch (FileNotFoundException ex) {
-            setStatus(404);
-        } catch (IOException ex) {
-            setStatus(404);
-        }
-        // maybe necessary to redirect request to 404NotFoundController?
+        contentLength = -1;
     }
 
     public Response(InputStream is) {
-        status = 200;
+        this();
         stream = is;
-        contentType = "application/octet-stream";
-        contentLength = -1;
+    }
+
+    public Response(byte[] bytes) {
+        this(new ByteArrayInputStream(bytes));
+        contentLength = bytes.length;
+    }
+
+    public Response(String s) {
+        this(s.getBytes());
+        contentType = "text/html";  // I assume that text/html will be more often
+    }
+
+    public Response(File f) throws IOException {
+        this(new FileInputStream(f));
+        contentType = Files.probeContentType(f.toPath());
+        contentLength = f.length();
     }
 
     public Response setStatus(int status) {
@@ -111,12 +107,12 @@ public final class Response {
         this.contentType = "text/xml";
         return this;
     }
-    
+
     public Response asJavascript() {
         this.contentType = "application/javascript";
         return this;
     }
-    
+
     public Response asCss() {
         this.contentType = "text/css";
         return this;

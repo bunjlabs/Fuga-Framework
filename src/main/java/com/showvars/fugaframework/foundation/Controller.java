@@ -1,60 +1,13 @@
 package com.showvars.fugaframework.foundation;
 
-import com.showvars.fugaframework.foundation.controllers.DefaultController;
 import com.showvars.fugaframework.templates.TemplateNotFoundException;
 import com.showvars.fugaframework.templates.TemplateRenderException;
-import java.io.File;
-import java.io.InputStream;
 import java.util.UUID;
 
-public abstract class Controller {
+public abstract class Controller extends Responses {
 
     protected static Response proceed() {
         return null;
-    }
-
-    protected static Response notFound() {
-        return new Response().setStatus(404);
-    }
-
-    protected static Response notFound(String s) {
-        return new Response(s).setStatus(404);
-    }
-
-    protected static Response notFound(File f) {
-        return new Response(f).setStatus(404);
-    }
-
-    protected static Response notFound(InputStream is) {
-        return new Response(is).setStatus(404);
-    }
-
-    protected static Response notFoundDefault(Context ctx) {
-        return DefaultController.notFound(ctx);
-    }
-
-    protected static Response ok(String s) {
-        return new Response(s);
-    }
-
-    protected static Response ok(File f) {
-        return new Response(f);
-    }
-
-    protected static Response ok(InputStream is) {
-        return new Response(is);
-    }
-
-    protected static Response nothing() {
-        return new Response().setStatus(204);
-    }
-
-    protected static Response redirect(String url) {
-        return new Response().setStatus(301).setHeader("Location", url);
-    }
-
-    protected static Response temporaryRedirect(String url) {
-        return new Response().setStatus(302).setHeader("Location", url);
     }
 
     protected static String view(Context ctx, String name, Object obj) throws TemplateNotFoundException, TemplateRenderException {
