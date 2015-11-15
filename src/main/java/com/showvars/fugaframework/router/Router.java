@@ -25,7 +25,7 @@ public class Router {
         try {
             load(new FileInputStream(file));
             log.info("Routes loaded from: {}", file.getPath());
-        } catch (FileNotFoundException | NullPointerException | RoutesMapLoadException ex) {
+        } catch (FileNotFoundException | NullPointerException | RoutesMapLoadException | RoutesMapSyntaxException ex) {
             log.catching(ex);
         }
     }
@@ -34,7 +34,7 @@ public class Router {
         try {
             load(new FileInputStream(path));
             log.info("Routes loaded from: {}", path);
-        } catch (FileNotFoundException | NullPointerException | RoutesMapLoadException ex) {
+        } catch (FileNotFoundException | NullPointerException | RoutesMapLoadException | RoutesMapSyntaxException ex) {
             log.catching(ex);
         }
     }
@@ -43,12 +43,12 @@ public class Router {
         try {
             load(Router.class.getResourceAsStream("/" + path));
             log.info("Routes loaded from resources: {}", path);
-        } catch (NullPointerException | RoutesMapLoadException ex) {
+        } catch (NullPointerException | RoutesMapLoadException | RoutesMapSyntaxException ex) {
             log.catching(ex);
         }
     }
 
-    public void load(InputStream input) throws NullPointerException, RoutesMapLoadException {
+    public void load(InputStream input) throws NullPointerException, RoutesMapLoadException, RoutesMapSyntaxException {
         if (input == null) {
             throw new NullPointerException();
         }

@@ -35,11 +35,11 @@ public class Tokenizer {
         }
     }
 
-    public int next() {
+    public int next() throws RoutesMapSyntaxException {
         return ttype = nextToken();
     }
 
-    private int nextToken() {
+    private int nextToken() throws RoutesMapSyntaxException {
         sval = null;
 
         try {
@@ -90,7 +90,7 @@ public class Tokenizer {
                         if (!currIsWord()) {
                             char ct = (char) curr;
                             skip();
-                            throw new IOException("Unexpected symbol: " + ct);
+                            throw new RoutesMapSyntaxException(this, "Unexpected symbol: " + ct);
                         }
                         return word();
                     }
@@ -102,7 +102,7 @@ public class Tokenizer {
         }
     }
 
-    private void integer() throws IOException {
+    private void integer() throws RoutesMapSyntaxException, IOException {
         StringBuilder sb = new StringBuilder();
 
         while (currIsDigit()) {
@@ -113,11 +113,11 @@ public class Tokenizer {
         sval = sb.toString();
 
         if (!integerPattern.matcher(sval).matches()) {
-            throw new IOException("Not a integer");
+            throw new RoutesMapSyntaxException(this, "Not a integer");
         }
     }
 
-    private void constant() throws IOException {
+    private void constant() throws RoutesMapSyntaxException, IOException {
         StringBuilder sb = new StringBuilder();
         skip();
         while (curr != '"') {
@@ -125,7 +125,7 @@ public class Tokenizer {
                 case -1:
                 case '\n':
                 case '\r':
-                    throw new IOException("Unfinished string");
+                    throw new RoutesMapSyntaxException(this, "Unfinished string");
                 case '\\':
                     skip();
                     if (curr == 'n') {
@@ -139,7 +139,7 @@ public class Tokenizer {
                     } else if (curr == '\\') {
                         sb.append('\\');
                     } else {
-                        throw new IOException("Unsupported char escape sequance: \\" + ((char) curr));
+                        throw new RoutesMapSyntaxException(this, "Unsupported char escape sequance: \\" + ((char) curr));
                     }
                     break;
                 default:
@@ -179,7 +179,7 @@ public class Tokenizer {
         sval = sb.toString();
     }
 
-    private void comment() throws IOException {
+    private void comment() throws IOException, RoutesMapSyntaxException {
         skip();
         if (curr == '*') { /* block comment */
 
@@ -230,14 +230,14 @@ public class Tokenizer {
         column++;
     }
 
-    private void incLine() throws IOException {
+    private void incLine() throws IOException, RoutesMapSyntaxException {
         int old = curr;
         skip();
         if (currIsNewline() && curr != old) {
             skip();
         }
         if (++line >= Integer.MAX_VALUE) {
-            throw new IOException("Too big input");
+            throw new RoutesMapSyntaxException(this, "Too big input");
         }
         column = 1;
     }

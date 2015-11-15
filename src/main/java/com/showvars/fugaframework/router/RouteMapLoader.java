@@ -37,12 +37,12 @@ public class RouteMapLoader {
         }
     }
 
-    private RouteParameter parameter() throws RoutesMapLoadException {
+    private RouteParameter parameter() throws RoutesMapSyntaxException {
         String value;
         String type = "String";
 
         if (t.ttype != TK_INTEGER && t.ttype != TK_STRCONST) {
-            throw new RoutesMapLoadException("Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
+            throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
         }
 
         boolean isConst = t.ttype == TK_STRCONST;
@@ -53,7 +53,7 @@ public class RouteMapLoader {
         if (t.ttype == ':') {
             t.next();
             if (t.ttype != TK_WORD) {
-                throw new RoutesMapLoadException("Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
+                throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
             }
             type = t.sval;
             t.next();
@@ -65,11 +65,11 @@ public class RouteMapLoader {
         }
     }
 
-    private Route route() throws RoutesMapLoadException {
+    private Route route() throws RoutesMapSyntaxException, RoutesMapLoadException {
         String classMethodFull = t.sval;
         t.next();
         if (t.ttype != '(') {
-            throw new RoutesMapLoadException("Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
+            throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
         }
         t.next();
 
@@ -136,7 +136,7 @@ public class RouteMapLoader {
 
     }
 
-    private Extension extension() throws RoutesMapLoadException {
+    private Extension extension() throws RoutesMapLoadException, RoutesMapSyntaxException {
         RequestMethod method = null;
         Pattern pattern = null;
 
@@ -153,19 +153,19 @@ public class RouteMapLoader {
             } else if (t.ttype == TK_WORD) {
                 return new Extension(method, pattern, route());
             } else {
-                throw new RoutesMapLoadException("Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
+                throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
             }
         }
     }
 
-    private List<Extension> extensionList() throws RoutesMapLoadException {
+    private List<Extension> extensionList() throws RoutesMapSyntaxException, RoutesMapLoadException {
         List<Extension> list = new ArrayList<>();
         while (t.ttype != Tokenizer.TK_EOF) {
             switch (t.ttype) {
                 case TK_USE: {
                     t.next();
                     if (t.ttype != TK_WORD) {
-                        throw new RoutesMapLoadException("Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
+                        throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
                     }
                     uses.add(t.sval);
                     t.next();
@@ -182,13 +182,15 @@ public class RouteMapLoader {
                     t.next();
                     return list;
                 }
+                default: {
+                    throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
+                }
             }
-            //t.next();
         }
         return list;
     }
 
-    public List<Extension> load(InputStream input) throws RoutesMapLoadException {
+    public List<Extension> load(InputStream input) throws RoutesMapLoadException, RoutesMapSyntaxException {
         t = new Tokenizer(new InputStreamReader(input));
 
         t.next();
