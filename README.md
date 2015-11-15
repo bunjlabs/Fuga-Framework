@@ -5,10 +5,10 @@ Small Java Web Framework for big projects.
 [![Build Status](https://travis-ci.org/IntCode/Fuga-Framework.svg?branch=master)](https://travis-ci.org/IntCode/Fuga-Framework)
 [![Dependency Status](https://www.versioneye.com/user/projects/55b8dac9653762001700136e/badge.svg?style=flat)](https://www.versioneye.com/user/projects/55b8dac9653762001700136e)
 
-
+[Roadmap](https://github.com/IntCode/Fuga-Framework/wiki/Roadmap)
 ## Installation
 
-First of all whe need to download and import Fuga Framework in your IDE, create new maven project and add dependence in `pom.xml`:
+First of all you need to download and import Fuga Framework in your IDE, create new maven project and add dependence in `pom.xml`:
 
 ```
 <dependency>
@@ -22,7 +22,7 @@ First of all whe need to download and import Fuga Framework in your IDE, create 
 
 Every web application must contain at least main class, one controller and routes map.
 
-Let's create simple cotroller thar returns `Hello world!` for every client:
+Ccreate simple cotroller that returns `Hello world!` for every client:
 
 ```
 package com.example.controllers;
@@ -40,7 +40,7 @@ public class HelloWorldController extends Controller {
 }
 ```
 
-Now we need to add this controller to routes map. Create file `helloworld.routesmap` in `resources/routes/` and add this:
+Now add this controller to routes map. Create file `helloworld.routesmap` in `resources/routes/` and add this:
 
 ```
 use com.example.controllers
