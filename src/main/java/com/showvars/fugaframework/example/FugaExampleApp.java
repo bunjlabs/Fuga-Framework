@@ -6,7 +6,7 @@ public class FugaExampleApp extends FugaApp {
 
     @Override
     public void prepare() {
-        this.getRouter().loadFromResources("/example/routes.map");
+        this.getRouter().loadFromResources("example/routes.map");
         
     }
 
