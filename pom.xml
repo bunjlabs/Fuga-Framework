@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.showvars</groupId>
+    <groupId>com.bunjlabs</groupId>
     <artifactId>fuga</artifactId>
     <version>0.2.1-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -13,8 +13,8 @@
     </description>
     
     <organization>
-        <name>The Fuga Framework Project</name>
-        <!-- <url>http://example.com/</url> -->
+        <name>Bunjlabs</name>
+        <url>http://bunjlabs.com/</url>
     </organization>
 
     <licenses>
@@ -23,7 +23,7 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0</url>
         </license>
     </licenses>
-    <inceptionYear>2014</inceptionYear>
+    <inceptionYear>2015</inceptionYear>
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -55,9 +55,15 @@
     </dependencies>
     
     <distributionManagement>
-        <repository>
-            <id>local.repo</id>
-            <url>file:///home/show/repo</url>
-        </repository>
+      <repository>
+        <id>bunjlabs.repo</id>
+        <name>Bunjlabs Maven Repository</name>
+        <url>http://maven.bunjlabs.com/releases</url>
+      </repository>
+      <snapshotRepository>
+        <id>bunjlabs.repo</id>
+        <name>Bunjlabs Maven Repository</name>
+        <url>http://maven.bunjlabs.com/snapshots</url>
+      </snapshotRepository>
     </distributionManagement>
 </project>
