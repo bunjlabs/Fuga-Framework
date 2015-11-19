@@ -121,10 +121,8 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
         if (msg instanceof HttpContent && decoder) {
             HttpContent httpContent = (HttpContent) msg;
             
-            content.writeBytes(httpContent.content());
-            
-            if (httprequest != null && (httprequest.headers().contains("Content-Type", "form-data", true)
-                    || httprequest.headers().contains("Content-Type", "x-www-form-urlencoded", true))) {
+            if (httprequest != null && (httprequest.headers().contains("Content-Type", "application/form-data", true)
+                    || httprequest.headers().contains("Content-Type", "application/x-www-form-urlencoded", true))) {
                 HttpPostRequestDecoder postDecoder = new HttpPostRequestDecoder(httprequest);
                 
                 try {
@@ -137,6 +135,8 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                 }
                 
                 readHttpDataChunkByChunk(postDecoder);
+            } else {
+                content.writeBytes(httpContent.content());
             }
             
             if (httpContent instanceof LastHttpContent) {
