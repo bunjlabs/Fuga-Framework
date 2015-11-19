@@ -1,4 +1,4 @@
-package com.showvars.fugaframework.router;
+package com.bunjlabs.fugaframework.router;
 
 public class RoutesMapLoadException extends Exception {
 

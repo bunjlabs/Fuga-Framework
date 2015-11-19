@@ -1,11 +1,11 @@
-package com.showvars.fugaframework.foundation.controllers;
+package com.bunjlabs.fugaframework.foundation.controllers;
 
-import com.showvars.fugaframework.foundation.Context;
-import com.showvars.fugaframework.foundation.Controller;
-import com.showvars.fugaframework.foundation.Response;
-import com.showvars.fugaframework.templates.TemplateNotFoundException;
-import com.showvars.fugaframework.templates.TemplateRenderException;
-import com.showvars.fugaframework.utils.MimeTypeUtils;
+import com.bunjlabs.fugaframework.foundation.Context;
+import com.bunjlabs.fugaframework.foundation.Controller;
+import com.bunjlabs.fugaframework.foundation.Response;
+import com.bunjlabs.fugaframework.templates.TemplateNotFoundException;
+import com.bunjlabs.fugaframework.templates.TemplateRenderException;
+import com.bunjlabs.fugaframework.utils.MimeTypeUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

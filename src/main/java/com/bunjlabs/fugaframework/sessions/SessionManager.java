@@ -1,7 +1,7 @@
-package com.showvars.fugaframework.sessions;
+package com.bunjlabs.fugaframework.sessions;
 
-import com.showvars.fugaframework.FugaApp;
-import com.showvars.fugaframework.foundation.Context;
+import com.bunjlabs.fugaframework.FugaApp;
+import com.bunjlabs.fugaframework.foundation.Context;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.DefaultCookie;
 import java.util.Date;

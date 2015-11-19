@@ -1,6 +1,6 @@
-package com.showvars.fugaframework.network;
+package com.bunjlabs.fugaframework.network;
 
-import com.showvars.fugaframework.FugaApp;
+import com.bunjlabs.fugaframework.FugaApp;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -15,11 +15,11 @@ public class HttpServer {
 
     private static final Logger log = LogManager.getLogger(HttpServer.class);
     private final SocketAddress addr;
-    private final FugaApp server;
+    private final FugaApp app;
 
-    public HttpServer(SocketAddress addr, FugaApp server) {
+    public HttpServer(SocketAddress addr, FugaApp app) {
         this.addr = addr;
-        this.server = server;
+        this.app = app;
     }
 
     public void start() throws Exception {
@@ -39,7 +39,7 @@ public class HttpServer {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
-                    .childHandler(new HttpServerInitializer(server));
+                    .childHandler(new HttpServerInitializer(app));
             Channel ch = b.bind(addr).sync().channel();
             ch.closeFuture().sync();
         } finally {

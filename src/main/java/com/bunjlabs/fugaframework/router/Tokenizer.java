@@ -1,4 +1,4 @@
-package com.showvars.fugaframework.router;
+package com.bunjlabs.fugaframework.router;
 
 import java.io.IOException;
 import java.io.Reader;

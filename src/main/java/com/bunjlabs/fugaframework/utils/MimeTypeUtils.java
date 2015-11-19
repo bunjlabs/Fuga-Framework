@@ -1,4 +1,4 @@
-package com.showvars.fugaframework.utils;
+package com.bunjlabs.fugaframework.utils;
 
 import java.util.HashMap;
 import java.util.Map;

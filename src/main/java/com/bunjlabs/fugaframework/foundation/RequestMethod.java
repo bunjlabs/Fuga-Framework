@@ -1,4 +1,4 @@
-package com.showvars.fugaframework.foundation;
+package com.bunjlabs.fugaframework.foundation;
 
 public enum RequestMethod {
 

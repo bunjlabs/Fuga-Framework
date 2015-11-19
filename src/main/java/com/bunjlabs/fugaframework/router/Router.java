@@ -1,8 +1,8 @@
-package com.showvars.fugaframework.router;
+package com.bunjlabs.fugaframework.router;
 
-import com.showvars.fugaframework.foundation.Context;
-import com.showvars.fugaframework.foundation.Response;
-import com.showvars.fugaframework.foundation.controllers.DefaultController;
+import com.bunjlabs.fugaframework.foundation.Context;
+import com.bunjlabs.fugaframework.foundation.Response;
+import com.bunjlabs.fugaframework.foundation.controllers.DefaultController;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;

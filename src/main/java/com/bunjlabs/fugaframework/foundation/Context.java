@@ -1,7 +1,7 @@
-package com.showvars.fugaframework.foundation;
+package com.bunjlabs.fugaframework.foundation;
 
-import com.showvars.fugaframework.FugaApp;
-import com.showvars.fugaframework.sessions.Session;
+import com.bunjlabs.fugaframework.FugaApp;
+import com.bunjlabs.fugaframework.sessions.Session;
 import java.util.HashMap;
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package com.showvars.fugaframework.configuration;
+package com.bunjlabs.fugaframework.configuration;
 
 import java.io.File;
 import java.io.FileInputStream;

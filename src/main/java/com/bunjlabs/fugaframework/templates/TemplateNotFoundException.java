@@ -1,5 +1,4 @@
-
-package com.showvars.fugaframework.templates;
+package com.bunjlabs.fugaframework.templates;
 
 public class TemplateNotFoundException extends Exception {
 

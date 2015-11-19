@@ -1,6 +1,7 @@
-package com.showvars.fugaframework.example;
+package com.bunjlabs.fugaframework.example;
 
-import com.showvars.fugaframework.FugaApp;
+import com.bunjlabs.fugaframework.FugaApp;
+
 
 public class FugaExampleApp extends FugaApp {
 

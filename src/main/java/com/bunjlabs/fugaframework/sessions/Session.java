@@ -1,4 +1,4 @@
-package com.showvars.fugaframework.sessions;
+package com.bunjlabs.fugaframework.sessions;
 
 import java.util.Date;
 import java.util.HashMap;

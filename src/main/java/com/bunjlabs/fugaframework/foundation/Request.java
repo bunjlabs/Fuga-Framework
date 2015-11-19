@@ -1,4 +1,4 @@
-package com.showvars.fugaframework.foundation;
+package com.bunjlabs.fugaframework.foundation;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.http.Cookie;

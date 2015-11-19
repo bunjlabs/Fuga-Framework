@@ -1,4 +1,4 @@
-package com.showvars.fugaframework.router;
+package com.bunjlabs.fugaframework.router;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

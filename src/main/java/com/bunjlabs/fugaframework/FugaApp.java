@@ -1,12 +1,13 @@
-package com.showvars.fugaframework;
+package com.bunjlabs.fugaframework;
 
-import com.showvars.fugaframework.configuration.Configuration;
-import com.showvars.fugaframework.network.HttpServer;
-import com.showvars.fugaframework.router.Router;
-import com.showvars.fugaframework.services.ServiceManager;
-import com.showvars.fugaframework.sessions.SessionManager;
-import com.showvars.fugaframework.sessions.SessionService;
-import com.showvars.fugaframework.templates.TemplateEngine;
+
+import com.bunjlabs.fugaframework.configuration.Configuration;
+import com.bunjlabs.fugaframework.network.HttpServer;
+import com.bunjlabs.fugaframework.router.Router;
+import com.bunjlabs.fugaframework.services.ServiceManager;
+import com.bunjlabs.fugaframework.sessions.SessionManager;
+import com.bunjlabs.fugaframework.sessions.SessionService;
+import com.bunjlabs.fugaframework.templates.TemplateEngine;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.HashMap;

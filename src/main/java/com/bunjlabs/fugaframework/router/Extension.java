@@ -1,6 +1,6 @@
-package com.showvars.fugaframework.router;
+package com.bunjlabs.fugaframework.router;
 
-import com.showvars.fugaframework.foundation.RequestMethod;
+import com.bunjlabs.fugaframework.foundation.RequestMethod;
 import java.util.List;
 import java.util.regex.Pattern;
 

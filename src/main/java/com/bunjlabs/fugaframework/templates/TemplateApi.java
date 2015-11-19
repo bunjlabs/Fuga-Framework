@@ -1,7 +1,7 @@
-package com.showvars.fugaframework.templates;
+package com.bunjlabs.fugaframework.templates;
 
-import com.showvars.fugaframework.FugaApp;
-import com.showvars.fugaframework.foundation.Context;
+import com.bunjlabs.fugaframework.FugaApp;
+import com.bunjlabs.fugaframework.foundation.Context;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;

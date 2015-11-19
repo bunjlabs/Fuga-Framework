@@ -1,6 +1,6 @@
-package com.showvars.fugaframework.services;
+package com.bunjlabs.fugaframework.services;
 
-import com.showvars.fugaframework.FugaApp;
+import com.bunjlabs.fugaframework.FugaApp;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;

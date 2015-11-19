@@ -1,5 +1,4 @@
-package com.showvars.fugaframework.services;
-
+package com.bunjlabs.fugaframework.services;
 
 public abstract class Service implements Runnable{
 

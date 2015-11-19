@@ -1,4 +1,4 @@
-package com.showvars.fugaframework.templates;
+package com.bunjlabs.fugaframework.templates;
 
 import java.nio.charset.Charset;
 

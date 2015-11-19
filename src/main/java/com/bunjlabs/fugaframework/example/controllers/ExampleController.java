@@ -1,8 +1,9 @@
-package com.showvars.fugaframework.example.controllers;
+package com.bunjlabs.fugaframework.example.controllers;
 
-import com.showvars.fugaframework.foundation.Context;
-import com.showvars.fugaframework.foundation.Controller;
-import com.showvars.fugaframework.foundation.Response;
+
+import com.bunjlabs.fugaframework.foundation.Context;
+import com.bunjlabs.fugaframework.foundation.Controller;
+import com.bunjlabs.fugaframework.foundation.Response;
 import java.nio.charset.Charset;
 
 public class ExampleController extends Controller {

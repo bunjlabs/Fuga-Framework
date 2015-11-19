@@ -1,8 +1,8 @@
-package com.showvars.fugaframework.templates;
+package com.bunjlabs.fugaframework.templates;
 
-import com.showvars.fugaframework.FugaApp;
-import com.showvars.fugaframework.configuration.Configuration;
-import com.showvars.fugaframework.foundation.Context;
+import com.bunjlabs.fugaframework.FugaApp;
+import com.bunjlabs.fugaframework.configuration.Configuration;
+import com.bunjlabs.fugaframework.foundation.Context;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;

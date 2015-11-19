@@ -1,8 +1,8 @@
-package com.showvars.fugaframework.sessions;
+package com.bunjlabs.fugaframework.sessions;
 
-import com.showvars.fugaframework.FugaApp;
-import com.showvars.fugaframework.network.HttpServer;
-import com.showvars.fugaframework.services.Service;
+import com.bunjlabs.fugaframework.FugaApp;
+import com.bunjlabs.fugaframework.network.HttpServer;
+import com.bunjlabs.fugaframework.services.Service;
 import java.util.logging.Logger;
 
 public class SessionService extends Service {

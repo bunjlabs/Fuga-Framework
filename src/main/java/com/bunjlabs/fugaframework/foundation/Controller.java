@@ -1,7 +1,7 @@
-package com.showvars.fugaframework.foundation;
+package com.bunjlabs.fugaframework.foundation;
 
-import com.showvars.fugaframework.templates.TemplateNotFoundException;
-import com.showvars.fugaframework.templates.TemplateRenderException;
+import com.bunjlabs.fugaframework.templates.TemplateNotFoundException;
+import com.bunjlabs.fugaframework.templates.TemplateRenderException;
 import java.util.UUID;
 
 public abstract class Controller extends Responses {
