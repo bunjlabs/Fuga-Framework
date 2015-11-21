@@ -1,5 +1,6 @@
 package com.bunjlabs.fugaframework.foundation;
 
+import com.bunjlabs.fugaframework.FugaApp;
 import com.bunjlabs.fugaframework.templates.TemplateNotFoundException;
 import com.bunjlabs.fugaframework.templates.TemplateRenderException;
 import java.lang.reflect.InvocationTargetException;
@@ -7,6 +8,7 @@ import java.util.UUID;
 
 public abstract class Controller extends Responses {
 
+    protected FugaApp app;
     protected Context ctx;
     protected Urls urls;
     protected Forms forms;
@@ -25,8 +27,9 @@ public abstract class Controller extends Responses {
 
     public static class Builder {
 
-        public static Controller build(Class controller, Context ctxb) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+        public static Controller build(Class controller, FugaApp app, Context ctxb) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
             Controller c = (Controller) controller.getConstructor().newInstance();
+            c.app = app;
             c.ctx = ctxb;
             c.urls = new Urls(c);
             c.forms = new Forms(c);

@@ -1,5 +1,6 @@
 package com.bunjlabs.fugaframework.router;
 
+import com.bunjlabs.fugaframework.FugaApp;
 import com.bunjlabs.fugaframework.foundation.Context;
 import com.bunjlabs.fugaframework.foundation.Controller;
 import com.bunjlabs.fugaframework.foundation.Response;
@@ -60,7 +61,7 @@ public class Router {
 
     }
 
-    public Response forward(Context ctx) {
+    public Response forward(FugaApp app, Context ctx) {
         if (extensions == null || extensions.isEmpty()) {
             return Responses.internalServerError(new RoutesMapException("Empty routes map"));
         }
@@ -68,7 +69,7 @@ public class Router {
         Response resp;
 
         try {
-            resp = forward(ctx, extensions);
+            resp = forward(app, ctx, extensions);
         } catch (RoutesMapException ex) {
             return Responses.internalServerError();
         }
@@ -80,7 +81,7 @@ public class Router {
         return Responses.notFound("404 Not Found");
     }
 
-    private Response forward(Context ctx, List<Extension> exts) throws RoutesMapException {
+    private Response forward(FugaApp app, Context ctx, List<Extension> exts) throws RoutesMapException {
         if (exts == null) {
             throw new RoutesMapException("Extensions sublist is null");
         }
@@ -109,7 +110,7 @@ public class Router {
                 }
 
                 try {
-                    Response resp = invoke(ctx, route, args);
+                    Response resp = invoke(app, ctx, route, args);
                     if (resp != null) {
                         return resp;
                     }
@@ -118,7 +119,7 @@ public class Router {
                     return Responses.internalServerError(ex);
                 }
             } else if (ext.getNodes() != null && !ext.getNodes().isEmpty()) {
-                Response resp = (Response) forward(ctx, ext.getNodes());
+                Response resp = (Response) forward(app, ctx, ext.getNodes());
                 if (resp != null) {
                     return resp;
                 }
@@ -127,8 +128,8 @@ public class Router {
         return null;
     }
 
-    private static Response invoke(Context ctx, Route route, Object... args) throws Exception {
-        Controller controller = Controller.Builder.build(route.getController(), ctx);
+    private Response invoke(FugaApp app, Context ctx, Route route, Object... args) throws Exception {
+        Controller controller = Controller.Builder.build(route.getController(), app, ctx);
         return (Response) route.getMethod().invoke(controller, args);
     }
 }

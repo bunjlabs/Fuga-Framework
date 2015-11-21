@@ -180,7 +180,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
         log.debug("Access from {}: {}{}", request.getSocketAddress(), request.getHost(), request.getUri());
 
-        resp = app.getRouter().forward(sctx);
+        resp = app.getRouter().forward(app, sctx);
 
         HttpResponse response = new DefaultHttpResponse(
                 HttpVersion.HTTP_1_1,

@@ -1,6 +1,5 @@
 package com.bunjlabs.fugaframework;
 
-
 import com.bunjlabs.fugaframework.configuration.Configuration;
 import com.bunjlabs.fugaframework.network.HttpServer;
 import com.bunjlabs.fugaframework.router.Router;
@@ -18,30 +17,31 @@ public abstract class FugaApp {
 
     private static final Logger log = LogManager.getLogger(FugaApp.class);
     private final Configuration config;
-    private final Router hmap = new Router();
+    private final Router router;
     private final SessionManager sessionManager;
-    private final TemplateEngine templateEngine;
     private final ServiceManager serviceManager;
+    private final TemplateEngine templateEngine;
     private HttpServer httpserver;
     private SocketAddress addr;
 
     public FugaApp() {
         this.config = new Configuration();
 
-        this.sessionManager = new SessionManager(this);
-
+        this.router = new Router();
+        this.sessionManager = new SessionManager();
+        this.serviceManager = new ServiceManager();
+        
         this.templateEngine = new TemplateEngine(this);
-        this.serviceManager = new ServiceManager(this);
 
     }
 
     public Router getRouter() {
-        return hmap;
+        return router;
     }
 
     public void start() throws Exception {
-        log.info("Fuga Framework 0.2.1-SNAPSHOT");
-        
+        log.info("Fuga Framework 0.3.0-SNAPSHOT");
+
         prepare();
 
         serviceManager.registerService(new SessionService(this), config.getInt("fuga.sessions.refreshtime", 15), TimeUnit.SECONDS);

@@ -13,11 +13,6 @@ import java.util.UUID;
 public class SessionManager {
 
     private final Map<UUID, Session> sessions = new HashMap<>();
-    private final FugaApp app;
-
-    public SessionManager(FugaApp app) {
-        this.app = app;
-    }
 
     public Session getSession(UUID sessionId) {
         return sessions.get(sessionId);
