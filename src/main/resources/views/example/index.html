@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Example page</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link  media="all" rel="stylesheet" href="{# api.asset('common.css') #}">
+    </head>
+    <body>
+        {%
+        
+            var data = context.get('data');
+        
+        %}
+        <p>{# data #}</p>
+    </body>
+</html>
