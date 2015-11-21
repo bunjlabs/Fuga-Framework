@@ -1,4 +1,4 @@
-/* Routes map for example Fuga App */
+/* Routes map example Fuga App */
 
 use com.bunjlabs.fugaframework.example.controllers
 

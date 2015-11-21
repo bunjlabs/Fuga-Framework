@@ -18,6 +18,7 @@ public class Request {
     private final Map<String, List<Cookie>> cookiesDownload;
     private final Map<String, Cookie> cookiesUpload;
     private final ByteBuf content;
+    private String s;
 
     public static class Builder {
 

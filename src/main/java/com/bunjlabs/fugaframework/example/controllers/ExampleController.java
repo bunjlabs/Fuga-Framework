@@ -1,6 +1,5 @@
 package com.bunjlabs.fugaframework.example.controllers;
 
-import com.bunjlabs.fugaframework.foundation.Context;
 import com.bunjlabs.fugaframework.foundation.Controller;
 import com.bunjlabs.fugaframework.foundation.Response;
 import com.bunjlabs.fugaframework.templates.TemplateNotFoundException;
@@ -9,20 +8,20 @@ import java.nio.charset.Charset;
 
 public class ExampleController extends Controller {
 
-    public static Response skip(Context ctx) {
+    public Response skip() {
         ctx.getSession().put("Key", "Some important string");
 
         ctx.put("key", "Context value");
         return proceed();
     }
 
-    public static Response index(Context ctx, String one, int to) throws TemplateNotFoundException, TemplateRenderException {
+    public Response index(String one, int to) throws TemplateNotFoundException, TemplateRenderException {
         ctx.put("data", "Hello! " + one + " - " + to + " = " + ctx.getSession().getString("Key")
                 + " | " + ctx.get("key", String.class));
-        return ok(view(ctx, "example/index.html"));
+        return ok(view("example/index.html"));
     }
 
-    public static Response post(Context ctx) {
+    public Response post() {
 
         return ok(ctx.getRequest().getContent().toString(Charset.forName("UTF-8")));
     }

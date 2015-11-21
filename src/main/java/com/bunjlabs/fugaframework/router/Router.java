@@ -1,15 +1,15 @@
 package com.bunjlabs.fugaframework.router;
 
 import com.bunjlabs.fugaframework.foundation.Context;
+import com.bunjlabs.fugaframework.foundation.Controller;
 import com.bunjlabs.fugaframework.foundation.Response;
-import com.bunjlabs.fugaframework.foundation.controllers.DefaultController;
+import com.bunjlabs.fugaframework.foundation.Responses;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.regex.Matcher;
 import org.apache.logging.log4j.LogManager;
@@ -62,22 +62,22 @@ public class Router {
 
     public Response forward(Context ctx) {
         if (extensions == null || extensions.isEmpty()) {
-            return DefaultController.exception(ctx, new RoutesMapException("Empty routes map"));
+            return Responses.internalServerError(new RoutesMapException("Empty routes map"));
         }
-        
+
         Response resp;
-        
+
         try {
             resp = forward(ctx, extensions);
         } catch (RoutesMapException ex) {
-            return DefaultController.exception(ctx, ex);
+            return Responses.internalServerError();
         }
-        
+
         if (resp != null) {
             return resp;
         }
-        
-        return DefaultController.notFound(ctx);
+
+        return Responses.notFound("404 Not Found");
     }
 
     private Response forward(Context ctx, List<Extension> exts) throws RoutesMapException {
@@ -97,31 +97,25 @@ public class Router {
 
             if (ext.getRoute() != null) {
                 Route route = ext.getRoute();
-                Object[] args = new Object[route.getParameters().size() + 1];
-                args[0] = ctx;
-                for (int i = 1; i < args.length; i++) {
-                    RouteParameter mp = route.getParameters().get(i - 1);
+                Object[] args = new Object[route.getParameters().size()];
+
+                for (int i = 0; i < args.length; i++) {
+                    RouteParameter mp = route.getParameters().get(i);
                     if (mp.getType() == RouteParameter.ParameterType.CAPTURE_GROUP) {
                         args[i] = mp.cast(m.group(mp.getCaptureGroup()));
                     } else {
                         args[i] = mp.cast();
                     }
                 }
+
                 try {
-                    Response resp = (Response) route.getMethod().invoke(null, args);
+                    Response resp = invoke(ctx, route, args);
                     if (resp != null) {
                         return resp;
                     }
-                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                } catch (Exception ex) {
                     log.catching(ex);
-                    Throwable cause = ex.getCause();
-                    if (cause == null) {
-                        return DefaultController.exception(ctx, ex);
-                    } else if (cause instanceof Exception) {
-                        return DefaultController.exception(ctx, (Exception) cause);
-                    } else {
-                        return DefaultController.exception(ctx, ex);
-                    }
+                    return Responses.internalServerError(ex);
                 }
             } else if (ext.getNodes() != null && !ext.getNodes().isEmpty()) {
                 Response resp = (Response) forward(ctx, ext.getNodes());
@@ -131,5 +125,10 @@ public class Router {
             }
         }
         return null;
+    }
+
+    private static Response invoke(Context ctx, Route route, Object... args) throws Exception {
+        Controller controller = Controller.Builder.build(route.getController(), ctx);
+        return (Response) route.getMethod().invoke(controller, args);
     }
 }

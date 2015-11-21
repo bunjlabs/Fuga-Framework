@@ -1,6 +1,6 @@
 package com.bunjlabs.fugaframework.router;
 
-class RouteParameter {
+public class RouteParameter {
 
     public static enum ParameterType {
 

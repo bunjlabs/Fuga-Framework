@@ -87,12 +87,12 @@ public class RouteMapLoader {
             }
         }
 
-        Class[] classes = new Class[parameters.size() + 1];
-        classes[0] = Context.class;
+        Class[] classes = new Class[parameters.size()];
+        //classes[0] = Context.class;
 
-        for (int i = 1; i < classes.length; i++) {
+        for (int i = 0; i < classes.length; i++) {
             try {
-                classes[i] = getClassTypeBySimpleName(parameters.get(i - 1).getDataType());
+                classes[i] = getClassTypeBySimpleName(parameters.get(i).getDataType());
             } catch (ClassNotFoundException ex) {
                 throw new RoutesMapLoadException(ex);
             }
@@ -111,11 +111,11 @@ public class RouteMapLoader {
 
             switch (classMethod) {
                 case "view":
-                    return new Route(tryGetMethod(defaultController, "viewTemplate", classes), parameters);
+                    return new Route(defaultController, tryGetMethod(defaultController, "viewTemplate", classes), parameters);
                 case "asset":
-                    return new Route(tryGetMethod(defaultController, "asset", classes), parameters);
+                    return new Route(defaultController, tryGetMethod(defaultController, "asset", classes), parameters);
                 case "notFound":
-                    return new Route(tryGetMethod(defaultController, "notFound", classes), parameters);
+                    return new Route(defaultController, tryGetMethod(defaultController, "notFound", classes), parameters);
             }
         }
 
@@ -127,7 +127,7 @@ public class RouteMapLoader {
         for (String use : uses) {
             if ((c = tryLoadClass(className.isEmpty() ? use : use + "." + className)) != null) {
                 if ((m = tryGetMethod(c, classMethod, classes)) != null) {
-                    return new Route(m, parameters);
+                    return new Route(c, m, parameters);
                 }
             }
         }

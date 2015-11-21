@@ -12,15 +12,15 @@ import java.io.IOException;
 
 public class DefaultController extends Controller {
 
-    public static Response notFound(Context ctx) {
+    public Response notFound(Context ctx) {
         String path = ctx.getApp().getConfiguration().get("fuga.404.redirect", null);
         if (path != null && !path.isEmpty()) {
-            return temporaryRedirect(Controller.Urls.that(ctx, path));
+            return temporaryRedirect(urls.that(path));
         }
         return notFound("404 Not Found");
     }
 
-    public static Response asset(Context ctx, String path) {
+    public Response asset(Context ctx, String path) {
         File asset;
         if (ctx.getApp().getConfiguration().getBoolean("fuga.resources.external", false)) {
             asset = new File(ctx.getApp().getConfiguration().get("fuga.resources.path", "./") + "/assets/" + path);
@@ -40,7 +40,7 @@ public class DefaultController extends Controller {
         }
     }
 
-    public static Response exception(Context ctx, Exception e) {
+    public Response exception(Context ctx, Exception e) {
         StackTraceElement[] ste = e.getStackTrace();
 
         StringBuilder sb = new StringBuilder();
@@ -51,7 +51,7 @@ public class DefaultController extends Controller {
         return ok("<code>" + e.toString() + "</code><br><pre>" + sb.toString() + "</pre>");
     }
     
-    public static Response viewTemplate(Context ctx, String name) throws TemplateNotFoundException, TemplateRenderException {
-        return ok(view(ctx, name));
+    public Response viewTemplate(Context ctx, String name) throws TemplateNotFoundException, TemplateRenderException {
+        return ok(view(name));
     }
 }
