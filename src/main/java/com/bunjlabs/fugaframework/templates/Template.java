@@ -10,7 +10,7 @@ import javax.script.ScriptException;
 
 public class Template {
 
-    private static final Pattern codePattern = Pattern.compile("(\\{%([\\s\\S]*?)%\\})|(\\{#([^\\n\\r]*?)#\\})");
+    private static final Pattern codePattern = Pattern.compile("(\\<%([\\s\\S]*?)%\\>)|(\\<#([^\\n\\r]*?)#\\>)");
     private static final Pattern namePattern = Pattern.compile("[a-zA-Z0-9_-]+");
     private final String tid;
     private final String templateClassName;
@@ -19,7 +19,7 @@ public class Template {
     private String input;
 
     public Template(TemplateEngine templateEngine, String tid, String input) {
-        this.tid = tid; //UUID.randomUUID().toString().replaceAll("-", "_");
+        this.tid = tid;
         this.templateClassName = "Template_" + tid;
         this.templateEngine = templateEngine;
         this.input = input;
@@ -35,7 +35,7 @@ public class Template {
 
         String extendClassName = "";
 
-        if (input.startsWith("@extend ")) {
+        if (input.startsWith("@extends ")) {
             String extendName = input.substring(8, input.indexOf('\n')).trim();
             input = input.substring(input.indexOf('\n') + 1);
             if (extendName != null && extendName.length() > 0) {
@@ -45,7 +45,7 @@ public class Template {
 
         jsCode.append(templateClassName).append("=function(stream){this.stream=stream;};");
 
-        jsCode.append(templateClassName).append(".prototype.render=function(context,data,api){");
+        jsCode.append(templateClassName).append(".prototype.render=function(ctx,data,api){");
         jsCode.append(parseBlock(false));
         jsCode.append("};");
 
@@ -54,14 +54,14 @@ public class Template {
         }
 
         for (Map.Entry<String, String> e : blocks.entrySet()) {
-            jsCode.append(templateClassName).append(".prototype.block_").append(e.getKey()).append("=function(context,data,api){");
+            jsCode.append(templateClassName).append(".prototype.block_").append(e.getKey()).append("=function(ctx,data,api){");
             jsCode.append(e.getValue());
             jsCode.append("};");
         }
 
-        jsCode.append("process_").append(tid).append("=function(stream,context,data,api) { ")
+        jsCode.append("process_").append(tid).append("=function(stream,ctx,data,api) { ")
                 .append("var tpl=new ").append(templateClassName)
-                .append("(stream);tpl.render(context,data,api);")
+                .append("(stream);tpl.render(ctx,data,api);")
                 .append("};");
 
         try {
@@ -95,7 +95,7 @@ public class Template {
                         }
                         input = input.substring(m.end());
                         blocks.put(blockName, parseBlock(true));
-                        jsCode.append("this.block_").append(blockName).append("(context,data,api);");
+                        jsCode.append("this.block_").append(blockName).append("(ctx,data,api);");
                     } else if (codeBlock.startsWith("endblock")) {
                         if (!inBlock) {
                             throw new TemplateRenderException("Unexpected block end");
@@ -129,7 +129,7 @@ public class Template {
                 .replaceAll("\\r", "\\\\r")
                 .replaceAll("\\f", "\\\\f")
                 .replaceAll("\\'", "\\\\'")
-                .replaceAll("\\\"", "\\\\\""); // and it's works as needed
+                .replaceAll("\\\"", "\\\\\"");
     }
 
     public static String generateTid() {
