@@ -10,8 +10,6 @@ import com.bunjlabs.fugaframework.sessions.SessionService;
 import com.bunjlabs.fugaframework.templates.TemplateEngine;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,7 +22,6 @@ public abstract class FugaApp {
     private final SessionManager sessionManager;
     private final TemplateEngine templateEngine;
     private final ServiceManager serviceManager;
-    private final Map<String, Object> objects;
     private HttpServer httpserver;
     private SocketAddress addr;
 
@@ -35,7 +32,6 @@ public abstract class FugaApp {
 
         this.templateEngine = new TemplateEngine(this);
         this.serviceManager = new ServiceManager(this);
-        this.objects = new HashMap<>();
 
     }
 
@@ -60,14 +56,6 @@ public abstract class FugaApp {
 
     public SessionManager getSessionManager() {
         return sessionManager;
-    }
-
-    public Object getObject(String name) {
-        return objects.get(name);
-    }
-
-    public void putObject(String name, Object obj) {
-        objects.put(name, obj);
     }
 
     public TemplateEngine getTemplateEngine() {
