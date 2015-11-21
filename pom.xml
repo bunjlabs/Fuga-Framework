@@ -55,15 +55,24 @@
     </dependencies>
     
     <distributionManagement>
-      <repository>
-        <id>bunjlabs.repo</id>
-        <name>Bunjlabs Maven Repository</name>
-        <url>http://maven.bunjlabs.com/releases</url>
-      </repository>
-      <snapshotRepository>
-        <id>bunjlabs.repo</id>
-        <name>Bunjlabs Maven Repository</name>
-        <url>http://maven.bunjlabs.com/snapshots</url>
-      </snapshotRepository>
+        <repository>
+            <id>bunjlabs.repo</id>
+            <name>Bunjlabs Maven Repository</name>
+            <url>http://maven.bunjlabs.com/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>bunjlabs.repo</id>
+            <name>Bunjlabs Maven Repository</name>
+            <url>http://maven.bunjlabs.com/snapshots</url>
+        </snapshotRepository>
     </distributionManagement>
+    
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>   
+    </build>
 </project>
