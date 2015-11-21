@@ -5,6 +5,7 @@ import com.bunjlabs.fugaframework.foundation.Context;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 public class TemplateApi {
@@ -15,7 +16,6 @@ public class TemplateApi {
     public TemplateApi(FugaApp app, Context ctx) {
         this.app = app;
         this.ctx = ctx;
-
     }
 
     public String asset(Object... args) {
@@ -61,7 +61,7 @@ public class TemplateApi {
 
         return StringEscapeUtils.escapeHtml4(sb.toString());
     }
-    
+
     public String nltobr(Object... args) {
         StringBuilder sb = new StringBuilder();
 
@@ -84,6 +84,17 @@ public class TemplateApi {
         } catch (UnsupportedEncodingException ex) {
             return "";
         }
+    }
+
+    public String format(Object... args) {
+        if (args.length == 0) {
+            return "";
+        }
+        if (args.length == 1) {
+            return args[0] != null ? args[0].toString() : "";
+        }
+
+        return String.format(args[0].toString(), Arrays.copyOfRange(args, 1, args.length));
     }
 
 }
