@@ -4,7 +4,6 @@
 
 Thumbs.db
 ehthumbs.db
-
 Desktop.ini
 
 #############
@@ -16,8 +15,14 @@ dist/
 target/
 
 ############
+## NetBeans
+############
+
+nb-configuration.xml
+
+############
 ## Idea
-###########
+############
 
 .idea/
 fuga.iml
