@@ -11,7 +11,6 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.cookie.Cookie;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.DefaultLastHttpContent;
 import io.netty.handler.codec.http.HttpChunkedInput;
@@ -25,6 +24,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.handler.codec.http.QueryStringDecoder;
+import io.netty.handler.codec.http.cookie.Cookie;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.handler.codec.http.cookie.ServerCookieEncoder;
 import io.netty.handler.codec.http.multipart.Attribute;
@@ -120,11 +120,11 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
         if (msg instanceof HttpContent && decoder) {
             HttpContent httpContent = (HttpContent) msg;
-            
+
             if (httprequest != null && (httprequest.headers().contains("Content-Type", "application/form-data", true)
                     || httprequest.headers().contains("Content-Type", "application/x-www-form-urlencoded", true))) {
                 HttpPostRequestDecoder postDecoder = new HttpPostRequestDecoder(httprequest);
-                
+
                 try {
                     postDecoder.offer(httpContent);
                 } catch (ErrorDataDecoderException ex) {
@@ -133,12 +133,12 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                     reset();
                     return;
                 }
-                
+
                 readHttpDataChunkByChunk(postDecoder);
             } else {
                 content.writeBytes(httpContent.content());
             }
-            
+
             if (httpContent instanceof LastHttpContent) {
                 writeResponse(ctx, msg);
                 reset();
@@ -199,7 +199,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
         resp.getHeaders().entrySet().stream().forEach((e) -> {
             response.headers().set(e.getKey(), e.getValue());
         });
-        
+
         response.headers().set(HttpHeaders.Names.SERVER, "Fuga Web Server/0.0.1.Alpha"); // how it's beautiful!
 
         // Set cookies
@@ -216,13 +216,12 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
         }
 
-        
         ctx.write(response);
 
         if (resp.getStream() != null) {
             ctx.write(new HttpChunkedInput(new ChunkedStream(resp.getStream())));
         }
-        
+
         LastHttpContent fs = new DefaultLastHttpContent();
         ChannelFuture sendContentFuture = ctx.writeAndFlush(fs);
         if (!HttpHeaders.isKeepAlive(httprequest)) {

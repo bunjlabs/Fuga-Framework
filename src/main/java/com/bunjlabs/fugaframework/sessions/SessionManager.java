@@ -1,9 +1,8 @@
 package com.bunjlabs.fugaframework.sessions;
 
-import com.bunjlabs.fugaframework.FugaApp;
 import com.bunjlabs.fugaframework.foundation.Context;
-import io.netty.handler.codec.http.Cookie;
-import io.netty.handler.codec.http.DefaultCookie;
+import io.netty.handler.codec.http.cookie.Cookie;
+import io.netty.handler.codec.http.cookie.DefaultCookie;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +28,7 @@ public class SessionManager {
         boolean flag = false;
         if (sessionCookieList != null) {
             for (Cookie sessionCookie : sessionCookieList) {
-                if (sessionCookie != null && (session = sessions.get(UUID.fromString(sessionCookie.getValue()))) != null) {
+                if (sessionCookie != null && (session = sessions.get(UUID.fromString(sessionCookie.value()))) != null) {
                     flag = true;
                     break;
                 }
