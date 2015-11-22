@@ -11,8 +11,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.Cookie;
-import io.netty.handler.codec.http.CookieDecoder;
+import io.netty.handler.codec.http.cookie.Cookie;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.DefaultLastHttpContent;
 import io.netty.handler.codec.http.HttpChunkedInput;
@@ -26,7 +25,8 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.handler.codec.http.ServerCookieEncoder;
+import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
+import io.netty.handler.codec.http.cookie.ServerCookieEncoder;
 import io.netty.handler.codec.http.multipart.Attribute;
 import io.netty.handler.codec.http.multipart.DefaultHttpDataFactory;
 import io.netty.handler.codec.http.multipart.HttpDataFactory;
@@ -91,11 +91,11 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
             String cookieString = httprequest.headers().get(HttpHeaders.Names.COOKIE);
             if (cookieString != null) {
-                CookieDecoder.decode(cookieString).stream().forEach((cookie) -> {
-                    if (cookiesDownload.containsKey(cookie.getName())) {
-                        cookiesDownload.get(cookie.getName()).add(cookie);
+                ServerCookieDecoder.STRICT.decode(cookieString).stream().forEach((cookie) -> {
+                    if (cookiesDownload.containsKey(cookie.name())) {
+                        cookiesDownload.get(cookie.name()).add(cookie);
                     } else {
-                        cookiesDownload.put(cookie.getName(), new ArrayList<>(Arrays.asList(cookie)));
+                        cookiesDownload.put(cookie.name(), new ArrayList<>(Arrays.asList(cookie)));
                     }
                 });
             }
@@ -204,7 +204,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
         // Set cookies
         cookiesUpload.addAll(sctx.getRequest().getCookiesUpload().values());
-        response.headers().set(HttpHeaders.Names.SET_COOKIE, ServerCookieEncoder.encode(cookiesUpload));
+        response.headers().set(HttpHeaders.Names.SET_COOKIE, ServerCookieEncoder.STRICT.encode(cookiesUpload));
 
         if (resp.getContentLength() >= 0) {
             response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, resp.getContentLength());

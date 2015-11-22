@@ -1,7 +1,7 @@
 package com.bunjlabs.fugaframework.foundation;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.http.Cookie;
+import io.netty.handler.codec.http.cookie.Cookie;
 import java.net.SocketAddress;
 import java.util.List;
 import java.util.Map;
@@ -148,7 +148,7 @@ public class Request {
     }
 
     public void setCookie(Cookie cookie) {
-        this.cookiesUpload.put(cookie.getName(), cookie);
+        this.cookiesUpload.put(cookie.name(), cookie);
     }
 
     public ByteBuf getContent() {
