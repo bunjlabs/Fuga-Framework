@@ -5,12 +5,11 @@ import com.bunjlabs.fugaframework.foundation.Context;
 import com.bunjlabs.fugaframework.foundation.Controller;
 import com.bunjlabs.fugaframework.foundation.Response;
 import com.bunjlabs.fugaframework.foundation.Responses;
+import com.bunjlabs.fugaframework.resources.ResourceManager;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import org.apache.logging.log4j.LogManager;
@@ -20,36 +19,32 @@ public class Router {
 
     private static final Logger log = LogManager.getLogger(Router.class);
 
-    private List<Extension> extensions = null;
+    private final ResourceManager resourceManager;
+    private final List<Extension> extensions = new ArrayList<>();
 
-    public void load(File file) {
-        try {
-            load(new FileInputStream(file));
-            log.info("Routes loaded from: {}", file.getPath());
-        } catch (FileNotFoundException | NullPointerException | RoutesMapLoadException | RoutesMapSyntaxException ex) {
-            log.catching(ex);
-        }
+    public Router(FugaApp app) {
+        this.resourceManager = app.getResourceManager();
     }
 
     public void load(String path) {
         try {
-            load(new FileInputStream(path));
+            load(resourceManager.load(path));
             log.info("Routes loaded from: {}", path);
-        } catch (FileNotFoundException | NullPointerException | RoutesMapLoadException | RoutesMapSyntaxException ex) {
-            log.catching(ex);
+        } catch (NullPointerException | RoutesMapLoadException | RoutesMapSyntaxException ex) {
+            log.error("Unable to load routes from: {}", path, ex);
         }
     }
 
     public void loadFromResources(String path) {
         try {
-            load(Router.class.getResourceAsStream("/" + path));
+            load(resourceManager.loadFromResources(path));
             log.info("Routes loaded from resources: {}", path);
         } catch (NullPointerException | RoutesMapLoadException | RoutesMapSyntaxException ex) {
-            log.catching(ex);
+            log.error("Unable to load routes from: {}", path, ex);
         }
     }
 
-    public void load(InputStream input) throws NullPointerException, RoutesMapLoadException, RoutesMapSyntaxException {
+    private void load(InputStream input) throws NullPointerException, RoutesMapLoadException, RoutesMapSyntaxException {
         if (input == null) {
             throw new NullPointerException();
         }
@@ -57,21 +52,24 @@ public class Router {
 
         RouteMapLoader mapLoader = new RouteMapLoader();
 
-        extensions = mapLoader.load(input);
-
+        List<Extension> ext = mapLoader.load(input);
+        extensions.addAll(ext);
     }
 
     public Response forward(FugaApp app, Context ctx) {
-        if (extensions == null || extensions.isEmpty()) {
-            return Responses.internalServerError(new RoutesMapException("Empty routes map"));
+        if (extensions.isEmpty()) {
+            Exception ex = new RoutesMapException("Empty routes map");
+            log.catching(ex);
+            return Responses.internalServerError(ex);
         }
 
         Response resp;
 
         try {
             resp = forward(app, ctx, extensions);
-        } catch (RoutesMapException ex) {
-            return Responses.internalServerError();
+        } catch (Exception ex) {
+            log.catching(ex);
+            return Responses.internalServerError(ex);
         }
 
         if (resp != null) {

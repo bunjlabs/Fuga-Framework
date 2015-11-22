@@ -12,17 +12,18 @@ public class ExampleController extends Controller {
         ctx.getSession().put("Key", "Some important string");
 
         ctx.put("key", "Context value");
+        
         return proceed();
     }
 
     public Response index(String one, int to) throws TemplateNotFoundException, TemplateRenderException {
         ctx.put("data", "Hello! " + one + " - " + to + " = " + ctx.getSession().getString("Key")
                 + " | " + ctx.get("key", String.class));
-        return ok(view("example/index.html"));
+
+        return ok(view("defaults/example.html"));
     }
 
     public Response post() {
-
         return ok(ctx.getRequest().getContent().toString(Charset.forName("UTF-8")));
     }
 }

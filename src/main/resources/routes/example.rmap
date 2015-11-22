@@ -1,0 +1,14 @@
+use com.bunjlabs.fugaframework.example.controllers
+
+GET $/assets/(.*) asset(1)
+
+GET {
+    ExampleController.skip()
+    
+    $/          ExampleController.index("empty", "223":int)
+    $/(index)   ExampleController.index(1:String, "223":int)
+    $/(\d+)     ExampleController.index(1:String, "223":int)
+}
+
+POST $/post     ExampleController.post()
+

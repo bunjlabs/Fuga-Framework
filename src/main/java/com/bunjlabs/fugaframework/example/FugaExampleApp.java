@@ -7,7 +7,7 @@ public class FugaExampleApp extends FugaApp {
 
     @Override
     public void prepare() {
-        this.getRouter().loadFromResources("example/routes.map");
+        getRouter().load("routes/example.rmap");        
         
     }
 
