@@ -1,8 +1,10 @@
 use com.bunjlabs.fugaframework.example.controllers
 
+ok("Oops")
+
 GET $/assets/(.*) asset(1)
 
-GET OPTIONS HEAD {
+GET {
     ExampleController.skip()
     
     $/          ExampleController.index("empty", "223":int)
@@ -12,3 +14,4 @@ GET OPTIONS HEAD {
 
 POST $/post     ExampleController.post()
 
+HEAD OPTIONS ExampleController.noData()

@@ -26,4 +26,8 @@ public class ExampleController extends Controller {
     public Response post() {
         return ok(ctx.getRequest().getContent().toString(Charset.forName("UTF-8")));
     }
+    
+    public Response noData() {
+        return ok();
+    }
 }

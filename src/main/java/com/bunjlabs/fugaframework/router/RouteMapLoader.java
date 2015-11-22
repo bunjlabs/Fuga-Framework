@@ -90,7 +90,6 @@ public class RouteMapLoader {
         }
 
         Class[] classes = new Class[parameters.size()];
-        //classes[0] = Context.class;
 
         for (int i = 0; i < classes.length; i++) {
             try {
@@ -113,11 +112,13 @@ public class RouteMapLoader {
 
             switch (classMethod) {
                 case "view":
-                    return new Route(defaultController, tryGetMethod(defaultController, "viewTemplate", classes), parameters);
+                    return new Route(defaultController, tryGetMethod(defaultController, "generateAssetView", classes), parameters);
                 case "asset":
-                    return new Route(defaultController, tryGetMethod(defaultController, "asset", classes), parameters);
+                    return new Route(defaultController, tryGetMethod(defaultController, "generateAsset", classes), parameters);
                 case "notFound":
-                    return new Route(defaultController, tryGetMethod(defaultController, "notFound", classes), parameters);
+                    return new Route(defaultController, tryGetMethod(defaultController, "generateNotFound", classes), parameters);
+                case "ok":
+                    return new Route(defaultController, tryGetMethod(defaultController, "generateOk", classes), parameters);
             }
         }
 
