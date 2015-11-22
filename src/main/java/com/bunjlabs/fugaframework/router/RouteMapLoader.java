@@ -8,7 +8,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class RouteMapLoader {
@@ -137,21 +139,21 @@ public class RouteMapLoader {
     }
 
     private Extension extension() throws RoutesMapLoadException, RoutesMapSyntaxException {
-        RequestMethod method = null;
+        Set<RequestMethod> methods = EnumSet.noneOf(RequestMethod.class);
         Pattern pattern = null;
 
         for (;;) {
             if (t.ttype == TK_METHOD) {
-                method = RequestMethod.valueOf(t.sval);
+                methods.add(RequestMethod.valueOf(t.sval));
                 t.next();
             } else if (t.ttype == TK_PATTERN) {
                 pattern = Pattern.compile(t.sval);
                 t.next();
             } else if (t.ttype == '{') {
                 t.next();
-                return new Extension(method, pattern, extensionList());
+                return new Extension(methods, pattern, extensionList());
             } else if (t.ttype == TK_WORD) {
-                return new Extension(method, pattern, route());
+                return new Extension(methods, pattern, route());
             } else {
                 throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
             }

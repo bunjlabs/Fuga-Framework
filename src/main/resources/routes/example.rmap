@@ -2,7 +2,7 @@ use com.bunjlabs.fugaframework.example.controllers
 
 GET $/assets/(.*) asset(1)
 
-GET {
+GET OPTIONS HEAD {
     ExampleController.skip()
     
     $/          ExampleController.index("empty", "223":int)

@@ -85,7 +85,7 @@ public class Router {
         }
         Matcher m;
         for (Extension ext : exts) {
-            if (ext.getRequestMethod() != null && ext.getRequestMethod() != ctx.getRequest().getRequestMethod()) {
+            if (ext.getRequestMethods() != null && !ext.getRequestMethods().isEmpty() && !ext.getRequestMethods().contains(ctx.getRequest().getRequestMethod())) {
                 continue;
             }
             if (ext.getPattern() == null) {

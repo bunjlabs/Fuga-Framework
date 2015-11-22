@@ -2,6 +2,7 @@ package com.bunjlabs.fugaframework.router;
 
 import com.bunjlabs.fugaframework.foundation.RequestMethod;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class Extension {
@@ -9,22 +10,22 @@ public class Extension {
     private List<Extension> nodes = null;
     private Route route = null;
 
-    private final RequestMethod requestMethod;
+    private final Set<RequestMethod> requestMethods;
     private final Pattern pattern;
 
-    Extension(RequestMethod requestMethod, Pattern pattern) {
-        this.requestMethod = requestMethod;
+    Extension( Set<RequestMethod> requestMethods, Pattern pattern) {
+        this.requestMethods = requestMethods;
         this.pattern = pattern;
     }
 
-    Extension(RequestMethod requestMethod, Pattern pattern, List<Extension> nodes) {
-        this.requestMethod = requestMethod;
+    Extension( Set<RequestMethod> requestMethods, Pattern pattern, List<Extension> nodes) {
+        this.requestMethods = requestMethods;
         this.pattern = pattern;
         this.nodes = nodes;
     }
 
-    Extension(RequestMethod requestMethod, Pattern pattern, Route route) {
-        this.requestMethod = requestMethod;
+    Extension( Set<RequestMethod> requestMethods, Pattern pattern, Route route) {
+        this.requestMethods = requestMethods;
         this.pattern = pattern;
         this.route = route;
     }
@@ -37,8 +38,8 @@ public class Extension {
         return route;
     }
 
-    public RequestMethod getRequestMethod() {
-        return requestMethod;
+    public  Set<RequestMethod> getRequestMethods() {
+        return requestMethods;
     }
 
     public Pattern getPattern() {
