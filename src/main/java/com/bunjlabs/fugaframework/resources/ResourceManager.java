@@ -31,6 +31,6 @@ public final class ResourceManager {
             return loadFromResources(name);
         }
 
-        return loadFromResources(name);
+        return is;
     }
 }

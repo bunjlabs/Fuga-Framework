@@ -4,15 +4,10 @@
         <title>Example page</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link  media="all" rel="stylesheet" href="{# api.asset('common.css') #}">
     </head>
     <body>
-        <%
-        
-            var data = ctx.get('data');
-        
-        %>
+        <% var data = ctx.get('data'); %>
         <p><# data #></p>
-        <p><# api.format("%s %s %d", "Hello", "world", 10) #></p>
+        <p><# api.format("> %s %s %d", "Hello", "world", 10) #></p>
     </body>
 </html>

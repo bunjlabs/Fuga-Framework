@@ -1,9 +1,5 @@
 use com.bunjlabs.fugaframework.example.controllers
 
-ok("Oops")
-
-GET $/assets/(.*) asset(1)
-
 GET {
     ExampleController.skip()
     
