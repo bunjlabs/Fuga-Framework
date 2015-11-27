@@ -52,12 +52,14 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
     private static final Logger log = LogManager.getLogger(HttpServerHandler.class);
     private static final HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
     private final FugaApp app;
-    private final ByteBuf content;
+    private ByteBuf content;
     private HttpRequest httprequest;
     private Request.Builder requestBuilder;
     private Response resp;
     private boolean decoder;
     private Collection<Cookie> cookiesUpload;
+    
+    private Map<String, List<String>> postmap;
 
     HttpServerHandler(FugaApp app) {
         this.app = app;
@@ -71,8 +73,9 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
         resp = null;
         decoder = false;
         cookiesUpload = null;
-        content.discardReadBytes();
-        content.clear();
+        content = null;
+        
+        postmap = null;
     }
 
     @Override
@@ -100,6 +103,8 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                 });
             }
 
+            postmap = new TreeMap<>();
+            
             requestBuilder.requestMethod(RequestMethod.valueOf(httprequest.getMethod().name()))
                     .host(httprequest.headers().get("HOST"))
                     .uri(httprequest.getUri())
@@ -121,6 +126,8 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
         if (msg instanceof HttpContent && decoder) {
             HttpContent httpContent = (HttpContent) msg;
 
+            
+            
             if (httprequest != null && (httprequest.headers().contains("Content-Type", "application/form-data", true)
                     || httprequest.headers().contains("Content-Type", "application/x-www-form-urlencoded", true))) {
                 HttpPostRequestDecoder postDecoder = new HttpPostRequestDecoder(httprequest);
@@ -148,7 +155,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
     }
 
     private void readHttpDataChunkByChunk(HttpPostRequestDecoder decoder) {
-        Map<String, List<String>> postmap = new TreeMap<>();
+        
         try {
             while (decoder.hasNext()) {
                 InterfaceHttpData data = decoder.next();
@@ -170,10 +177,12 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
         } catch (EndOfDataDecoderException e) { // it's ok
         }
-        requestBuilder.parameters(postmap);
+        
     }
 
     private void writeResponse(ChannelHandlerContext ctx, HttpObject msg) {
+        requestBuilder.parameters(postmap);
+        
         Request request = requestBuilder.build();
 
         Context sctx = new Context(request, app);
