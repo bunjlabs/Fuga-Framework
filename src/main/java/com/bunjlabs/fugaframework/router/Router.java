@@ -7,6 +7,7 @@ import com.bunjlabs.fugaframework.foundation.Response;
 import com.bunjlabs.fugaframework.foundation.Responses;
 import com.bunjlabs.fugaframework.resources.ResourceManager;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -44,6 +45,10 @@ public class Router {
         }
     }
 
+    public void loadFromString(String input) throws NullPointerException, RoutesMapLoadException, RoutesMapSyntaxException {
+        load(new ByteArrayInputStream(input.getBytes()));
+    }
+
     private void load(InputStream input) throws NullPointerException, RoutesMapLoadException, RoutesMapSyntaxException {
         if (input == null) {
             throw new NullPointerException();
@@ -52,8 +57,7 @@ public class Router {
 
         RouteMapLoader mapLoader = new RouteMapLoader();
 
-        List<Extension> ext = mapLoader.load(input);
-        extensions.addAll(ext);
+        extensions.addAll(mapLoader.load(input));
     }
 
     public Response forward(FugaApp app, Context ctx) {
