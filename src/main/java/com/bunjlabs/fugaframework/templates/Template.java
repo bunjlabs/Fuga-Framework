@@ -10,7 +10,10 @@ import javax.script.ScriptException;
 
 public class Template {
 
-    private static final Pattern codePattern = Pattern.compile("(\\<%([\\s\\S]*?)%\\>)|(\\<#([^\\n\\r]*?)#\\>)");
+    private static final Pattern codePattern = Pattern.compile(
+            "(\\@\\{([^\\{\\}\\n\\r]*?)\\})"
+            + "|(\\<%([\\s\\S]*?)%\\>)"
+            + "|(\\<#([^\\n\\r]*?)#\\>)");
     private static final Pattern namePattern = Pattern.compile("[a-zA-Z0-9_-]+");
     private final String tid;
     private final String templateClassName;
@@ -24,7 +27,7 @@ public class Template {
         this.templateEngine = templateEngine;
         this.input = input;
     }
-    
+
     public String getTid() {
         return tid;
     }
@@ -84,7 +87,10 @@ public class Template {
                     jsCode.append("this.stream.print('").append(text).append("');");
                 }
                 if (m.group(2) != null) {
-                    String codeBlock = m.group(2).trim();
+                    jsCode.append("this.stream.print(").append(m.group(2).trim()).append(");");
+                    input = input.substring(m.end());
+                } else if (m.group(4) != null) {
+                    String codeBlock = m.group(4).trim();
                     if (codeBlock.startsWith("block ")) {
                         if (inBlock) {
                             throw new TemplateRenderException("Unexpected block start");
@@ -103,11 +109,11 @@ public class Template {
                         input = input.substring(m.end());
                         return jsCode.toString();
                     } else {
-                        jsCode.append(m.group(2).trim());
+                        jsCode.append(codeBlock);
                         input = input.substring(m.end());
                     }
-                } else {
-                    jsCode.append("this.stream.print(").append(m.group(4).trim()).append(");");
+                } else if (m.group(6) != null) {
+                    jsCode.append("this.stream.print(").append(m.group(6).trim()).append(");");
                     input = input.substring(m.end());
                 }
 

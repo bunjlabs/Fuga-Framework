@@ -7,7 +7,14 @@
     </head>
     <body>
         <% var data = ctx.get('data'); %>
-        <p><# data #></p>
+        <p>@{ data }</p>
         <p><# api.format("> %s %s %d", "Hello", "world", 10) #></p>
+        <% 
+
+        var element = {};
+        element.one = "One!";
+        element.two = "Two!";
+
+        %>
     </body>
 </html>

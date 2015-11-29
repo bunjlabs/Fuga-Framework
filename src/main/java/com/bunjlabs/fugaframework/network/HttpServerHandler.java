@@ -52,6 +52,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
     private static final Logger log = LogManager.getLogger(HttpServerHandler.class);
     private static final HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
     private final FugaApp app;
+    private final String serverVersion;
     private ByteBuf content;
     private HttpRequest httprequest;
     private Request.Builder requestBuilder;
@@ -65,6 +66,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
         this.app = app;
         content = Unpooled.buffer();
 
+        serverVersion = app.getConfiguration().get("fuga.version", "(version is unknown)");
     }
 
     private void reset() {
@@ -111,6 +113,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                     .path(queryStringDecoder.path())
                     .socketAddress(ctx.channel().remoteAddress())
                     .query(queryStringDecoder.parameters())
+                    .parameters(postmap)
                     .cookiesDownload(cookiesDownload)
                     .cookiesUpload(new HashMap<>())
                     .content(content);
@@ -180,9 +183,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
         
     }
 
-    private void writeResponse(ChannelHandlerContext ctx, HttpObject msg) {
-        requestBuilder.parameters(postmap);
-        
+    private void writeResponse(ChannelHandlerContext ctx, HttpObject msg) {        
         Request request = requestBuilder.build();
 
         Context sctx = new Context(request, app);
@@ -209,7 +210,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             response.headers().set(e.getKey(), e.getValue());
         });
 
-        response.headers().set(HttpHeaders.Names.SERVER, "Fuga Web Server/0.0.1.Alpha"); // how it's beautiful!
+        response.headers().set(HttpHeaders.Names.SERVER, "Fuga Web Server/" + serverVersion); // how it's beautiful!
 
         // Set cookies
         cookiesUpload.addAll(sctx.getRequest().getCookiesUpload().values());
@@ -242,6 +243,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         log.catching(cause);
         ctx.close();
+        reset();
     }
 
 }
