@@ -27,7 +27,7 @@ public class TemplateEngine {
     public TemplateEngine(FugaApp app) {
         this.app = app;
         this.engine = new ScriptEngineManager().getEngineByName("nashorn");
-        config = app.getConfiguration();
+        config = app == null ? null : app.getConfiguration();
     }
 
     public String compile(String name) throws TemplateNotFoundException, TemplateRenderException {
@@ -54,12 +54,16 @@ public class TemplateEngine {
             throw new TemplateNotFoundException("Unable to load: " + name);
         }
 
+        return compile(name, input.toString());
+    }
+
+    public String compile(String name, String input) throws TemplateRenderException, TemplateNotFoundException {
         String tid
                 = config.getBoolean("fuga.templates.recompile", false)
                 && templates.containsKey(name)
                         ? templates.get(name).getTid() : Template.generateTid();
 
-        Template t = new Template(this, tid, input.toString());
+        Template t = new Template(this, tid, input);
         t.compile(engine);
 
         templates.put(name, t);
@@ -92,6 +96,10 @@ public class TemplateEngine {
 
     public String renderToString(String name, Context ctx) throws TemplateNotFoundException, TemplateRenderException {
         return renderToString(name, ctx, null);
+    }
+
+    public String getJsSource(String name) {
+        return templates.get(name).getJsSource();
     }
 
 }

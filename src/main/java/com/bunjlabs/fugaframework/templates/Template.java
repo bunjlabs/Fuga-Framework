@@ -20,6 +20,7 @@ public class Template {
     private final Map<String, String> blocks = new HashMap<>();
     private final TemplateEngine templateEngine;
     private String input;
+    private String jsSource;
 
     public Template(TemplateEngine templateEngine, String tid, String input) {
         this.tid = tid;
@@ -30,6 +31,10 @@ public class Template {
 
     public String getTid() {
         return tid;
+    }
+    
+    public String getJsSource() {
+        return jsSource;
     }
 
     public String compile(ScriptEngine engine) throws TemplateRenderException, TemplateNotFoundException {
@@ -67,8 +72,11 @@ public class Template {
                 .append("(stream);tpl.render(ctx,data,api);")
                 .append("};");
 
+        input = null;
+        jsSource = jsCode.toString();
+        
         try {
-            engine.eval(jsCode.toString());
+            engine.eval(jsSource);
         } catch (ScriptException ex) {
             throw new TemplateRenderException(ex.getLocalizedMessage());
         }
