@@ -8,23 +8,23 @@ import java.io.InputStream;
 public class Responses {
 
     public static Response ok() {
-        return new Response();
+        return new Response().setStatus(200);
     }
 
     public static Response ok(InputStream is) {
-        return new Response(is);
+        return new Response(is).setStatus(200);
     }
 
     public static Response ok(byte[] bytes) {
-        return new Response(bytes);
+        return new Response(bytes).setStatus(200);
     }
 
     public static Response ok(String s) {
-        return new Response(s);
+        return new Response(s).setStatus(200);
     }
 
     public static Response ok(File f) throws IOException {
-        return new Response(f);
+        return new Response(f).setStatus(200);
     }
 
     public static Response badRequest() {
