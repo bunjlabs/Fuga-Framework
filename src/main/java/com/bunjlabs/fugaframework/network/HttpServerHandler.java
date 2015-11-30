@@ -75,7 +75,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
         resp = null;
         decoder = false;
         cookiesUpload = null;
-        content = null;
+        content = Unpooled.buffer();
         
         postmap = null;
     }

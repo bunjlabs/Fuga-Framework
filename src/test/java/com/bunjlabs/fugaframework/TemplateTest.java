@@ -59,6 +59,7 @@ public class TemplateTest {
         te.compile("test-09", "<##");
         te.compile("test-10", "##>");
 
+        
         Assert.assertEquals("@",     te.renderToString("test-01", null));
         Assert.assertEquals("@@",    te.renderToString("test-02", null));
         Assert.assertEquals("@{",    te.renderToString("test-03", null));
