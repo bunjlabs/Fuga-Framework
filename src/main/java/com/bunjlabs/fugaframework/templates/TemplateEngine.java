@@ -64,10 +64,12 @@ public class TemplateEngine {
                         ? templates.get(name).getTid() : Template.generateTid();
 
         Template t = new Template(this, tid, input);
-        t.compile(engine);
+        t.compile();
 
         templates.put(name, t);
 
+        t.eval(engine);
+        
         return tid;
     }
 

@@ -135,15 +135,16 @@ public class Responses {
         return ok(f).setStatus(500);
     }
     
-    public static Response internalServerError(Exception e) {
+    public static Response internalServerError(Throwable e) {
         StackTraceElement[] ste = e.getStackTrace();
 
         StringBuilder sb = new StringBuilder();
 
         for (StackTraceElement el : ste) {
-            sb.append(el.toString()).append("\n");
+            sb.append(el.toString()).append("<br>");
         }
-        return ok("<code>" + e.toString() + "</code><br><pre>" + sb.toString() + "</pre>").setStatus(500);
+        
+        return ok("<h3>" + e.toString() + "</h3><p>" + sb.toString() + "</p>").setStatus(500);
     }
 
     public static Response notFound() {

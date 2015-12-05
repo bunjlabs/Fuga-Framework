@@ -32,12 +32,12 @@ public class Template {
     public String getTid() {
         return tid;
     }
-    
+
     public String getJsSource() {
         return jsSource;
     }
 
-    public String compile(ScriptEngine engine) throws TemplateRenderException, TemplateNotFoundException {
+    public String compile() throws TemplateRenderException, TemplateNotFoundException {
 
         StringBuilder jsCode = new StringBuilder();
 
@@ -74,14 +74,17 @@ public class Template {
 
         input = null;
         jsSource = jsCode.toString();
-        
+
+        return tid;
+
+    }
+
+    public void eval(ScriptEngine engine) throws TemplateRenderException {
         try {
             engine.eval(jsSource);
         } catch (ScriptException ex) {
             throw new TemplateRenderException(ex.getLocalizedMessage());
         }
-        return tid;
-
     }
 
     private String parseBlock(boolean inBlock) throws TemplateRenderException {

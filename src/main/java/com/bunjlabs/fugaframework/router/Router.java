@@ -73,7 +73,8 @@ public class Router {
             resp = forward(app, ctx, extensions);
         } catch (Exception ex) {
             log.catching(ex);
-            return Responses.internalServerError(ex);
+            Throwable t = ex.getCause();
+            return Responses.internalServerError(t == null ? ex : t);
         }
 
         if (resp != null) {
@@ -83,7 +84,7 @@ public class Router {
         return Responses.notFound("404 Not Found");
     }
 
-    private Response forward(FugaApp app, Context ctx, List<Extension> exts) throws RoutesMapException {
+    private Response forward(FugaApp app, Context ctx, List<Extension> exts) throws Exception {
         if (exts == null) {
             throw new RoutesMapException("Extensions sublist is null");
         }
@@ -110,15 +111,9 @@ public class Router {
                         args[i] = mp.cast();
                     }
                 }
-
-                try {
-                    Response resp = invoke(app, ctx, route, args);
-                    if (resp != null) {
-                        return resp;
-                    }
-                } catch (Exception ex) {
-                    log.catching(ex);
-                    return Responses.internalServerError(ex);
+                Response resp = invoke(app, ctx, route, args);
+                if (resp != null) {
+                    return resp;
                 }
             } else if (ext.getNodes() != null && !ext.getNodes().isEmpty()) {
                 Response resp = (Response) forward(app, ctx, ext.getNodes());
