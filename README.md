@@ -8,7 +8,7 @@ Small Java Web Framework for big projects.
 [Roadmap](https://github.com/IntCode/Fuga-Framework/wiki/Roadmap)
 ## Installation
 
-Whe use Maven as build system. Because whe still in active developming whe don't have stable or beta versions. But you can manualy download and install snapshot releases GitHub. Anyway you can also feel free to use our maven snapshot repository:
+Whe use Maven as build system. Due to the fact that whe still in active developming whe don't have stable or beta versions. But you can manualy download and install snapshot releases from GitHub. Anyway, you can also feel free to use our maven snapshot repository:
 ```
 <dependency>
   <groupId>com.bunjlabs</groupId>
@@ -28,7 +28,7 @@ Whe use Maven as build system. Because whe still in active developming whe don't
 
 Every web application must contain at least main class, one controller and routes map.
 
-Ccreate simple cotroller that returns `Hello world!` for every client:
+Let's create simple cotroller that returns `Hello world!` for every client:
 
 ```
 package com.example.controllers;
@@ -46,7 +46,7 @@ public class HelloWorldController extends Controller {
 }
 ```
 
-Now add this controller to routes map. Create file `default.routes` in `routes/` directory with this content:
+Now whe can add this controller to routes map. Just create file `default.routes` in `routes/` directory with this content:
 
 ```
 use com.example.controllers
@@ -55,7 +55,7 @@ GET $/ HelloWorldController.index()
 ```
 
 
-Create main class:
+and create main class:
 
 ```
 package com.example;
