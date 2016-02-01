@@ -9,7 +9,7 @@ import java.util.Map;
 public class Request {
 
     private final RequestMethod requestMethod;
-    private final String host;
+    private Map<String, String> headers;
     private final String uri;
     private final String path;
     private final SocketAddress socketAddress;
@@ -23,7 +23,7 @@ public class Request {
     public static class Builder {
 
         private RequestMethod requestMethod;
-        private String host;
+        private Map<String, String> headers;
         private String uri;
         private String path;
         private SocketAddress socketAddress;
@@ -38,8 +38,8 @@ public class Request {
             return this;
         }
 
-        public Builder host(String host) {
-            this.host = host;
+        public Builder headers(Map<String, String> headers) {
+            this.headers = headers;
             return this;
         }
 
@@ -90,7 +90,7 @@ public class Request {
 
     private Request(Builder builder) {
         this.requestMethod = builder.requestMethod;
-        this.host = builder.host;
+        this.headers = builder.headers;
         this.uri = builder.uri;
         this.path = builder.path;
         this.socketAddress = builder.socketAddress;
@@ -106,7 +106,11 @@ public class Request {
     }
 
     public String getHost() {
-        return host;
+        return headers.get("HOST");
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers;
     }
 
     public String getUri() {
