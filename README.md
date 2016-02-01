@@ -8,39 +8,45 @@ Small Java Web Framework for big projects.
 [Roadmap](https://github.com/IntCode/Fuga-Framework/wiki/Roadmap)
 ## Installation
 
-First of all you need to download and import Fuga Framework in your IDE, create new maven project and add dependence in `pom.xml`:
-
+Whe use Maven as build system. Due to the fact that whe still in active developming whe don't have stable or beta versions. But you can manualy download and install snapshot releases from GitHub. Anyway, you can also feel free to use our maven snapshot repository:
 ```
 <dependency>
-  <groupId>${project.groupId}</groupId>
-  <artifactId>fugaframework</artifactId>
-  <version>${project.version}</version>
+  <groupId>com.bunjlabs</groupId>
+  <artifactId>fuga</artifactId>
+  <version>0.3.0-SNAPSHOT</version>
 </dependency>
+<repositories>
+  <repository>
+    <id>bunjlabs.repo</id>
+    <name>Bunjlabs Maven Snapshots Repository</name>
+    <url>http://maven.bunjlabs.com/snapshots</url>
+  </repository>
+</repositories>
 ```
 
 ## Using
 
 Every web application must contain at least main class, one controller and routes map.
 
-Ccreate simple cotroller that returns `Hello world!` for every client:
+Let's create simple cotroller that returns `Hello world!` for every client:
 
 ```
 package com.example.controllers;
 
-import com.showvars.fugaframework.foundation.Context;
-import com.showvars.fugaframework.foundation.Controller;
-import com.showvars.fugaframework.foundation.Response;
+import com.bunjlabs.fugaframework.foundation.Context;
+import com.bunjlabs.fugaframework.foundation.Controller;
+import com.bunjlabs.fugaframework.foundation.Response;
 
 public class HelloWorldController extends Controller {
 
-    public static Response index(Context ctx) throws Exception {
+    public Response index() {
         return ok("Hello world!");
     }
 
 }
 ```
 
-Now add this controller to routes map. Create file `helloworld.routesmap` in `resources/routes/` and add this:
+Now whe can add this controller to routes map. Just create file `default.routes` in `routes/` directory with this content:
 
 ```
 use com.example.controllers
@@ -49,7 +55,7 @@ GET $/ HelloWorldController.index()
 ```
 
 
-Create main class:
+and create main class:
 
 ```
 package com.example;
@@ -60,7 +66,7 @@ public class HelloWorldApp extends FugaApp{
 
 	@Override
 	public void prepare() {
-		getRouter().loadFromResources("/routes/helloworld.routesmap");
+		getRouter().load("routes/default.routes");
 	}
 	
 	public static void main(String[] args) throws Exception {
