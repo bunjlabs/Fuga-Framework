@@ -103,9 +103,9 @@ public class Template {
                 } else if (m.group(4) != null) {
                     String codeBlock = m.group(4).trim();
                     if (codeBlock.startsWith("block ")) {
-                        if (inBlock) {
-                            throw new TemplateRenderException("Unexpected block start");
-                        }
+                        //if (inBlock) {
+                        //    throw new TemplateRenderException("Unexpected block start");
+                        //}
                         String blockName = codeBlock.substring(6);
                         if (!namePattern.matcher(blockName).matches()) {
                             throw new TemplateRenderException("Disallowed block name");
