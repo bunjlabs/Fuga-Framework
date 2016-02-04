@@ -108,9 +108,9 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             postmap = new TreeMap<>();
 
             Map<String, String> headers = new HashMap<>();
-            httprequest.headers().entries().stream().forEach((e) -> {
+            for(Map.Entry<String, String> e : httprequest.headers().entries()) {
                 headers.put(e.getKey(), e.getValue());
-            });
+            }
 
             requestBuilder.requestMethod(RequestMethod.valueOf(httprequest.getMethod().name()))
                     .headers(headers)

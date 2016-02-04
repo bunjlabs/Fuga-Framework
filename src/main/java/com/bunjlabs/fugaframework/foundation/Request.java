@@ -106,7 +106,7 @@ public class Request {
     }
 
     public String getHost() {
-        return headers.get("HOST");
+        return headers.get("Host");
     }
 
     public Map<String, String> getHeaders() {
