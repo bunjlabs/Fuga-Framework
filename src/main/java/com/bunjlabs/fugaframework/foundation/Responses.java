@@ -134,17 +134,29 @@ public class Responses {
     public static Response internalServerError(File f) throws IOException {
         return ok(f).setStatus(500);
     }
-    
+
     public static Response internalServerError(Throwable e) {
         StackTraceElement[] ste = e.getStackTrace();
 
         StringBuilder sb = new StringBuilder();
 
+        sb.append("<h2>").append(e.toString()).append("</h2><p>");
         for (StackTraceElement el : ste) {
             sb.append(el.toString()).append("<br>");
         }
-        
-        return ok("<h3>" + e.toString() + "</h3><p>" + sb.toString() + "</p>").setStatus(500);
+        sb.append("</p>");
+
+        Throwable cause = e.getCause();
+        if (cause != null) {
+            ste = cause.getStackTrace();
+            sb.append("<h3>Caused by: ").append(cause.toString()).append("</h3><p>");
+            for (StackTraceElement el : ste) {
+                sb.append(el.toString()).append("<br>");
+            }
+            sb.append("</p>");
+        }
+
+        return ok(sb.toString()).setStatus(500);
     }
 
     public static Response notFound() {

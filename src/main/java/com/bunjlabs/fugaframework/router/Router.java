@@ -73,8 +73,7 @@ public class Router {
             resp = forward(app, ctx, extensions);
         } catch (Exception ex) {
             log.catching(ex);
-            Throwable t = ex.getCause();
-            return Responses.internalServerError(t == null ? ex : t);
+            return Responses.internalServerError(ex);
         }
 
         if (resp != null) {

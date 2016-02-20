@@ -1,6 +1,7 @@
 package com.bunjlabs.fugaframework;
 
 import com.bunjlabs.fugaframework.configuration.Configuration;
+import com.bunjlabs.fugaframework.dependency.DependencyManager;
 import com.bunjlabs.fugaframework.network.HttpServer;
 import com.bunjlabs.fugaframework.resources.ResourceManager;
 import com.bunjlabs.fugaframework.router.Router;
@@ -18,33 +19,38 @@ public abstract class FugaApp {
 
     private static final Logger log = LogManager.getLogger(FugaApp.class);
     private final ResourceManager resourceManager;
-    private final Configuration config;
+    private final Configuration configuration;
     private final Router router;
     private final TemplateEngine templateEngine;
+    private final DependencyManager dependencyManager;
     private final SessionManager sessionManager;
     private final ServiceManager serviceManager;
+
     private HttpServer httpserver;
     private SocketAddress addr;
 
     public FugaApp() {
         this.resourceManager = new ResourceManager();
 
-        this.config = new Configuration(this);
+        this.configuration = new Configuration(this);
         this.router = new Router(this);
         this.templateEngine = new TemplateEngine(this);
-
+        this.dependencyManager = new DependencyManager(this);
+        
         this.sessionManager = new SessionManager();
         this.serviceManager = new ServiceManager();
 
     }
 
     public void start() throws Exception {
-        log.info("Fuga Framework {}", config.get("fuga.version", "(version is unknown)"));
+        log.info("Fuga Framework {}", configuration.get("fuga.version", "(version is unknown)"));
 
+        dependencyManager.addDependency(this, configuration);
+        
         prepare();
 
-        serviceManager.registerService(new SessionService(this), config.getInt("fuga.sessions.refreshtime", 15), TimeUnit.SECONDS);
-        addr = new InetSocketAddress(config.get("fuga.http.bindhost", "localhost"), config.getInt("fuga.http.bindport", 8080));
+        serviceManager.registerService(new SessionService(this), configuration.getInt("fuga.sessions.refreshtime", 15), TimeUnit.SECONDS);
+        addr = new InetSocketAddress(configuration.get("fuga.http.bindhost", "localhost"), configuration.getInt("fuga.http.bindport", 8080));
         httpserver = new HttpServer(addr, this);
         httpserver.start();
     }
@@ -54,7 +60,7 @@ public abstract class FugaApp {
     }
 
     public Configuration getConfiguration() {
-        return config;
+        return configuration;
     }
 
     public Router getRouter() {
@@ -71,6 +77,10 @@ public abstract class FugaApp {
 
     public TemplateEngine getTemplateEngine() {
         return templateEngine;
+    }
+
+    public DependencyManager getDependencyManager() {
+        return dependencyManager;
     }
 
     public abstract void prepare();
