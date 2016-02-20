@@ -2,6 +2,7 @@ package com.bunjlabs.fugaframework.dependency;
 
 import com.bunjlabs.fugaframework.FugaApp;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.logging.log4j.LogManager;
@@ -23,19 +24,9 @@ public class DependencyManager {
             if (f.isAnnotationPresent(Inject.class)) {
                 try {
                     Class cls = f.getType();
-                    Object injectOnject = null;
-                    if (dependencies.containsKey(cls)) {
-                        injectOnject = dependencies.get(cls);
-                    } else {
-                        for (Map.Entry<Class, Object> e : dependencies.entrySet()) {
-                            if (e.getKey().isAssignableFrom(cls)) {
-                                injectOnject = e.getValue();
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if(injectOnject == null) {
+                    Object injectOnject = getDependency(cls);
+
+                    if (injectOnject == null) {
                         throw new InjectException("No suitable dependency for " + cls.getName());
                     }
 
@@ -45,6 +36,25 @@ public class DependencyManager {
                 }
             }
         }
+    }
+
+    public Object getDependency(Class cls) {
+        if (dependencies.containsKey(cls)) {
+            return dependencies.get(cls);
+        } else {
+            for (Map.Entry<Class, Object> e : dependencies.entrySet()) {
+                if (e.getKey().isAssignableFrom(cls)) {
+                    return e.getValue();
+                }
+            }
+        }
+
+        try {
+            return cls.getConstructor().newInstance();
+        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+        }
+
+        return null;
     }
 
     public void addDependency(Object... objs) {
