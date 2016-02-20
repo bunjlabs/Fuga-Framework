@@ -8,7 +8,7 @@ public class ServiceManager {
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public void registerService(Service service, long delay, TimeUnit timeUnit) {
-        scheduler.schedule(service, delay, timeUnit);
+        scheduler.scheduleAtFixedRate(service, 0, delay, timeUnit);
         
     }
 
