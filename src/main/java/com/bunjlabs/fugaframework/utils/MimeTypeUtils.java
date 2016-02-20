@@ -10,7 +10,7 @@ public class MimeTypeUtils {
     static {
         mimeTypes.put("css", "text/css");
         mimeTypes.put("gif", "image/gif");
-        mimeTypes.put("jpeg", "jpg,image/jpeg");
+        mimeTypes.put("jpeg", "image/jpeg");
         mimeTypes.put("jpg", "image/jpeg");
         mimeTypes.put("png", "image/png");
         mimeTypes.put("ico", "image/x-icon");
