@@ -76,11 +76,15 @@ public class Router {
             return Responses.internalServerError(ex);
         }
 
-        if (resp != null) {
-            return resp;
+        if (resp == null) {
+            resp = Responses.notFound();
         }
 
-        return Responses.notFound("404 Not Found");
+        if (resp.getStatus() == 404 && resp.getStream() == null) {
+            resp = Responses.notFound("404 Not Found"); //TODO: Remove kostyl
+        }
+        
+        return resp;
     }
 
     private Response forward(FugaApp app, Context ctx, List<Extension> exts) throws Exception {

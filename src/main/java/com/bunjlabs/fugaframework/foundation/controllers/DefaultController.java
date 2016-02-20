@@ -10,7 +10,7 @@ import java.io.InputStream;
 public class DefaultController extends Controller {
 
     public Response generateNotFound() {
-        return notFound("404 Not Found");
+        return notFound();
     }
 
     public Response generateAsset(String path) {
