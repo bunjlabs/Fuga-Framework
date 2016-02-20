@@ -26,10 +26,6 @@ public class DependencyManager {
                     Class cls = f.getType();
                     Object injectOnject = getDependency(cls);
 
-                    if (injectOnject == null) {
-                        throw new InjectException("No suitable dependency for " + cls.getName());
-                    }
-
                     f.set(injectable, injectOnject);
                 } catch (IllegalArgumentException | IllegalAccessException e) {
                     throw new InjectException("Unable to inject field", e);
@@ -38,7 +34,7 @@ public class DependencyManager {
         }
     }
 
-    public Object getDependency(Class cls) {
+    public Object getDependency(Class cls) throws InjectException {
         if (dependencies.containsKey(cls)) {
             return dependencies.get(cls);
         } else {
@@ -54,7 +50,7 @@ public class DependencyManager {
         } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
         }
 
-        return null;
+        throw new InjectException("No suitable dependency for " + cls.getName());
     }
 
     public void addDependency(Object... objs) {
