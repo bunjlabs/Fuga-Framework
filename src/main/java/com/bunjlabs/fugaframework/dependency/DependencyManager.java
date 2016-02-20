@@ -34,6 +34,10 @@ public class DependencyManager {
                             }
                         }
                     }
+                    
+                    if(injectOnject == null) {
+                        throw new InjectException("No suitable dependency for " + cls.getName());
+                    }
 
                     f.set(injectable, injectOnject);
                 } catch (IllegalArgumentException | IllegalAccessException e) {
