@@ -23,7 +23,7 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0</url>
         </license>
     </licenses>
-    <inceptionYear>2015</inceptionYear>
+    <inceptionYear>2016</inceptionYear>
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
