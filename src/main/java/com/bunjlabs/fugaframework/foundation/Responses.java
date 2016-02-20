@@ -1,6 +1,5 @@
 package com.bunjlabs.fugaframework.foundation;
 
-import com.bunjlabs.fugaframework.foundation.controllers.DefaultController;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
