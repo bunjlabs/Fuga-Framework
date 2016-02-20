@@ -154,7 +154,6 @@ public class Template {
         jsCode.append("var escape = function() { return api.escape(Array.prototype.slice.call(arguments, 0)); };");
         jsCode.append("var nltobr = function() { return api.nltobr(Array.prototype.slice.call(arguments, 0)); };");
         jsCode.append("var format = function() { return api.format(Array.prototype.slice.call(arguments, 0)); };");
-
     }
 
     private static String escapeSpaces(String input) {

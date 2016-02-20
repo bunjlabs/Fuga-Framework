@@ -22,7 +22,7 @@ public class DefaultController extends Controller {
 
         String mime = MimeTypeUtils.getMimeTypeByExt(path.substring(path.lastIndexOf('.') + 1));
 
-        return ok(asset).setContentType(mime != null ? mime : "application/octet-stream");
+        return ok(asset).as(mime != null ? mime : "application/octet-stream");
     }
 
     public Response generateAssetView(String name) throws TemplateNotFoundException, TemplateRenderException {

@@ -19,7 +19,7 @@ public final class Response {
     private InputStream stream;
     private String contentType;
     private long contentLength;
-    private Map<String, String> headers = new TreeMap<>();
+    private final Map<String, String> headers = new TreeMap<>();
 
     public Response() {
         contentType = "application/octet-stream";   // or anything else
@@ -47,22 +47,17 @@ public final class Response {
         contentLength = f.length();
     }
 
-    public Response setStatus(int status) {
+    public Response status(int status) {
         this.status = status;
         return this;
     }
 
-    public Response setContentType(String contentType) {
-        this.contentType = contentType;
-        return this;
-    }
-
-    public Response setContentLength(long contentLength) {
+    public Response length(long contentLength) {
         this.contentLength = contentLength;
         return this;
     }
 
-    public Response setHeader(String name, String value) {
+    public Response header(String name, String value) {
         headers.put(name, value);
         return this;
     }
@@ -114,6 +109,11 @@ public final class Response {
 
     public Response asCss() {
         this.contentType = "text/css";
+        return this;
+    }
+    
+    public Response as(String contentType) {
+        this.contentType = contentType;
         return this;
     }
 }
