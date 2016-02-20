@@ -78,7 +78,7 @@ public class TemplateEngine {
 
         try {
             Invocable inv = (Invocable) engine;
-            inv.invokeFunction("process_" + tid, output, ctx, obj, new TemplateApi(app, ctx));
+            inv.invokeFunction("process_" + tid, output, ctx, obj, new TemplateApi(ctx));
         } catch (ScriptException | NoSuchMethodException ex) {
             throw new TemplateRenderException(ex.getLocalizedMessage());
         }

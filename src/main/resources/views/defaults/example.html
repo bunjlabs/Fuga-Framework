@@ -8,7 +8,13 @@
     <body>
         <% var data = ctx.get('data'); %>
         <p>@{ data }</p>
-        <p><# api.format("> %s %s %d", "Hello", "world", 10) #></p>
+        <p>Asset: <# asset('woo', 'hoo') #></p>
+        <p>Asset empty: <# asset() #></p>
+        <p>That: <# that('woo', 'hoo') #></p>
+        <p>That empty: <# that() #></p>
+        <p>Urlencode: <# that(urlencode('Привет мир!')) #></p>
+        
+        <p><# format("> %s %s %d", "Hello", "world", 10) #></p>
         <% 
 
         var element = {};

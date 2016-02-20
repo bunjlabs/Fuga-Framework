@@ -89,6 +89,9 @@ public class Template {
 
     private String parseBlock(boolean inBlock) throws TemplateRenderException {
         StringBuilder jsCode = new StringBuilder();
+
+        generateApiFunctions(jsCode);
+
         while (input.length() > 0) {
             Matcher m = codePattern.matcher(input);
             if (m.find()) {
@@ -137,6 +140,21 @@ public class Template {
             }
         }
         return jsCode.toString();
+    }
+
+    private static void generateApiFunctions(StringBuilder jsCode) {
+        jsCode.append("var that = function() { return api.urls.that(Array.prototype.slice.call(arguments, 0)); };");
+        jsCode.append("var asset = function() { return api.urls.asset(Array.prototype.slice.call(arguments, 0)); };");
+        jsCode.append("var urlencode = function() { return api.urls.urlencode(Array.prototype.slice.call(arguments, 0)); };");
+
+        jsCode.append("var generateFormId = function() { return api.forms.generateFormId(Array.prototype.slice.call(arguments, 0)); };");
+        jsCode.append("var testFormId = function() { return api.forms.testFormId(Array.prototype.slice.call(arguments, 0)); };");
+
+        jsCode.append("var bytes = function() { return api.bytes(Array.prototype.slice.call(arguments, 0)); };");
+        jsCode.append("var escape = function() { return api.escape(Array.prototype.slice.call(arguments, 0)); };");
+        jsCode.append("var nltobr = function() { return api.nltobr(Array.prototype.slice.call(arguments, 0)); };");
+        jsCode.append("var format = function() { return api.format(Array.prototype.slice.call(arguments, 0)); };");
+
     }
 
     private static String escapeSpaces(String input) {

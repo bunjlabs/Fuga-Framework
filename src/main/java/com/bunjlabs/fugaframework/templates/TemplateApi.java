@@ -1,62 +1,44 @@
 package com.bunjlabs.fugaframework.templates;
 
-import com.bunjlabs.fugaframework.FugaApp;
 import com.bunjlabs.fugaframework.foundation.Context;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import com.bunjlabs.fugaframework.foundation.Forms;
+import com.bunjlabs.fugaframework.foundation.Urls;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 public class TemplateApi {
 
-    private final FugaApp app;
     private final Context ctx;
 
-    public TemplateApi(FugaApp app, Context ctx) {
-        this.app = app;
+    public final Urls urls;
+    public final Forms forms;
+
+    public TemplateApi(Context ctx) {
         this.ctx = ctx;
-    }
-
-    public String asset(Object... args) {
-        String path = "";
-        if (args.length > 0 && args[0] != null && args[0] instanceof String) {
-            path = (String) args[0];
-        }
-        if (!app.getConfiguration().getBoolean("fuga.assets.external")) {
-            return that("assets/" + path);
-        } else {
-            return app.getConfiguration().get("fuga.assets.path", that()) + path;
-        }
-    }
-
-    public String that(Object... args) {
-        String path = "";
-        if (args.length > 0 && args[0] != null && args[0] instanceof String) {
-            path = (String) args[0];
-        }
-        StringBuilder sb = new StringBuilder();
-        sb.append("http://")
-                .append(ctx.getRequest().getHost())
-                .append("/")
-                .append(path);
-        return sb.toString();
+        this.urls = new Urls(ctx);
+        this.forms = new Forms(ctx);
     }
 
     public byte[] bytes(Object... args) {
-        String str = "";
-        if (args.length > 0 && args[0] != null && args[0] instanceof String) {
-            str = (String) args[0];
+        StringBuilder sb = new StringBuilder();
+
+        for (Object arg : args) {
+            if (arg != null) {
+                sb.append(arg);
+            }
         }
 
-        return str.getBytes(Charset.forName("UTF-8"));
+        return sb.toString().getBytes(Charset.forName("UTF-8"));
     }
 
     public String escape(Object... args) {
         StringBuilder sb = new StringBuilder();
 
-        for (Object a : args) {
-            sb.append(a != null ? a : "");
+        for (Object arg : args) {
+            if (arg != null) {
+                sb.append(arg);
+            }
         }
 
         return StringEscapeUtils.escapeHtml4(sb.toString());
@@ -65,25 +47,13 @@ public class TemplateApi {
     public String nltobr(Object... args) {
         StringBuilder sb = new StringBuilder();
 
-        for (Object a : args) {
-            sb.append(a != null ? a : "");
+        for (Object arg : args) {
+            if (arg != null) {
+                sb.append(arg);
+            }
         }
 
         return sb.toString().replaceAll("\n", "<br>");
-    }
-
-    public String urlencode(Object... args) {
-        StringBuilder sb = new StringBuilder();
-
-        for (Object a : args) {
-            sb.append(a != null ? a : "");
-        }
-
-        try {
-            return URLEncoder.encode(sb.toString(), "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            return "";
-        }
     }
 
     public String format(Object... args) {
