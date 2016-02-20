@@ -1,5 +1,7 @@
 package com.bunjlabs.fugaframework.sessions;
 
+import com.bunjlabs.fugaframework.FugaApp;
+import com.bunjlabs.fugaframework.configuration.Configuration;
 import com.bunjlabs.fugaframework.foundation.Context;
 import io.netty.handler.codec.http.cookie.Cookie;
 import io.netty.handler.codec.http.cookie.DefaultCookie;
@@ -12,7 +14,12 @@ import java.util.UUID;
 public class SessionManager {
 
     private final Map<UUID, Session> sessions = new HashMap<>();
+    private final Configuration configuration;
 
+    public SessionManager(FugaApp app) {
+        this.configuration = app.getConfiguration();
+        
+    }
     public Session getSession(UUID sessionId) {
         return sessions.get(sessionId);
     }
@@ -22,7 +29,7 @@ public class SessionManager {
     }
 
     public void process(Context ctx) {
-        List<Cookie> sessionCookieList = ctx.getRequest().getCookiesDownload().get("FUGASESSIONID");
+        List<Cookie> sessionCookieList = ctx.getRequest().getCookiesDownload().get(configuration.get("fuga.sessions.cookie"));
         Session session = null;
         
         boolean flag = false;
@@ -41,7 +48,7 @@ public class SessionManager {
 
             sessions.put(sessionId, session);
 
-            DefaultCookie sessionCookie = new DefaultCookie("FUGASESSIONID", session.getSessionId().toString());
+            DefaultCookie sessionCookie = new DefaultCookie(configuration.get("fuga.sessions.cookie"), session.getSessionId().toString());
             sessionCookie.setPath("/");
             ctx.getRequest().setCookie(sessionCookie);
         }

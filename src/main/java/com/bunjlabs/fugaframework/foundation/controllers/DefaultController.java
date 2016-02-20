@@ -10,10 +10,6 @@ import java.io.InputStream;
 public class DefaultController extends Controller {
 
     public Response generateNotFound() {
-        String path = ctx.getApp().getConfiguration().get("fuga.404.redirect", null);
-        if (path != null && !path.isEmpty()) {
-            return temporaryRedirect(urls.that(path));
-        }
         return notFound("404 Not Found");
     }
 

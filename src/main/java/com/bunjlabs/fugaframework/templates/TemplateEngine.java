@@ -31,7 +31,7 @@ public class TemplateEngine {
     }
 
     public String compile(String name) throws TemplateNotFoundException, TemplateRenderException {
-        if (templates.containsKey(name) && !config.getBoolean("fuga.templates.recompile", false)) {
+        if (templates.containsKey(name) && !config.getBoolean("fuga.templates.recompile")) {
             return templates.get(name).getTid();
         }
 
@@ -59,7 +59,7 @@ public class TemplateEngine {
 
     public String compile(String name, String input) throws TemplateRenderException, TemplateNotFoundException {
         String tid
-                = config.getBoolean("fuga.templates.recompile", false)
+                = config.getBoolean("fuga.templates.recompile")
                 && templates.containsKey(name)
                         ? templates.get(name).getTid() : Template.generateTid();
 

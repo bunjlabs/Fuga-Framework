@@ -36,8 +36,8 @@ public abstract class FugaApp {
         this.router = new Router(this);
         this.templateEngine = new TemplateEngine(this);
         this.dependencyManager = new DependencyManager(this);
+        this.sessionManager = new SessionManager(this);
         
-        this.sessionManager = new SessionManager();
         this.serviceManager = new ServiceManager();
 
     }
@@ -49,8 +49,8 @@ public abstract class FugaApp {
         
         prepare();
 
-        serviceManager.registerService(new SessionService(this), configuration.getInt("fuga.sessions.refreshtime", 15), TimeUnit.SECONDS);
-        addr = new InetSocketAddress(configuration.get("fuga.http.bindhost", "localhost"), configuration.getInt("fuga.http.bindport", 8080));
+        serviceManager.registerService(new SessionService(this), configuration.getInt("fuga.sessions.refreshtime"), TimeUnit.SECONDS);
+        addr = new InetSocketAddress(configuration.get("fuga.http.bindhost"), configuration.getInt("fuga.http.bindport"));
         httpserver = new HttpServer(addr, this);
         httpserver.start();
     }

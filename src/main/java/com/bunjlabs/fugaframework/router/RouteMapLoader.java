@@ -1,6 +1,5 @@
 package com.bunjlabs.fugaframework.router;
 
-import com.bunjlabs.fugaframework.foundation.Context;
 import com.bunjlabs.fugaframework.foundation.RequestMethod;
 import com.bunjlabs.fugaframework.foundation.controllers.DefaultController;
 import static com.bunjlabs.fugaframework.router.Tokenizer.*;

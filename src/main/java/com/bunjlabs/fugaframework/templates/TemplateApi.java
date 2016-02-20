@@ -23,10 +23,10 @@ public class TemplateApi {
         if (args.length > 0 && args[0] != null && args[0] instanceof String) {
             path = (String) args[0];
         }
-        if (!app.getConfiguration().getBoolean("fuga.templates.assets.external", false)) {
+        if (!app.getConfiguration().getBoolean("fuga.assets.external")) {
             return that("assets/" + path);
         } else {
-            return app.getConfiguration().get("fuga.templates.assets.path", that()) + path;
+            return app.getConfiguration().get("fuga.assets.path", that()) + path;
         }
     }
 
