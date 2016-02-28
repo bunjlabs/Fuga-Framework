@@ -1,21 +1,15 @@
 package com.bunjlabs.fugaframework.sessions;
 
-import com.bunjlabs.fugaframework.FugaApp;
-import com.bunjlabs.fugaframework.network.HttpServer;
+import com.bunjlabs.fugaframework.dependency.Inject;
 import com.bunjlabs.fugaframework.services.Service;
-import java.util.logging.Logger;
 
 public class SessionService extends Service {
 
-    private static final Logger log = Logger.getLogger(HttpServer.class.getName());
-    private final SessionManager sessionManager;
-
-    public SessionService(FugaApp app) {
-        this.sessionManager = app.getSessionManager();
-    }
+    @Inject
+    public SessionManager sessionManager;
 
     @Override
-    public void run() {
+    public void onUpdate() {
         sessionManager.update();
     }
 

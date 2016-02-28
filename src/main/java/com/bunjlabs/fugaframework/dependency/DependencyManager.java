@@ -53,18 +53,18 @@ public class DependencyManager {
         throw new InjectException("No suitable dependency for " + cls.getName());
     }
 
-    public void addDependency(Object... objs) {
+    public void registerDependency(Object... objs) {
         for (Object obj : objs) {
             dependencies.put(obj.getClass(), obj);
         }
     }
 
-    public void addDependency(Class... clss) {
+    public void registerDependency(Class... clss) {
         for (Class cls : clss) {
             try {
                 dependencies.put(cls, cls.newInstance());
             } catch (InstantiationException | IllegalAccessException ex) {
-                log.error("Unable to add dependency", ex);
+                log.error("Unable to register dependency", ex);
             }
         }
     }

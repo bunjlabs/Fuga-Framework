@@ -1,7 +1,17 @@
 package com.bunjlabs.fugaframework.services;
 
-public abstract class Service implements Runnable{
+public abstract class Service {
 
-    @Override
-    public abstract void run();
+    public Service() {
+
+    }
+
+    public void onCreate() {
+    }
+
+    public void onDestroy() {
+    }
+
+    public void onUpdate() {
+    }
 }

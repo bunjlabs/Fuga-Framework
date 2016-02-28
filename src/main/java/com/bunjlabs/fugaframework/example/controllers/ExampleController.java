@@ -3,6 +3,7 @@ package com.bunjlabs.fugaframework.example.controllers;
 import com.bunjlabs.fugaframework.dependency.Inject;
 import com.bunjlabs.fugaframework.example.ExampleDependency;
 import com.bunjlabs.fugaframework.example.FugaExampleApp;
+import com.bunjlabs.fugaframework.example.services.ExampleService;
 import com.bunjlabs.fugaframework.foundation.Controller;
 import com.bunjlabs.fugaframework.foundation.Response;
 import com.bunjlabs.fugaframework.templates.TemplateNotFoundException;
@@ -17,9 +18,12 @@ public class ExampleController extends Controller {
 
     @Inject
     public FugaExampleApp app;
-    
+
     @Inject
     public ExampleDependency ed;
+
+    @Inject
+    public ExampleService es;
 
     public Response skip() {
         ctx.getSession().put("Key", "Some important string");
@@ -31,7 +35,7 @@ public class ExampleController extends Controller {
 
     public Response index(String one, int to) throws TemplateNotFoundException, TemplateRenderException {
         log.info(ed.getString());
-        
+
         ctx.put("data",
                 "Hello! " + one + " - " + to + " = " + ctx.getSession().getString("Key")
                 + " | " + ctx.get("key", String.class));

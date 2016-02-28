@@ -18,11 +18,13 @@ import org.apache.logging.log4j.Logger;
 public abstract class FugaApp {
 
     private static final Logger log = LogManager.getLogger(FugaApp.class);
+
+    private final DependencyManager dependencyManager;
     private final ResourceManager resourceManager;
     private final Configuration configuration;
     private final Router router;
     private final TemplateEngine templateEngine;
-    private final DependencyManager dependencyManager;
+
     private final SessionManager sessionManager;
     private final ServiceManager serviceManager;
 
@@ -30,26 +32,26 @@ public abstract class FugaApp {
     private SocketAddress addr;
 
     public FugaApp() {
-        this.resourceManager = new ResourceManager();
+        this.dependencyManager = new DependencyManager(this);
 
+        this.resourceManager = new ResourceManager();
         this.configuration = new Configuration(this);
         this.router = new Router(this);
         this.templateEngine = new TemplateEngine(this);
-        this.dependencyManager = new DependencyManager(this);
         this.sessionManager = new SessionManager(this);
-        
-        this.serviceManager = new ServiceManager();
+        this.serviceManager = new ServiceManager(this);
 
     }
 
     public void start() throws Exception {
         log.info("Fuga Framework {}", configuration.get("fuga.version", "(version is unknown)"));
 
-        dependencyManager.addDependency(this, configuration);
-        
+        dependencyManager.registerDependency(this, resourceManager, configuration, router, templateEngine, sessionManager, serviceManager);
+
+        serviceManager.registerService(SessionService.class, configuration.getInt("fuga.sessions.refreshtime"), TimeUnit.SECONDS);
+
         prepare();
 
-        serviceManager.registerService(new SessionService(this), configuration.getInt("fuga.sessions.refreshtime"), TimeUnit.SECONDS);
         addr = new InetSocketAddress(configuration.get("fuga.http.bindhost"), configuration.getInt("fuga.http.bindport"));
         httpserver = new HttpServer(addr, this);
         httpserver.start();
