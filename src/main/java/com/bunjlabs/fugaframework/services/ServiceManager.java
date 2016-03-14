@@ -42,7 +42,7 @@ public class ServiceManager {
             app.getDependencyManager().injectDependencies(serviceInstance);
 
             services.put(service, serviceInstance);
-            app.getDependencyManager().registerDependency(service);
+            app.getDependencyManager().registerDependency(service, serviceInstance);
             
             serviceInstance.onCreate();
         } catch (InstantiationException | IllegalAccessException ex) {
