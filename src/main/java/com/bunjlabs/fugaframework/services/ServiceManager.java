@@ -43,8 +43,10 @@ public class ServiceManager {
 
             services.put(service, serviceInstance);
             app.getDependencyManager().registerDependency(service);
+            
+            serviceInstance.onCreate();
         } catch (InstantiationException | IllegalAccessException ex) {
-
+            log.catching(ex);
         } catch (InjectException ex) {
             log.error("Unable to inject dependencies to the service", ex);
         }
