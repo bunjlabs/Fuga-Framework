@@ -31,6 +31,8 @@ public class MimeTypeUtils {
         mimeTypes.put("js", "application/x-javascript");
         mimeTypes.put("svg", "image/svg+xml");
         mimeTypes.put("mp4", "video/mp4");
+        
+        mimeTypes.put("pdf", "application/pdf");
     }
 
     public static String getMimeTypeByExt(String ext) {
