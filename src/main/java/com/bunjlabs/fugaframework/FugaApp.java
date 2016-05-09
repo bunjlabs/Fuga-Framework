@@ -15,6 +15,10 @@ package com.bunjlabs.fugaframework;
 
 import com.bunjlabs.fugaframework.configuration.Configuration;
 import com.bunjlabs.fugaframework.dependency.DependencyManager;
+import com.bunjlabs.fugaframework.handlers.DefaultErrorHandler;
+import com.bunjlabs.fugaframework.handlers.DefaultRequestHandler;
+import com.bunjlabs.fugaframework.handlers.ErrorHandler;
+import com.bunjlabs.fugaframework.handlers.RequestHandler;
 import com.bunjlabs.fugaframework.network.HttpServer;
 import com.bunjlabs.fugaframework.resources.ResourceManager;
 import com.bunjlabs.fugaframework.router.Router;
@@ -41,11 +45,14 @@ public abstract class FugaApp {
     private final SessionManager sessionManager;
     private final ServiceManager serviceManager;
 
+    private ErrorHandler errorHandler;
+    private RequestHandler requestHandler;
+
     private HttpServer httpserver;
     private SocketAddress addr;
 
     public FugaApp() {
-        this.dependencyManager = new DependencyManager(this);
+        this.dependencyManager = new DependencyManager();
 
         this.resourceManager = new ResourceManager();
         this.configuration = new Configuration(this);
@@ -54,12 +61,26 @@ public abstract class FugaApp {
         this.sessionManager = new SessionManager(this);
         this.serviceManager = new ServiceManager(this);
 
+        this.errorHandler = new DefaultErrorHandler();
+        this.requestHandler = new DefaultRequestHandler();
+
     }
 
     public void start() throws Exception {
         log.info("Fuga Framework {}", configuration.get("fuga.version", "(version is unknown)"));
 
-        dependencyManager.registerDependency(this, resourceManager, configuration, router, templateEngine, sessionManager, serviceManager);
+        dependencyManager.registerDependency(
+                this,
+                resourceManager,
+                configuration,
+                router,
+                templateEngine,
+                sessionManager,
+                serviceManager
+        );
+
+        dependencyManager.registerDependency(ErrorHandler.class, errorHandler);
+        dependencyManager.registerDependency(RequestHandler.class, requestHandler);
 
         serviceManager.registerService(SessionService.class, configuration.getInt("fuga.sessions.refreshtime"), TimeUnit.SECONDS);
 
@@ -98,5 +119,24 @@ public abstract class FugaApp {
         return dependencyManager;
     }
 
+    public ErrorHandler getErrorHandler() {
+        return errorHandler;
+    }
+
+    public void setErrorHandler(ErrorHandler errorHandler) {
+        this.errorHandler = errorHandler;
+        dependencyManager.registerDependency(ErrorHandler.class, errorHandler);
+    }
+
+    public RequestHandler getRequestHandler() {
+        return requestHandler;
+    }
+
+    public void setRequestHandler(RequestHandler requestHandler) {
+        this.requestHandler = requestHandler;
+        dependencyManager.registerDependency(RequestHandler.class, requestHandler);
+    }
+
     public abstract void prepare();
+
 }

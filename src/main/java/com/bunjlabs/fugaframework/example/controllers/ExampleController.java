@@ -17,8 +17,11 @@ import com.bunjlabs.fugaframework.dependency.Inject;
 import com.bunjlabs.fugaframework.example.ExampleDependency;
 import com.bunjlabs.fugaframework.example.FugaExampleApp;
 import com.bunjlabs.fugaframework.example.services.ExampleService;
+import com.bunjlabs.fugaframework.foundation.Context;
 import com.bunjlabs.fugaframework.foundation.Controller;
 import com.bunjlabs.fugaframework.foundation.Response;
+import com.bunjlabs.fugaframework.foundation.Responses;
+import com.bunjlabs.fugaframework.handlers.RequestHandler;
 import com.bunjlabs.fugaframework.templates.TemplateNotFoundException;
 import com.bunjlabs.fugaframework.templates.TemplateRenderException;
 import java.nio.charset.Charset;
@@ -37,6 +40,9 @@ public class ExampleController extends Controller {
 
     @Inject
     public ExampleService es;
+    
+    @Inject
+    public RequestHandler re;
 
     public Response skip() {
         ctx.getSession().put("Key", "Some important string");
@@ -58,6 +64,30 @@ public class ExampleController extends Controller {
 
     public Response post() {
         return ok(ctx.getRequest().getContent().toString(Charset.forName("UTF-8")));
+    }
+
+    public Response throwError() {
+        int a = 1 / 0;
+        return ok("WiGO?");
+    }
+
+    public Response nf() {
+        return notFound();
+    }
+    
+    public Response showCurrentRequestHandler() {
+        return ok("Current request handler is: " + re.getClass().getName());
+    }
+
+    public Response changeDefaultRequestHandler() {
+        app.setRequestHandler(new RequestHandler() {
+
+            @Override
+            public Response onRequest(Context ctx) {
+                return Responses.ok("I'm dummy request handler!");
+            }
+        });
+        return ok("Done!");
     }
 
     public Response noData() {

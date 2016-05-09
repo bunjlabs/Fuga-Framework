@@ -18,6 +18,7 @@ import com.bunjlabs.fugaframework.foundation.Context;
 import com.bunjlabs.fugaframework.foundation.Request;
 import com.bunjlabs.fugaframework.foundation.RequestMethod;
 import com.bunjlabs.fugaframework.foundation.Response;
+import com.bunjlabs.fugaframework.foundation.Responses;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
@@ -121,7 +122,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             postmap = new TreeMap<>();
 
             Map<String, String> headers = new HashMap<>();
-            for(Map.Entry<String, String> e : httprequest.headers().entries()) {
+            for (Map.Entry<String, String> e : httprequest.headers().entries()) {
                 headers.put(e.getKey(), e.getValue());
             }
 
@@ -206,16 +207,22 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
         log.debug("Access from {}: {}{}", request.getSocketAddress(), request.getHost(), request.getUri());
 
-        resp = app.getRouter().forward(app, sctx);
+        resp = app.getRequestHandler().onRequest(sctx);
 
-        HttpResponse response = new DefaultHttpResponse(
+        HttpResponse response;
+
+        if (resp == null) {
+            log.error("Null response is received");
+
+            resp = Responses.internalServerError();
+        }
+
+        response = new DefaultHttpResponse(
                 HttpVersion.HTTP_1_1,
-                true // ((LastHttpContent) msg).getDecoderResult().isSuccess()
-                && resp != null
-                        ? HttpResponseStatus.valueOf(resp.getStatus()) : HttpResponseStatus.BAD_REQUEST);
+                HttpResponseStatus.valueOf(resp.getStatus()));
 
         response.headers().set(HttpHeaders.Names.TRANSFER_ENCODING, HttpHeaders.Values.CHUNKED);
-        response.headers().set(HttpHeaders.Names.CONTENT_TYPE, resp != null ? resp.getContentType() : "text/plain");
+        response.headers().set(HttpHeaders.Names.CONTENT_TYPE, resp.getContentType());
 
         // Disable cache by default
         response.headers().set(HttpHeaders.Names.CACHE_CONTROL, "no-cache, no-store, must-revalidate");

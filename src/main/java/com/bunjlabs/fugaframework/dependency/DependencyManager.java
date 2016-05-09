@@ -13,7 +13,6 @@
  */
 package com.bunjlabs.fugaframework.dependency;
 
-import com.bunjlabs.fugaframework.FugaApp;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -25,11 +24,9 @@ public class DependencyManager {
 
     private static final Logger log = LogManager.getLogger(DependencyManager.class);
 
-    private final FugaApp app;
     private final Map<Class, Object> dependencies = new HashMap<>();
 
-    public DependencyManager(FugaApp app) {
-        this.app = app;
+    public DependencyManager() {
     }
 
     public void injectDependencies(Object injectable) throws InjectException {
@@ -70,6 +67,10 @@ public class DependencyManager {
         for (Object obj : objs) {
             dependencies.put(obj.getClass(), obj);
         }
+    }
+
+    public void registerDependency(Class cls, Object obj) {
+        dependencies.put(cls, obj);
     }
 
     public void registerDependency(Class... clss) {

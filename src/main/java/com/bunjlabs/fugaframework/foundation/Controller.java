@@ -13,7 +13,6 @@
  */
 package com.bunjlabs.fugaframework.foundation;
 
-import com.bunjlabs.fugaframework.FugaApp;
 import com.bunjlabs.fugaframework.dependency.InjectException;
 import com.bunjlabs.fugaframework.templates.TemplateNotFoundException;
 import com.bunjlabs.fugaframework.templates.TemplateRenderException;
@@ -39,13 +38,13 @@ public abstract class Controller extends Responses {
 
     public static class Builder {
 
-        public static Controller build(Class<? extends Controller> controller, FugaApp app, Context ctxb) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InjectException {
+        public static Controller build(Class<? extends Controller> controller, Context ctxb) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InjectException {
             Controller c = controller.getConstructor().newInstance();
             c.ctx = ctxb;
             c.urls = new Urls(ctxb);
             c.forms = new Forms(ctxb);
 
-            app.getDependencyManager().injectDependencies(c);
+            ctxb.getApp().getDependencyManager().injectDependencies(c);
 
             return c;
         }

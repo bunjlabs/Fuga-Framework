@@ -120,6 +120,7 @@ public class RouteMapLoader {
         String classMethod;
 
         if (lio < 0) {
+            className = "";
             classMethod = classMethodFull;
 
             switch (classMethod) {
@@ -132,11 +133,11 @@ public class RouteMapLoader {
                 case "ok":
                     return new Route(defaultController, tryGetMethod(defaultController, "generateOk", classes), parameters);
             }
+        } else {
+            className = classMethodFull.substring(0, lio);
+            classMethod = classMethodFull.substring(lio + 1);
         }
-
-        className = classMethodFull.substring(0, lio);
-        classMethod = classMethodFull.substring(lio + 1);
-
+        
         Class c;
         Method m;
         for (String use : uses) {

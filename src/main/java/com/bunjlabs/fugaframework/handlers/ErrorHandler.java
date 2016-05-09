@@ -1,4 +1,4 @@
-/* 
+/*
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -11,21 +11,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.bunjlabs.fugaframework.handlers;
 
-use com.bunjlabs.fugaframework.example.controllers.ExampleController
+import com.bunjlabs.fugaframework.foundation.Context;
+import com.bunjlabs.fugaframework.foundation.Response;
 
-GET {
-    skip()
-    
-    $/          index("empty", "223":int)
-    $/(index)   index(1:String, "223":int)
-    $/(\d+)     index(1:String, "223":int)
-    $/ex        throwError()
-    $/nf        nf()
-    $/cdrh      changeDefaultRequestHandler()
-    $/scrh      showCurrentRequestHandler()
+public interface ErrorHandler {
+
+    public Response onClientError(Context ctx, int statusCode);
+
+    public Response onServerError(Context ctx, Throwable cause);
 }
-
-POST $/post     post()
-
-HEAD OPTIONS noData()

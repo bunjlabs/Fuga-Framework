@@ -34,8 +34,6 @@ public final class Response {
     private long contentLength;
     private final Map<String, String> headers = new TreeMap<>();
 
-    private boolean empty = true;
-
     public Response() {
         contentType = "application/octet-stream";
         contentLength = -1;
@@ -43,7 +41,6 @@ public final class Response {
 
     public Response(InputStream is) {
         this();
-        empty = false;
         stream = is;
     }
 
@@ -134,6 +131,6 @@ public final class Response {
     }
 
     public boolean isEmpty() {
-        return empty;
+        return stream == null;
     }
 }

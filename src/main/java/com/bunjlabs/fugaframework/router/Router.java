@@ -17,17 +17,16 @@ import com.bunjlabs.fugaframework.FugaApp;
 import com.bunjlabs.fugaframework.foundation.Context;
 import com.bunjlabs.fugaframework.foundation.Controller;
 import com.bunjlabs.fugaframework.foundation.Response;
-import com.bunjlabs.fugaframework.foundation.ResponseGiver;
 import com.bunjlabs.fugaframework.foundation.Responses;
+import com.bunjlabs.fugaframework.handlers.DefaultErrorHandler;
+import com.bunjlabs.fugaframework.handlers.ErrorHandler;
 import com.bunjlabs.fugaframework.resources.ResourceManager;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,8 +37,6 @@ public class Router {
 
     private final ResourceManager resourceManager;
     private final List<Extension> extensions = new ArrayList<>();
-
-    private final Map<Integer, ResponseGiver> defaultErrorResponses = new HashMap<>();
 
     public Router(FugaApp app) {
         this.resourceManager = app.getResourceManager();
@@ -78,11 +75,7 @@ public class Router {
         extensions.addAll(mapLoader.load(input));
     }
 
-    public void setDefaultErrorResponse(int status, ResponseGiver rg) {
-        defaultErrorResponses.put(status, rg);
-    }
-
-    public Response forward(FugaApp app, Context ctx) {
+    public Response forward(Context ctx) {
         if (extensions.isEmpty()) {
             Exception ex = new RoutesMapException("Empty routes map");
             log.catching(ex);
@@ -92,28 +85,24 @@ public class Router {
         Response resp;
 
         try {
-            resp = forward(app, ctx, extensions);
+            resp = forward(ctx, extensions);
         } catch (Exception ex) {
             log.catching(ex);
-            return Responses.internalServerError(ex);
+            return ctx.getApp().getErrorHandler().onServerError(ctx, ex);
         }
 
         if (resp == null) {
-            resp = Responses.notFound();
+            resp = ctx.getApp().getErrorHandler().onClientError(ctx, 404);
         }
 
-        if (resp.isEmpty()) {
-            resp = defaultErrorResponses.get(resp.getStatus()).get();
-        }
-
-        if (resp.getStatus() == 404 && resp.getStream() == null) {
-            resp = Responses.notFound("404 Not Found"); //TODO: Remove kostyl
+        if (resp.isEmpty() && resp.getStatus() >= 400 && resp.getStatus() < 500) {
+            resp = ctx.getApp().getErrorHandler().onClientError(ctx, resp.getStatus());
         }
 
         return resp;
     }
 
-    private Response forward(FugaApp app, Context ctx, List<Extension> exts) throws Exception {
+    private Response forward(Context ctx, List<Extension> exts) throws Exception {
         if (exts == null) {
             throw new RoutesMapException("Extensions sublist is null");
         }
@@ -140,12 +129,12 @@ public class Router {
                         args[i] = mp.cast();
                     }
                 }
-                Response resp = invoke(app, ctx, route, args);
+                Response resp = invoke(ctx, route, args);
                 if (resp != null) {
                     return resp;
                 }
             } else if (ext.getNodes() != null && !ext.getNodes().isEmpty()) {
-                Response resp = (Response) forward(app, ctx, ext.getNodes());
+                Response resp = (Response) forward(ctx, ext.getNodes());
                 if (resp != null) {
                     return resp;
                 }
@@ -154,8 +143,8 @@ public class Router {
         return null;
     }
 
-    private Response invoke(FugaApp app, Context ctx, Route route, Object... args) throws Exception {
-        Controller controller = Controller.Builder.build(route.getController(), app, ctx);
+    private Response invoke(Context ctx, Route route, Object... args) throws Exception {
+        Controller controller = Controller.Builder.build(route.getController(), ctx);
         return (Response) route.getMethod().invoke(controller, args);
     }
 }
