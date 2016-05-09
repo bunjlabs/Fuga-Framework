@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 
 public class Tokenizer {
 
-    private static final Pattern methodPattern = Pattern.compile("GET|POST|PUT|DELETE|HEAD|OPTIONS");
+    private static final Pattern methodPattern = Pattern.compile("GET|POST|PUT|PATCH|TRACE|DELETE|HEAD|OPTIONS");
     private static final Pattern integerPattern = Pattern.compile("([1-9][0-9]+)|[0-9]");
 
     public static final int TK_EOF = -1;
