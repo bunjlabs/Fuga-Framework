@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.script.Invocable;
@@ -82,7 +83,7 @@ public class TemplateEngine {
         templates.put(name, t);
 
         t.eval(engine);
-        
+
         return tid;
     }
 
@@ -106,7 +107,11 @@ public class TemplateEngine {
 
         render(name, new PrintStream(out), ctx, obj);
 
-        return out.toString();
+        try {
+            return out.toString("UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            throw new TemplateRenderException(ex);
+        }
     }
 
     public String renderToString(String name, Context ctx) throws TemplateNotFoundException, TemplateRenderException {

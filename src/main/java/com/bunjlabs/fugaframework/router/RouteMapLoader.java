@@ -107,12 +107,12 @@ public class RouteMapLoader {
             try {
                 classes[i] = getClassTypeBySimpleName(parameters.get(i).getDataType());
             } catch (ClassNotFoundException ex) {
-                throw new RoutesMapLoadException(ex);
+                throw new RoutesMapLoadException(t, "Unable to cast parameter " + i, ex);
             }
         }
 
         if (classMethodFull.trim().isEmpty()) {
-            throw new RoutesMapLoadException("Method name cannot be empty!");
+            throw new RoutesMapLoadException(t, "Method name cannot be empty!");
         }
 
         int lio = classMethodFull.lastIndexOf('.');
@@ -147,7 +147,7 @@ public class RouteMapLoader {
             }
         }
 
-        throw new RoutesMapLoadException("Method not found: " + className + "." + classMethod);
+        throw new RoutesMapLoadException(t, "Method not found: " + className + "." + classMethod);
 
     }
 

@@ -17,6 +17,7 @@ import com.bunjlabs.fugaframework.FugaApp;
 import com.bunjlabs.fugaframework.foundation.Context;
 import com.bunjlabs.fugaframework.foundation.Controller;
 import com.bunjlabs.fugaframework.foundation.Response;
+import com.bunjlabs.fugaframework.foundation.ResponseGiver;
 import com.bunjlabs.fugaframework.foundation.Responses;
 import com.bunjlabs.fugaframework.resources.ResourceManager;
 import java.io.BufferedReader;
@@ -24,7 +25,9 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,6 +39,8 @@ public class Router {
     private final ResourceManager resourceManager;
     private final List<Extension> extensions = new ArrayList<>();
 
+    private final Map<Integer, ResponseGiver> defaultResponses = new HashMap<>();
+    
     public Router(FugaApp app) {
         this.resourceManager = app.getResourceManager();
     }
@@ -90,9 +95,13 @@ public class Router {
         }
 
         if (resp == null) {
-            resp = Responses.notFound();
+            return Responses.notFound();
         }
 
+        if(resp.getStream() == null) {
+            resp = defaultResponses.get(resp.getStatus()).get();
+        }
+        
         if (resp.getStatus() == 404 && resp.getStream() == null) {
             resp = Responses.notFound("404 Not Found"); //TODO: Remove kostyl
         }
