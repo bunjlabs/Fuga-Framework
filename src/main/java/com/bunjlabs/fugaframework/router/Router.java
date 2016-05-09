@@ -39,8 +39,8 @@ public class Router {
     private final ResourceManager resourceManager;
     private final List<Extension> extensions = new ArrayList<>();
 
-    private final Map<Integer, ResponseGiver> defaultResponses = new HashMap<>();
-    
+    private final Map<Integer, ResponseGiver> defaultErrorResponses = new HashMap<>();
+
     public Router(FugaApp app) {
         this.resourceManager = app.getResourceManager();
     }
@@ -78,6 +78,10 @@ public class Router {
         extensions.addAll(mapLoader.load(input));
     }
 
+    public void setDefaultErrorResponse(int status, ResponseGiver rg) {
+        defaultErrorResponses.put(status, rg);
+    }
+
     public Response forward(FugaApp app, Context ctx) {
         if (extensions.isEmpty()) {
             Exception ex = new RoutesMapException("Empty routes map");
@@ -95,17 +99,17 @@ public class Router {
         }
 
         if (resp == null) {
-            return Responses.notFound();
+            resp = Responses.notFound();
         }
 
-        if(resp.getStream() == null) {
-            resp = defaultResponses.get(resp.getStatus()).get();
+        if (resp.isEmpty()) {
+            resp = defaultErrorResponses.get(resp.getStatus()).get();
         }
-        
+
         if (resp.getStatus() == 404 && resp.getStream() == null) {
             resp = Responses.notFound("404 Not Found"); //TODO: Remove kostyl
         }
-        
+
         return resp;
     }
 

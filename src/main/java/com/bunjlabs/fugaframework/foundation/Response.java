@@ -34,13 +34,16 @@ public final class Response {
     private long contentLength;
     private final Map<String, String> headers = new TreeMap<>();
 
+    private boolean empty = true;
+
     public Response() {
-        contentType = "application/octet-stream";   // or anything else
+        contentType = "application/octet-stream";
         contentLength = -1;
     }
 
     public Response(InputStream is) {
         this();
+        empty = false;
         stream = is;
     }
 
@@ -51,7 +54,7 @@ public final class Response {
 
     public Response(String s) {
         this(s.getBytes());
-        contentType = "text/html";  // I assume that text/html will be more often
+        contentType = "text/html";
     }
 
     public Response(File f) throws IOException {
@@ -124,9 +127,13 @@ public final class Response {
         this.contentType = "text/css";
         return this;
     }
-    
+
     public Response as(String contentType) {
         this.contentType = contentType;
         return this;
+    }
+
+    public boolean isEmpty() {
+        return empty;
     }
 }
