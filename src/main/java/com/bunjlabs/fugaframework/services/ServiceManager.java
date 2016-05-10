@@ -28,19 +28,19 @@ public class ServiceManager {
     private static final Logger log = LogManager.getLogger(ServiceManager.class);
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-    private final Map<Class<? extends Service>, Service> services = new HashMap<>();
+    private final Map<Class<? extends Service>, ServiceAgent> services = new HashMap<>();
     private final FugaApp app;
 
     public ServiceManager(FugaApp app) {
         this.app = app;
     }
 
-    public void registerService(Class<? extends Service> service) {
+    public void register(Class<? extends Service> service) {
         try {
             Service serviceInstance = app.getDependencyManager().inject(service);
-
-            services.put(service, serviceInstance);
             app.getDependencyManager().registerDependency(service, serviceInstance);
+
+            services.put(service, new ServiceAgent(serviceInstance));
 
             serviceInstance.onCreate();
         } catch (InjectException ex) {
@@ -48,16 +48,35 @@ public class ServiceManager {
         }
     }
 
-    public void registerService(Class<? extends Service> service, long updateTime, TimeUnit timeUnit) {
-        registerService(service);
+    public void register(Class<? extends Service> service, long updateTime, TimeUnit timeUnit) {
+        register(service);
+        schedule(service, updateTime, timeUnit);
+    }
 
-        Service serviceInstance = services.get(service);
+    public void schedule(Class<? extends Service> service, long updateTime, TimeUnit timeUnit) {
+        ServiceAgent serviceAgent = services.get(service);
 
-        if (serviceInstance == null) {
-            log.error("Unable to shedule service update");
+        if (serviceAgent == null) {
+            log.error("Unable to shedule service update. Service " + service.getName() + " not found.");
             return;
         }
 
-        scheduler.scheduleAtFixedRate(serviceInstance::onUpdate, 0, updateTime, timeUnit);
+        if (serviceAgent.isSheduled()) {
+            log.error("Unable to shedule service update. Service " + service.getName() + " already scheduled.");
+            return;
+        }
+
+        serviceAgent.setScheduledFuture(scheduler.scheduleAtFixedRate(serviceAgent.getService()::onUpdate, 0, updateTime, timeUnit));
     }
+
+    public void unregister(Class<? extends Service> service) {
+        ServiceAgent serviceAgent = services.get(service);
+
+        if (serviceAgent.isSheduled()) {
+            serviceAgent.getScheduledFuture().cancel(true);
+        }
+
+        services.remove(service);
+    }
+
 }

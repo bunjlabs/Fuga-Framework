@@ -61,10 +61,6 @@ public abstract class FugaApp {
         this.router = new Router(this);
         this.sessionManager = new SessionManager(this);
         this.serviceManager = new ServiceManager(this);
-
-        this.viewRenderer = new DefaultViewRenderer(this);
-        this.requestHandler = new DefaultRequestHandler(this);
-        this.errorHandler = new DefaultErrorHandler();
     }
 
     public void start() throws Exception {
@@ -79,11 +75,11 @@ public abstract class FugaApp {
                 serviceManager
         );
 
-        dependencyManager.registerDependency(ViewRenderer.class, viewRenderer);
-        dependencyManager.registerDependency(RequestHandler.class, requestHandler);
-        dependencyManager.registerDependency(ErrorHandler.class, errorHandler);
+        dependencyManager.registerDependency(ViewRenderer.class, viewRenderer = dependencyManager.inject(DefaultViewRenderer.class));
+        dependencyManager.registerDependency(RequestHandler.class, requestHandler = dependencyManager.inject(DefaultRequestHandler.class));
+        dependencyManager.registerDependency(ErrorHandler.class, errorHandler = dependencyManager.inject(DefaultErrorHandler.class));
 
-        serviceManager.registerService(SessionService.class, configuration.getInt("fuga.sessions.refreshtime"), TimeUnit.SECONDS);
+        serviceManager.register(SessionService.class, configuration.getInt("fuga.sessions.refreshtime"), TimeUnit.SECONDS);
 
         prepare();
 

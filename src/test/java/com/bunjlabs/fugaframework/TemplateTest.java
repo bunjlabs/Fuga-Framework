@@ -34,7 +34,7 @@ public class TemplateTest {
     public void controllSymbolsTest() throws Exception {
         FugaApp app = prepareTestApp();
 
-        DefaultViewRenderer vr = ((DefaultViewRenderer) app.getViewRenderer());
+        DefaultViewRenderer vr = new DefaultViewRenderer(app);
         TemplateEngine te = vr.getTemplateEngine();
 
         te.compile("test-01", "<# 'data' #>");
@@ -50,7 +50,7 @@ public class TemplateTest {
     public void jsTest() throws Exception {
         FugaApp app = prepareTestApp();
 
-        DefaultViewRenderer vr = ((DefaultViewRenderer) app.getViewRenderer());
+        DefaultViewRenderer vr = new DefaultViewRenderer(app);
         TemplateEngine te = vr.getTemplateEngine();
 
         te.compile("test-01", "<% for(var i = 1; i <= 5; i++) %><# i.toString() #>");
@@ -66,7 +66,7 @@ public class TemplateTest {
     public void jsHtmlTest() throws Exception {
         FugaApp app = prepareTestApp();
 
-        DefaultViewRenderer vr = ((DefaultViewRenderer) app.getViewRenderer());
+        DefaultViewRenderer vr = new DefaultViewRenderer(app);
         TemplateEngine te = vr.getTemplateEngine();
 
         te.compile("test-01", "@");

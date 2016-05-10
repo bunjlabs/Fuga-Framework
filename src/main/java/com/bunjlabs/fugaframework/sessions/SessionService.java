@@ -18,8 +18,12 @@ import com.bunjlabs.fugaframework.services.Service;
 
 public class SessionService extends Service {
 
+    private final SessionManager sessionManager;
+
     @Inject
-    public SessionManager sessionManager;
+    public SessionService(SessionManager sessionManager) {
+        this.sessionManager = sessionManager;
+    }
 
     @Override
     public void onUpdate() {

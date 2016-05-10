@@ -23,9 +23,9 @@ public class FugaExampleApp extends FugaApp {
     public void prepare() {
         getRouter().load("routes/example.rmap");
 
-        getDependencyManager().registerDependency(new ExampleDependency());
+        getDependencyManager().registerDependency(ExampleDependency.class);
 
-        getServiceManager().registerService(ExampleService.class, 5, TimeUnit.SECONDS);
+        getServiceManager().register(ExampleService.class, 5, TimeUnit.SECONDS);
 
     }
 

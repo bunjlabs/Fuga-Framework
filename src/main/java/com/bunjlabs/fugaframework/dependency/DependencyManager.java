@@ -98,21 +98,22 @@ public class DependencyManager {
 
     public Object getDependency(Class cls) throws InjectException {
         if (dependencies.containsKey(cls)) {
-            return dependencies.get(cls);
+            return getDependency(cls, dependencies.get(cls));
         } else {
             for (Map.Entry<Class, Object> e : dependencies.entrySet()) {
-                if (e.getKey().isAssignableFrom(cls)) {
-                    return e.getValue();
+                if (cls.isAssignableFrom(e.getKey())) {
+                    return getDependency(cls, e.getValue());
                 }
             }
         }
 
-        try {
-            return cls.getConstructor().newInstance();
-        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-        }
-
         throw new InjectException("No suitable dependency for " + cls.getName());
+    }
+    
+    private Object getDependency(Class cls, Object obj) throws InjectException {
+        if(obj != null) return obj;
+        
+        return inject(cls);
     }
 
     public void registerDependency(Class cls, Object obj) {
@@ -127,11 +128,7 @@ public class DependencyManager {
 
     public void registerDependency(Class... clss) {
         for (Class cls : clss) {
-            try {
-                registerDependency(cls, cls.newInstance());
-            } catch (InstantiationException | IllegalAccessException ex) {
-                log.error("Unable to register dependency", ex);
-            }
+            registerDependency(cls, null);
         }
     }
 }

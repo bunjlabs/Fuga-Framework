@@ -13,9 +13,20 @@
  */
 package com.bunjlabs.fugaframework.example;
 
+import com.bunjlabs.fugaframework.FugaApp;
+import com.bunjlabs.fugaframework.dependency.Inject;
+
 public class ExampleDependency {
 
+    private final FugaApp app;
+
+    @Inject
+    public ExampleDependency(FugaApp app) {
+        this.app = app;
+
+    }
+
     public String getString() {
-        return "I'm an example dependency";
+        return "I'm an example dependency and I have a FugaApp instance: " + app.getClass().getName();
     }
 }

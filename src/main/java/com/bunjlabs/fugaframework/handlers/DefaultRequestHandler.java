@@ -14,6 +14,7 @@
 package com.bunjlabs.fugaframework.handlers;
 
 import com.bunjlabs.fugaframework.FugaApp;
+import com.bunjlabs.fugaframework.dependency.Inject;
 import com.bunjlabs.fugaframework.foundation.Context;
 import com.bunjlabs.fugaframework.foundation.Request;
 import com.bunjlabs.fugaframework.foundation.Response;
@@ -26,6 +27,7 @@ public class DefaultRequestHandler implements RequestHandler {
 
     private final FugaApp app;
 
+    @Inject
     public DefaultRequestHandler(FugaApp app) {
         this.app = app;
     }

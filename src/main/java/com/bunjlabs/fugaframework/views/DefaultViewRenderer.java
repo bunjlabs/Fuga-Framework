@@ -14,6 +14,7 @@
 package com.bunjlabs.fugaframework.views;
 
 import com.bunjlabs.fugaframework.FugaApp;
+import com.bunjlabs.fugaframework.dependency.Inject;
 import com.bunjlabs.fugaframework.foundation.Context;
 import com.bunjlabs.fugaframework.templates.TemplateEngine;
 import com.bunjlabs.fugaframework.templates.TemplateNotFoundException;
@@ -26,6 +27,7 @@ public class DefaultViewRenderer implements ViewRenderer {
 
     private final TemplateEngine templateEngine;
 
+    @Inject
     public DefaultViewRenderer(FugaApp app) {
         templateEngine = new TemplateEngine(app);
     }
