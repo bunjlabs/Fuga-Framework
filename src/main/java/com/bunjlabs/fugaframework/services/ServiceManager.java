@@ -37,16 +37,12 @@ public class ServiceManager {
 
     public void registerService(Class<? extends Service> service) {
         try {
-            Service serviceInstance = service.newInstance();
-
-            app.getDependencyManager().injectDependencies(serviceInstance);
+            Service serviceInstance = app.getDependencyManager().inject(service);
 
             services.put(service, serviceInstance);
             app.getDependencyManager().registerDependency(service, serviceInstance);
             
             serviceInstance.onCreate();
-        } catch (InstantiationException | IllegalAccessException ex) {
-            log.catching(ex);
         } catch (InjectException ex) {
             log.error("Unable to inject dependencies to the service", ex);
         }

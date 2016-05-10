@@ -13,10 +13,14 @@
  */
 package com.bunjlabs.fugaframework.dependency;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,19 +33,67 @@ public class DependencyManager {
     public DependencyManager() {
     }
 
-    public void injectDependencies(Object injectable) throws InjectException {
-        for (Field f : injectable.getClass().getDeclaredFields()) {
-            if (f.isAnnotationPresent(Inject.class)) {
-                try {
-                    Class cls = f.getType();
-                    Object injectOnject = getDependency(cls);
+    public <T> T inject(Class<T> injectable) throws InjectException {
+        Constructor<T> annotatedConstructor = getAnnotatedConstructor(injectable);
 
-                    f.set(injectable, injectOnject);
-                } catch (IllegalArgumentException | IllegalAccessException e) {
-                    throw new InjectException("Unable to inject field", e);
-                }
-            }
+        if (annotatedConstructor != null) {
+            return injectToConstructor(annotatedConstructor);
         }
+
+        T obj;
+        try {
+            obj = injectable.getConstructor().newInstance();
+        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            throw new InjectException("Unable to instatiate class by default constructor of " + injectable.getName(), e);
+        }
+
+        injectToFields(obj, getAnnotatedFields(injectable));
+
+        return obj;
+    }
+
+    public <T> T injectToConstructor(Constructor<T> injactableConstructor) throws InjectException {
+        Object[] parameters = new Object[injactableConstructor.getParameterCount()];
+        Class[] parameterTypes = injactableConstructor.getParameterTypes();
+
+        for (int i = 0; i < parameters.length; i++) {
+            parameters[i] = getDependency(parameterTypes[i]);
+        }
+        try {
+            return injactableConstructor.newInstance(parameters);
+        } catch (SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            throw new InjectException("Unable to inject by constructor", ex);
+        }
+    }
+
+    public void injectToFields(Object injectable, List<Field> injectableFields) throws InjectException {
+        for (Field f : injectableFields) {
+            injectField(injectable, f);
+        }
+    }
+
+    public void injectField(Object injectable, Field injectableField) throws InjectException {
+        try {
+            Class cls = injectableField.getType();
+            Object injectOnject = getDependency(cls);
+
+            injectableField.set(injectable, injectOnject);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            throw new InjectException("Unable to inject field", e);
+        }
+
+    }
+
+    public Constructor getAnnotatedConstructor(Class injactable) {
+        return Stream.of(injactable.getConstructors())
+                .filter((Constructor c) -> c.isAnnotationPresent(Inject.class))
+                .findFirst().orElse(null);
+    }
+
+    public List<Field> getAnnotatedFields(Class injectable) {
+        return Stream.of(injectable.getFields())
+                .filter((Field f) -> f.isAnnotationPresent(Inject.class))
+                .collect(Collectors.toList());
     }
 
     public Object getDependency(Class cls) throws InjectException {
@@ -63,20 +115,20 @@ public class DependencyManager {
         throw new InjectException("No suitable dependency for " + cls.getName());
     }
 
-    public void registerDependency(Object... objs) {
-        for (Object obj : objs) {
-            dependencies.put(obj.getClass(), obj);
-        }
-    }
-
     public void registerDependency(Class cls, Object obj) {
         dependencies.put(cls, obj);
+    }
+
+    public void registerDependency(Object... objs) {
+        for (Object obj : objs) {
+            registerDependency(obj.getClass(), obj);
+        }
     }
 
     public void registerDependency(Class... clss) {
         for (Class cls : clss) {
             try {
-                dependencies.put(cls, cls.newInstance());
+                registerDependency(cls, cls.newInstance());
             } catch (InstantiationException | IllegalAccessException ex) {
                 log.error("Unable to register dependency", ex);
             }

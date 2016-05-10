@@ -35,12 +35,12 @@ public abstract class Controller extends Responses {
     public static class Builder {
 
         public static Controller build(Class<? extends Controller> controller, Context ctxb) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InjectException {
-            Controller c = controller.getConstructor().newInstance();
+            Controller c = ctxb.getApp().getDependencyManager().inject(controller);
             c.ctx = ctxb;
             c.urls = new Urls(ctxb);
             c.forms = new Forms(ctxb);
 
-            ctxb.getApp().getDependencyManager().injectDependencies(c);
+            
 
             return c;
         }

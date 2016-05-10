@@ -14,6 +14,7 @@
 package com.bunjlabs.fugaframework.example.services;
 
 import com.bunjlabs.fugaframework.dependency.Inject;
+import com.bunjlabs.fugaframework.example.ExampleDependency;
 import com.bunjlabs.fugaframework.handlers.RequestHandler;
 import com.bunjlabs.fugaframework.services.Service;
 import org.apache.logging.log4j.LogManager;
@@ -23,13 +24,20 @@ public class ExampleService extends Service {
 
     private static final Logger log = LogManager.getLogger(ExampleService.class);
 
-        
+    private final RequestHandler re;
+    private final ExampleDependency ed;
+
     @Inject
-    public RequestHandler re;
-    
+    public ExampleService(RequestHandler re, ExampleDependency ed) {
+        this.re = re;
+        this.ed = ed;
+
+    }
+
     @Override
     public void onCreate() {
         log.info("I'm was created!");
+        log.info("Request handler implementation is: {}", re.getClass().getName());
     }
 
     @Override
