@@ -66,8 +66,7 @@ public class Router {
         if (input == null) {
             throw new NullPointerException();
         }
-        BufferedReader br = new BufferedReader(new InputStreamReader(input));
-
+        
         RouteMapLoader mapLoader = new RouteMapLoader();
 
         extensions.addAll(mapLoader.load(input));

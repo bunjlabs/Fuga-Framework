@@ -14,6 +14,7 @@
 package com.bunjlabs.fugaframework.foundation.controllers;
 
 import com.bunjlabs.fugaframework.configuration.Configuration;
+import com.bunjlabs.fugaframework.dependency.Inject;
 import com.bunjlabs.fugaframework.foundation.Controller;
 import com.bunjlabs.fugaframework.foundation.Response;
 import com.bunjlabs.fugaframework.templates.TemplateNotFoundException;
@@ -24,6 +25,7 @@ public class DefaultController extends Controller {
 
     private final Configuration conf;
 
+    @Inject
     public DefaultController(Configuration conf) {
         this.conf = conf;
     }
