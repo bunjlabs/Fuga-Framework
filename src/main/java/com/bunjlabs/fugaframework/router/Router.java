@@ -18,8 +18,6 @@ import com.bunjlabs.fugaframework.foundation.Context;
 import com.bunjlabs.fugaframework.foundation.Controller;
 import com.bunjlabs.fugaframework.foundation.Response;
 import com.bunjlabs.fugaframework.foundation.Responses;
-import com.bunjlabs.fugaframework.handlers.DefaultErrorHandler;
-import com.bunjlabs.fugaframework.handlers.ErrorHandler;
 import com.bunjlabs.fugaframework.resources.ResourceManager;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -88,15 +86,15 @@ public class Router {
             resp = forward(ctx, extensions);
         } catch (Exception ex) {
             log.catching(ex);
-            return ctx.getApp().getErrorHandler().onServerError(ctx, ex);
+            return ctx.getApp().getErrorHandler().onServerError(ctx.getRequest(), ex);
         }
 
         if (resp == null) {
-            resp = ctx.getApp().getErrorHandler().onClientError(ctx, 404);
+            resp = ctx.getApp().getErrorHandler().onClientError(ctx.getRequest(), 404);
         }
 
         if (resp.isEmpty() && resp.getStatus() >= 400 && resp.getStatus() < 500) {
-            resp = ctx.getApp().getErrorHandler().onClientError(ctx, resp.getStatus());
+            resp = ctx.getApp().getErrorHandler().onClientError(ctx.getRequest(), resp.getStatus());
         }
 
         return resp;

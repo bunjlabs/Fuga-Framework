@@ -11,10 +11,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bunjlabs.fugaframework.network;
+package com.bunjlabs.fugaframework.network.netty;
 
 import com.bunjlabs.fugaframework.FugaApp;
-import com.bunjlabs.fugaframework.foundation.Context;
 import com.bunjlabs.fugaframework.foundation.Request;
 import com.bunjlabs.fugaframework.foundation.RequestMethod;
 import com.bunjlabs.fugaframework.foundation.Response;
@@ -61,9 +60,9 @@ import java.util.TreeMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
+class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
-    private static final Logger log = LogManager.getLogger(HttpServerHandler.class);
+    private static final Logger log = LogManager.getLogger(NettyHttpServerHandler.class);
     private static final HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
     private final FugaApp app;
     private final String serverVersion;
@@ -76,7 +75,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
     private Map<String, List<String>> postmap;
 
-    HttpServerHandler(FugaApp app) {
+    NettyHttpServerHandler(FugaApp app) {
         this.app = app;
         content = Unpooled.buffer();
 
@@ -203,13 +202,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
     private void writeResponse(ChannelHandlerContext ctx, HttpObject msg) {
         Request request = requestBuilder.build();
 
-        Context sctx = new Context(request, app);
-
-        log.debug("Access from {}: {}{}", request.getSocketAddress(), request.getHost(), request.getUri());
-
-        resp = app.getRequestHandler().onRequest(sctx);
-
-        HttpResponse response;
+        resp = app.getRequestHandler().onRequest(request);
 
         if (resp == null) {
             log.error("Null response is received");
@@ -217,7 +210,7 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             resp = Responses.internalServerError();
         }
 
-        response = new DefaultHttpResponse(
+        HttpResponse response = new DefaultHttpResponse(
                 HttpVersion.HTTP_1_1,
                 HttpResponseStatus.valueOf(resp.getStatus()));
 
@@ -233,10 +226,10 @@ class HttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             response.headers().set(e.getKey(), e.getValue());
         });
 
-        response.headers().set(HttpHeaders.Names.SERVER, "Fuga Web Server/" + serverVersion); // how it's beautiful!
+        response.headers().set(HttpHeaders.Names.SERVER, "Fuga Netty Web Server/" + serverVersion); 
 
         // Set cookies
-        cookiesUpload.addAll(sctx.getRequest().getCookiesUpload().values());
+        cookiesUpload.addAll(request.getCookiesUpload().values());
         response.headers().set(HttpHeaders.Names.SET_COOKIE, ServerCookieEncoder.STRICT.encode(cookiesUpload));
 
         if (resp.getContentLength() >= 0) {

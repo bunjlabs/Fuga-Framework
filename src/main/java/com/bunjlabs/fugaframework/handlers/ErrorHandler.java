@@ -13,12 +13,12 @@
  */
 package com.bunjlabs.fugaframework.handlers;
 
-import com.bunjlabs.fugaframework.foundation.Context;
+import com.bunjlabs.fugaframework.foundation.Request;
 import com.bunjlabs.fugaframework.foundation.Response;
 
 public interface ErrorHandler {
 
-    public Response onClientError(Context ctx, int statusCode);
+    public Response onClientError(Request request, int statusCode);
 
-    public Response onServerError(Context ctx, Throwable cause);
+    public Response onServerError(Request request, Throwable cause);
 }

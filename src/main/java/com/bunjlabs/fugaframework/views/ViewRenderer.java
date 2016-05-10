@@ -11,10 +11,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bunjlabs.fugaframework.network;
+package com.bunjlabs.fugaframework.views;
 
-public interface HttpServer {
+import com.bunjlabs.fugaframework.foundation.Context;
+import com.bunjlabs.fugaframework.templates.TemplateNotFoundException;
+import com.bunjlabs.fugaframework.templates.TemplateRenderException;
+import java.io.PrintStream;
 
-    void start() throws Exception;
+public interface ViewRenderer {
+
+    public void render(String name, Context ctx, PrintStream output) throws TemplateNotFoundException, TemplateRenderException;
+
+    public String renderToString(String name, Context ctx) throws TemplateNotFoundException, TemplateRenderException;
 
 }

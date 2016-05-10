@@ -66,7 +66,7 @@ public class Template {
 
         jsCode.append(templateClassName).append("=function(stream){this.stream=stream;};");
 
-        jsCode.append(templateClassName).append(".prototype.render=function(ctx,data,api){");
+        jsCode.append(templateClassName).append(".prototype.render=function(ctx,api){");
         jsCode.append(parseBlock(false));
         jsCode.append("};");
 
@@ -75,14 +75,14 @@ public class Template {
         }
 
         for (Map.Entry<String, String> e : blocks.entrySet()) {
-            jsCode.append(templateClassName).append(".prototype.block_").append(e.getKey()).append("=function(ctx,data,api){");
+            jsCode.append(templateClassName).append(".prototype.block_").append(e.getKey()).append("=function(ctx,api){");
             jsCode.append(e.getValue());
             jsCode.append("};");
         }
 
-        jsCode.append("process_").append(tid).append("=function(stream,ctx,data,api) { ")
+        jsCode.append("process_").append(tid).append("=function(stream,ctx,api) { ")
                 .append("var tpl=new ").append(templateClassName)
-                .append("(stream);tpl.render(ctx,data,api);")
+                .append("(stream);tpl.render(ctx,api);")
                 .append("};");
 
         input = null;
@@ -128,7 +128,7 @@ public class Template {
                         }
                         input = input.substring(m.end());
                         blocks.put(blockName, parseBlock(true));
-                        jsCode.append("this.block_").append(blockName).append("(ctx,data,api);");
+                        jsCode.append("this.block_").append(blockName).append("(ctx,api);");
                     } else if (codeBlock.startsWith("endblock")) {
                         if (!inBlock) {
                             throw new TemplateRenderException("Unexpected block end");

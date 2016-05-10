@@ -28,12 +28,8 @@ public abstract class Controller extends Responses {
         return null;
     }
 
-    protected String view(String name, Object data) throws TemplateNotFoundException, TemplateRenderException {
-        return ctx.getApp().getTemplateEngine().renderToString(name, ctx, data);
-    }
-
     protected String view(String name) throws TemplateNotFoundException, TemplateRenderException {
-        return ctx.getApp().getTemplateEngine().renderToString(name, ctx);
+        return ctx.getApp().getViewRenderer().renderToString(name, ctx);
     }
 
     public static class Builder {

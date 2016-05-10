@@ -17,12 +17,10 @@ import com.bunjlabs.fugaframework.FugaApp;
 import com.bunjlabs.fugaframework.configuration.Configuration;
 import com.bunjlabs.fugaframework.foundation.Context;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.script.Invocable;
@@ -41,7 +39,7 @@ public class TemplateEngine {
     public TemplateEngine(FugaApp app) {
         this.app = app;
         this.engine = new ScriptEngineManager().getEngineByName("nashorn");
-        config = app == null ? null : app.getConfiguration();
+        config = app.getConfiguration();
     }
 
     public String compile(String name) throws TemplateNotFoundException, TemplateRenderException {
@@ -87,35 +85,15 @@ public class TemplateEngine {
         return tid;
     }
 
-    public void render(String name, PrintStream output, Context ctx, Object obj) throws TemplateNotFoundException, TemplateRenderException {
+    public void render(String name, Context ctx, PrintStream output) throws TemplateNotFoundException, TemplateRenderException {
         String tid = compile(name);
 
         try {
             Invocable inv = (Invocable) engine;
-            inv.invokeFunction("process_" + tid, output, ctx, obj, new TemplateApi(ctx));
+            inv.invokeFunction("process_" + tid, output, ctx, new TemplateApi(ctx));
         } catch (ScriptException | NoSuchMethodException ex) {
             throw new TemplateRenderException(ex.getLocalizedMessage());
         }
-    }
-
-    public void render(String name, Context ctx, PrintStream output) throws TemplateNotFoundException, TemplateRenderException {
-        render(name, output, ctx, null);
-    }
-
-    public String renderToString(String name, Context ctx, Object obj) throws TemplateNotFoundException, TemplateRenderException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-        render(name, new PrintStream(out), ctx, obj);
-
-        try {
-            return out.toString("UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            throw new TemplateRenderException(ex);
-        }
-    }
-
-    public String renderToString(String name, Context ctx) throws TemplateNotFoundException, TemplateRenderException {
-        return renderToString(name, ctx, null);
     }
 
     public String getJsSource(String name) {

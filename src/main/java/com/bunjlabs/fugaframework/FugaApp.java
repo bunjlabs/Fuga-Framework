@@ -20,12 +20,14 @@ import com.bunjlabs.fugaframework.handlers.DefaultRequestHandler;
 import com.bunjlabs.fugaframework.handlers.ErrorHandler;
 import com.bunjlabs.fugaframework.handlers.RequestHandler;
 import com.bunjlabs.fugaframework.network.HttpServer;
+import com.bunjlabs.fugaframework.network.netty.NettyHttpServer;
 import com.bunjlabs.fugaframework.resources.ResourceManager;
 import com.bunjlabs.fugaframework.router.Router;
 import com.bunjlabs.fugaframework.services.ServiceManager;
 import com.bunjlabs.fugaframework.sessions.SessionManager;
 import com.bunjlabs.fugaframework.sessions.SessionService;
-import com.bunjlabs.fugaframework.templates.TemplateEngine;
+import com.bunjlabs.fugaframework.views.DefaultViewRenderer;
+import com.bunjlabs.fugaframework.views.ViewRenderer;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.TimeUnit;
@@ -40,13 +42,13 @@ public abstract class FugaApp {
     private final ResourceManager resourceManager;
     private final Configuration configuration;
     private final Router router;
-    private final TemplateEngine templateEngine;
 
     private final SessionManager sessionManager;
     private final ServiceManager serviceManager;
 
-    private ErrorHandler errorHandler;
+    private ViewRenderer viewRenderer;
     private RequestHandler requestHandler;
+    private ErrorHandler errorHandler;
 
     private HttpServer httpserver;
     private SocketAddress addr;
@@ -57,13 +59,12 @@ public abstract class FugaApp {
         this.resourceManager = new ResourceManager();
         this.configuration = new Configuration(this);
         this.router = new Router(this);
-        this.templateEngine = new TemplateEngine(this);
         this.sessionManager = new SessionManager(this);
         this.serviceManager = new ServiceManager(this);
 
+        this.viewRenderer = new DefaultViewRenderer(this);
+        this.requestHandler = new DefaultRequestHandler(this);
         this.errorHandler = new DefaultErrorHandler();
-        this.requestHandler = new DefaultRequestHandler();
-
     }
 
     public void start() throws Exception {
@@ -74,21 +75,25 @@ public abstract class FugaApp {
                 resourceManager,
                 configuration,
                 router,
-                templateEngine,
                 sessionManager,
                 serviceManager
         );
 
-        dependencyManager.registerDependency(ErrorHandler.class, errorHandler);
+        dependencyManager.registerDependency(ViewRenderer.class, viewRenderer);
         dependencyManager.registerDependency(RequestHandler.class, requestHandler);
+        dependencyManager.registerDependency(ErrorHandler.class, errorHandler);
 
         serviceManager.registerService(SessionService.class, configuration.getInt("fuga.sessions.refreshtime"), TimeUnit.SECONDS);
 
         prepare();
 
         addr = new InetSocketAddress(configuration.get("fuga.http.bindhost"), configuration.getInt("fuga.http.bindport"));
-        httpserver = new HttpServer(addr, this);
+        httpserver = new NettyHttpServer(addr, this);
         httpserver.start();
+    }
+
+    public DependencyManager getDependencyManager() {
+        return dependencyManager;
     }
 
     public ResourceManager getResourceManager() {
@@ -111,12 +116,13 @@ public abstract class FugaApp {
         return sessionManager;
     }
 
-    public TemplateEngine getTemplateEngine() {
-        return templateEngine;
+    public ViewRenderer getViewRenderer() {
+        return viewRenderer;
     }
 
-    public DependencyManager getDependencyManager() {
-        return dependencyManager;
+    public void setViewRenderer(ViewRenderer renderer) {
+        this.viewRenderer = renderer;
+        dependencyManager.registerDependency(RequestHandler.class, requestHandler);
     }
 
     public ErrorHandler getErrorHandler() {

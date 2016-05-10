@@ -19,6 +19,7 @@ import com.bunjlabs.fugaframework.example.FugaExampleApp;
 import com.bunjlabs.fugaframework.example.services.ExampleService;
 import com.bunjlabs.fugaframework.foundation.Context;
 import com.bunjlabs.fugaframework.foundation.Controller;
+import com.bunjlabs.fugaframework.foundation.Request;
 import com.bunjlabs.fugaframework.foundation.Response;
 import com.bunjlabs.fugaframework.foundation.Responses;
 import com.bunjlabs.fugaframework.handlers.RequestHandler;
@@ -40,7 +41,7 @@ public class ExampleController extends Controller {
 
     @Inject
     public ExampleService es;
-    
+
     @Inject
     public RequestHandler re;
 
@@ -74,7 +75,7 @@ public class ExampleController extends Controller {
     public Response nf() {
         return notFound();
     }
-    
+
     public Response showCurrentRequestHandler() {
         return ok("Current request handler is: " + re.getClass().getName());
     }
@@ -83,10 +84,11 @@ public class ExampleController extends Controller {
         app.setRequestHandler(new RequestHandler() {
 
             @Override
-            public Response onRequest(Context ctx) {
+            public Response onRequest(Request request) {
                 return Responses.ok("I'm dummy request handler!");
             }
         });
+
         return ok("Done!");
     }
 

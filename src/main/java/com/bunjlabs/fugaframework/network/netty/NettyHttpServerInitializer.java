@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bunjlabs.fugaframework.network;
+package com.bunjlabs.fugaframework.network.netty;
 
 import com.bunjlabs.fugaframework.FugaApp;
 import io.netty.channel.ChannelInitializer;
@@ -21,11 +21,11 @@ import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.stream.ChunkedWriteHandler;
 
-class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
+class NettyHttpServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private final FugaApp app;
 
-    HttpServerInitializer(FugaApp app) {
+    NettyHttpServerInitializer(FugaApp app) {
         this.app = app;
     }
 
@@ -37,7 +37,7 @@ class HttpServerInitializer extends ChannelInitializer<SocketChannel> {
         p.addLast(new HttpResponseEncoder());
         p.addLast(new ChunkedWriteHandler());
         
-        p.addLast(new HttpServerHandler(app));
+        p.addLast(new NettyHttpServerHandler(app));
 
     }
 }
