@@ -31,8 +31,9 @@ public class SessionManager {
 
     public SessionManager(FugaApp app) {
         this.configuration = app.getConfiguration();
-        
+
     }
+
     public Session getSession(UUID sessionId) {
         return sessions.get(sessionId);
     }
@@ -44,7 +45,7 @@ public class SessionManager {
     public void process(Context ctx) {
         List<Cookie> sessionCookieList = ctx.getRequest().getCookiesDownload().get(configuration.get("fuga.sessions.cookie"));
         Session session = null;
-        
+
         boolean flag = false;
         if (sessionCookieList != null) {
             for (Cookie sessionCookie : sessionCookieList) {

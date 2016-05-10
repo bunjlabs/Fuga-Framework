@@ -31,7 +31,7 @@ public class RouterTest {
     @Test
     public void compileTest() throws Exception {
         Router r = prepareTestApp().getRouter();
-        
+
         r.loadFromString("");
         r.loadFromString("GET ok(\"ok\")");
         r.loadFromString("GET POST ok(\"ok\")");
@@ -43,8 +43,8 @@ public class RouterTest {
         r.loadFromString("{{{{{{{{{ok(\"ok\")}}}}}}}}}");
         r.loadFromString("GET{POST{OPTIONS{ok(\"ok\")}}}");
         r.loadFromString("use com.example");
-        
+
         r.loadFromString("GET ok(\"ok\") POST ok(\"ok\") OPTIONS ok(\"ok\")");
-        
+
     }
 }

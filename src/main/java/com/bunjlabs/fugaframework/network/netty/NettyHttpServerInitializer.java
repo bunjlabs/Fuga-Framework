@@ -36,7 +36,7 @@ class NettyHttpServerInitializer extends ChannelInitializer<SocketChannel> {
         p.addLast(new HttpRequestDecoder());
         p.addLast(new HttpResponseEncoder());
         p.addLast(new ChunkedWriteHandler());
-        
+
         p.addLast(new NettyHttpServerHandler(app));
 
     }

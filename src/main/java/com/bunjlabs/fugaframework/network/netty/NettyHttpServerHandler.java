@@ -226,7 +226,7 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             response.headers().set(e.getKey(), e.getValue());
         });
 
-        response.headers().set(HttpHeaders.Names.SERVER, "Fuga Netty Web Server/" + serverVersion); 
+        response.headers().set(HttpHeaders.Names.SERVER, "Fuga Netty Web Server/" + serverVersion);
 
         // Set cookies
         cookiesUpload.addAll(request.getCookiesUpload().values());

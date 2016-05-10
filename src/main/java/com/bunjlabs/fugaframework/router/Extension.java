@@ -26,18 +26,18 @@ public class Extension {
     private final Set<RequestMethod> requestMethods;
     private final Pattern pattern;
 
-    Extension( Set<RequestMethod> requestMethods, Pattern pattern) {
+    Extension(Set<RequestMethod> requestMethods, Pattern pattern) {
         this.requestMethods = requestMethods;
         this.pattern = pattern;
     }
 
-    Extension( Set<RequestMethod> requestMethods, Pattern pattern, List<Extension> nodes) {
+    Extension(Set<RequestMethod> requestMethods, Pattern pattern, List<Extension> nodes) {
         this.requestMethods = requestMethods;
         this.pattern = pattern;
         this.nodes = nodes;
     }
 
-    Extension( Set<RequestMethod> requestMethods, Pattern pattern, Route route) {
+    Extension(Set<RequestMethod> requestMethods, Pattern pattern, Route route) {
         this.requestMethods = requestMethods;
         this.pattern = pattern;
         this.route = route;
@@ -51,7 +51,7 @@ public class Extension {
         return route;
     }
 
-    public  Set<RequestMethod> getRequestMethods() {
+    public Set<RequestMethod> getRequestMethods() {
         return requestMethods;
     }
 

@@ -40,8 +40,6 @@ public abstract class Controller extends Responses {
             c.urls = new Urls(ctxb);
             c.forms = new Forms(ctxb);
 
-            
-
             return c;
         }
     }

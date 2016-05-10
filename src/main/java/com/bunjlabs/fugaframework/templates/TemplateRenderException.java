@@ -21,7 +21,7 @@ public class TemplateRenderException extends Exception {
     public TemplateRenderException(String msg) {
         super(msg);
     }
-    
+
     public TemplateRenderException(Throwable cause) {
         super(cause);
     }

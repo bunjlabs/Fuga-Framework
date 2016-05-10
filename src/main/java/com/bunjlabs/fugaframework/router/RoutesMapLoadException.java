@@ -25,15 +25,15 @@ public class RoutesMapLoadException extends Exception {
     public RoutesMapLoadException(String msg) {
         super(msg);
     }
-    
+
     public RoutesMapLoadException(String msg, Throwable cause) {
         super(msg, cause);
     }
-    
+
     public RoutesMapLoadException(Tokenizer t, String msg) {
         super("(" + t.line + ":" + t.column + ") " + msg);
     }
-    
+
     public RoutesMapLoadException(Tokenizer t, String msg, Throwable cause) {
         super("(" + t.line + ":" + t.column + ") " + msg, cause);
     }

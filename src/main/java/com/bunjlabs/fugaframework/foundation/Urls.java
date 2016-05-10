@@ -61,8 +61,7 @@ public class Urls {
             return ctx.getApp().getConfiguration().get("fuga.assets.path") + sb.toString();
         }
     }
-    
-    
+
     public String urlencode(Object... args) {
         StringBuilder sb = new StringBuilder();
 

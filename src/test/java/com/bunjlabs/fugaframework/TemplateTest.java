@@ -29,11 +29,11 @@ public class TemplateTest {
         };
         return fa;
     }
-    
+
     @Test
     public void controllSymbolsTest() throws Exception {
         FugaApp app = prepareTestApp();
-        
+
         DefaultViewRenderer vr = ((DefaultViewRenderer) app.getViewRenderer());
         TemplateEngine te = vr.getTemplateEngine();
 
@@ -45,11 +45,11 @@ public class TemplateTest {
         Assert.assertEquals("data", vr.renderToString("test-02", null));
         Assert.assertEquals("data", vr.renderToString("test-03", null));
     }
-    
+
     @Test
     public void jsTest() throws Exception {
         FugaApp app = prepareTestApp();
-        
+
         DefaultViewRenderer vr = ((DefaultViewRenderer) app.getViewRenderer());
         TemplateEngine te = vr.getTemplateEngine();
 
@@ -61,11 +61,11 @@ public class TemplateTest {
         Assert.assertEquals("12345", vr.renderToString("test-02", null));
         Assert.assertEquals("12345", vr.renderToString("test-03", null));
     }
-    
+
     @Test
     public void jsHtmlTest() throws Exception {
         FugaApp app = prepareTestApp();
-        
+
         DefaultViewRenderer vr = ((DefaultViewRenderer) app.getViewRenderer());
         TemplateEngine te = vr.getTemplateEngine();
 
@@ -73,7 +73,7 @@ public class TemplateTest {
         te.compile("test-02", "@@");
         te.compile("test-03", "@{");
         te.compile("test-04", "@}");
-        
+
         te.compile("test-05", "<");
         te.compile("test-06", ">");
         te.compile("test-07", "<#");
@@ -81,19 +81,17 @@ public class TemplateTest {
         te.compile("test-09", "<##");
         te.compile("test-10", "##>");
 
-        
-        Assert.assertEquals("@",     vr.renderToString("test-01", null));
-        Assert.assertEquals("@@",    vr.renderToString("test-02", null));
-        Assert.assertEquals("@{",    vr.renderToString("test-03", null));
-        Assert.assertEquals("@}",    vr.renderToString("test-04", null));
-        
-        Assert.assertEquals("<",     vr.renderToString("test-05", null));
-        Assert.assertEquals(">",     vr.renderToString("test-06", null));
-        Assert.assertEquals("<#",    vr.renderToString("test-07", null));
-        Assert.assertEquals("#>",    vr.renderToString("test-08", null));
-        Assert.assertEquals("<##",   vr.renderToString("test-09", null));
-        Assert.assertEquals("##>",   vr.renderToString("test-10", null));
+        Assert.assertEquals("@", vr.renderToString("test-01", null));
+        Assert.assertEquals("@@", vr.renderToString("test-02", null));
+        Assert.assertEquals("@{", vr.renderToString("test-03", null));
+        Assert.assertEquals("@}", vr.renderToString("test-04", null));
+
+        Assert.assertEquals("<", vr.renderToString("test-05", null));
+        Assert.assertEquals(">", vr.renderToString("test-06", null));
+        Assert.assertEquals("<#", vr.renderToString("test-07", null));
+        Assert.assertEquals("#>", vr.renderToString("test-08", null));
+        Assert.assertEquals("<##", vr.renderToString("test-09", null));
+        Assert.assertEquals("##>", vr.renderToString("test-10", null));
     }
-    
 
 }

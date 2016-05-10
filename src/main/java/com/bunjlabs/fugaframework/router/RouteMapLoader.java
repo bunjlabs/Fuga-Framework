@@ -137,7 +137,7 @@ public class RouteMapLoader {
             className = classMethodFull.substring(0, lio);
             classMethod = classMethodFull.substring(lio + 1);
         }
-        
+
         Class c;
         Method m;
         for (String use : uses) {

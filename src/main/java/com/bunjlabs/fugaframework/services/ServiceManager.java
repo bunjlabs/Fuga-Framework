@@ -41,7 +41,7 @@ public class ServiceManager {
 
             services.put(service, serviceInstance);
             app.getDependencyManager().registerDependency(service, serviceInstance);
-            
+
             serviceInstance.onCreate();
         } catch (InjectException ex) {
             log.error("Unable to inject dependencies to the service", ex);

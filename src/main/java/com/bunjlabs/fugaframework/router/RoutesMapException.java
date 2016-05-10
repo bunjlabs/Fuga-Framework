@@ -21,7 +21,7 @@ public class RoutesMapException extends Exception {
     public RoutesMapException(String msg) {
         super(msg);
     }
-    
+
     public RoutesMapException(String msg, Throwable cause) {
         super(msg, cause);
     }

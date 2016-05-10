@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Route {
+
     private final Class cls;
     private final Method method;
     private final List<RouteParameter> parameters;
@@ -35,7 +36,7 @@ public class Route {
     public Method getMethod() {
         return method;
     }
-    
+
     public Class<? extends Controller> getController() {
         return cls;
     }
