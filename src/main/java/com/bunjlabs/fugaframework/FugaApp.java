@@ -66,7 +66,7 @@ public abstract class FugaApp {
     public void start() throws Exception {
         log.info("Fuga Framework {}", configuration.get("fuga.version", "(version is unknown)"));
 
-        dependencyManager.registerDependency(
+        dependencyManager.register(
                 this,
                 resourceManager,
                 configuration,
@@ -75,9 +75,9 @@ public abstract class FugaApp {
                 serviceManager
         );
 
-        dependencyManager.registerDependency(ViewRenderer.class, viewRenderer = dependencyManager.inject(DefaultViewRenderer.class));
-        dependencyManager.registerDependency(RequestHandler.class, requestHandler = dependencyManager.inject(DefaultRequestHandler.class));
-        dependencyManager.registerDependency(ErrorHandler.class, errorHandler = dependencyManager.inject(DefaultErrorHandler.class));
+        viewRenderer = dependencyManager.registerAndInject(DefaultViewRenderer.class);
+        requestHandler = dependencyManager.registerAndInject(DefaultRequestHandler.class);
+        errorHandler = dependencyManager.registerAndInject(DefaultErrorHandler.class);
 
         serviceManager.register(SessionService.class, configuration.getInt("fuga.sessions.refreshtime"), TimeUnit.SECONDS);
 
@@ -118,7 +118,7 @@ public abstract class FugaApp {
 
     public void setViewRenderer(ViewRenderer renderer) {
         this.viewRenderer = renderer;
-        dependencyManager.registerDependency(RequestHandler.class, requestHandler);
+        dependencyManager.register(RequestHandler.class, requestHandler);
     }
 
     public ErrorHandler getErrorHandler() {
@@ -127,7 +127,7 @@ public abstract class FugaApp {
 
     public void setErrorHandler(ErrorHandler errorHandler) {
         this.errorHandler = errorHandler;
-        dependencyManager.registerDependency(ErrorHandler.class, errorHandler);
+        dependencyManager.register(ErrorHandler.class, errorHandler);
     }
 
     public RequestHandler getRequestHandler() {
@@ -136,7 +136,7 @@ public abstract class FugaApp {
 
     public void setRequestHandler(RequestHandler requestHandler) {
         this.requestHandler = requestHandler;
-        dependencyManager.registerDependency(RequestHandler.class, requestHandler);
+        dependencyManager.register(RequestHandler.class, requestHandler);
     }
 
     public abstract void prepare();

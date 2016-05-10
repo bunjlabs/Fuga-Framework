@@ -109,26 +109,34 @@ public class DependencyManager {
 
         throw new InjectException("No suitable dependency for " + cls.getName());
     }
-    
+
     private Object getDependency(Class cls, Object obj) throws InjectException {
-        if(obj != null) return obj;
-        
+        if (obj != null) {
+            return obj;
+        }
+
         return inject(cls);
     }
 
-    public void registerDependency(Class cls, Object obj) {
+    public void register(Class cls, Object obj) {
         dependencies.put(cls, obj);
     }
 
-    public void registerDependency(Object... objs) {
+    public void register(Object... objs) {
         for (Object obj : objs) {
-            registerDependency(obj.getClass(), obj);
+            register(obj.getClass(), obj);
         }
     }
 
-    public void registerDependency(Class... clss) {
+    public void register(Class... clss) {
         for (Class cls : clss) {
-            registerDependency(cls, null);
+            register(cls, null);
         }
+    }
+
+    public <T> T registerAndInject(Class<T> injectable) throws InjectException {
+        T obj = inject(injectable);
+        register(injectable, obj);
+        return obj;
     }
 }

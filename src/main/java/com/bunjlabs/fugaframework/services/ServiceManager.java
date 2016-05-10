@@ -37,8 +37,7 @@ public class ServiceManager {
 
     public void register(Class<? extends Service> service) {
         try {
-            Service serviceInstance = app.getDependencyManager().inject(service);
-            app.getDependencyManager().registerDependency(service, serviceInstance);
+            Service serviceInstance = app.getDependencyManager().registerAndInject(service);
 
             services.put(service, new ServiceAgent(serviceInstance));
 
