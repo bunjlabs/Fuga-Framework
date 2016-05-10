@@ -7,13 +7,17 @@
     </head>
     <body>
         <% var data = ctx.get('data'); %>
+        <% var request = ctx.getRequest(); %>
         <p>@{ data }</p>
         <p>Asset: <# asset('woo', 'hoo') #></p>
         <p>Asset empty: <# asset() #></p>
         <p>That: <# that('woo', 'hoo') #></p>
         <p>That empty: <# that() #></p>
         <p>Urlencode: <# that(urlencode('Привет мир!')) #></p>
-
+        <p>Uri: <# request.getUri() #></p>
+        <p>Path: <# request.getPath() #></p>
+        <p>Host: <# request.getHeaders().get('Host') #></p>
+        
         <p><# format("> %s %s %d", "Hello", "world", 10) #></p>
         <% 
 

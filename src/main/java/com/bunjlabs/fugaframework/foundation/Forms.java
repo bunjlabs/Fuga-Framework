@@ -17,6 +17,8 @@ import java.util.UUID;
 
 public class Forms {
 
+    private static final String FORM_ID_PREFIX = "__formid__";
+
     private final Context ctx;
 
     public Forms(Context ctx) {
@@ -25,16 +27,16 @@ public class Forms {
 
     public String generateFormId(String formName) {
         String fid = UUID.randomUUID().toString();
-        ctx.getSession().put("__formid__" + formName, fid);
+        ctx.getSession().put(FORM_ID_PREFIX + formName, fid);
         return fid;
     }
 
     public boolean testFormId(String formName, String fid) {
-        Object lastfid = ctx.getSession().get("__formid__" + formName);
+        Object lastfid = ctx.getSession().get(FORM_ID_PREFIX + formName);
         if (lastfid == null) {
             return false;
         }
-        ctx.getSession().remove("__formid__" + formName);
+        ctx.getSession().remove(FORM_ID_PREFIX + formName);
         return fid.equals((String) lastfid);
     }
 }
