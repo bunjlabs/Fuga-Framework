@@ -49,9 +49,9 @@ public class Context {
     public <T> T get(String name, Class<T> type) {
         return (T) data.get(name);
     }
-
-    public Object get(String name) {
-        return data.get(name);
+    
+    public <T> T get(String name) {
+        return (T) data.get(name);
     }
 
     public void put(String name, Object obj) {

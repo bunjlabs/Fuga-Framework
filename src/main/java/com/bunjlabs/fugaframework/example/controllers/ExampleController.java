@@ -56,7 +56,7 @@ public class ExampleController extends Controller {
         log.info(ed.getString());
 
         ctx.put("data",
-                "Hello! " + one + " - " + to + " = " + ctx.getSession().getString("Key")
+                "Hello! " + one + " - " + to + " = " + ctx.getSession().get("Key")
                 + " | " + ctx.get("key", String.class));
 
         return ok(view("defaults/example.html"));

@@ -44,20 +44,12 @@ public class Session extends HashMap<String, Object> {
         this.timeout = timeout;
     }
 
-    public String getString(String name) {
-        return (String) this.get(name);
+    public <T> T get(String name, Class<T> type) {
+        return (T) this.get(name);
     }
 
-    public int getInteger(String name) {
-        return (int) this.get(name);
-    }
-
-    public long getLong(String name) {
-        return (long) this.get(name);
-    }
-
-    public boolean getBoolean(String name) {
-        return (boolean) this.get(name);
+    public <T> T get(String name) {
+        return (T) super.get(name);
     }
 
     public boolean test(String name, Object value) {
