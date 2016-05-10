@@ -13,14 +13,20 @@
  */
 package com.bunjlabs.fugaframework.foundation.controllers;
 
+import com.bunjlabs.fugaframework.configuration.Configuration;
 import com.bunjlabs.fugaframework.foundation.Controller;
 import com.bunjlabs.fugaframework.foundation.Response;
 import com.bunjlabs.fugaframework.templates.TemplateNotFoundException;
 import com.bunjlabs.fugaframework.templates.TemplateRenderException;
-import com.bunjlabs.fugaframework.utils.MimeTypeUtils;
 import java.io.InputStream;
 
 public class DefaultController extends Controller {
+
+    private final Configuration conf;
+
+    public DefaultController(Configuration conf) {
+        this.conf = conf;
+    }
 
     public Response generateNotFound() {
         return notFound();
@@ -33,9 +39,9 @@ public class DefaultController extends Controller {
             return notFound();
         }
 
-        String mime = MimeTypeUtils.getMimeTypeByExt(path.substring(path.lastIndexOf('.') + 1));
+        String mime = conf.get("fuga.mimetype." + path.substring(path.lastIndexOf('.') + 1), "application/octet-stream");
 
-        return ok(asset).as(mime != null ? mime : "application/octet-stream");
+        return ok(asset).as(mime);
     }
 
     public Response generateAssetView(String name) throws TemplateNotFoundException, TemplateRenderException {
