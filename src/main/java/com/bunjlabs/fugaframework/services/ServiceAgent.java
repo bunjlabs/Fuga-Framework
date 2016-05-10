@@ -5,14 +5,14 @@ import java.util.concurrent.ScheduledFuture;
 
 class ServiceAgent<T extends Service> {
 
-    private final Service service;
+    private final T service;
     private ScheduledFuture scheduledFuture;
 
-    ServiceAgent(Service service) {
+    ServiceAgent(T service) {
         this.service = service;
     }
 
-    public Service getService() {
+    public T getService() {
         return service;
     }
 

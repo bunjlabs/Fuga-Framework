@@ -14,6 +14,7 @@
 package com.bunjlabs.fugaframework.network.netty;
 
 import com.bunjlabs.fugaframework.FugaApp;
+import com.bunjlabs.fugaframework.foundation.Cookie;
 import com.bunjlabs.fugaframework.foundation.Request;
 import com.bunjlabs.fugaframework.foundation.RequestMethod;
 import com.bunjlabs.fugaframework.foundation.Response;
@@ -37,7 +38,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.handler.codec.http.cookie.Cookie;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.handler.codec.http.cookie.ServerCookieEncoder;
 import io.netty.handler.codec.http.multipart.Attribute;
@@ -71,7 +71,7 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
     private Request.Builder requestBuilder;
     private Response resp;
     private boolean decoder;
-    private Collection<Cookie> cookiesUpload;
+    private List<Cookie> cookiesUpload;
 
     private Map<String, List<String>> postmap;
 
@@ -111,9 +111,9 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             if (cookieString != null) {
                 ServerCookieDecoder.STRICT.decode(cookieString).stream().forEach((cookie) -> {
                     if (cookiesDownload.containsKey(cookie.name())) {
-                        cookiesDownload.get(cookie.name()).add(cookie);
+                        cookiesDownload.get(cookie.name()).add(NettyCookieConverter.convertToFuga(cookie));
                     } else {
-                        cookiesDownload.put(cookie.name(), new ArrayList<>(Arrays.asList(cookie)));
+                        cookiesDownload.put(cookie.name(), new ArrayList<>(NettyCookieConverter.convertListToFuga(cookie)));
                     }
                 });
             }
@@ -222,15 +222,15 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
         response.headers().set(HttpHeaders.Names.PRAGMA, "no-cache");
         response.headers().set(HttpHeaders.Names.EXPIRES, "0");
 
-        resp.getHeaders().entrySet().stream().forEach((e) -> {
-            response.headers().set(e.getKey(), e.getValue());
-        });
+        resp.getHeaders().entrySet().stream().forEach((e)
+                -> response.headers().set(e.getKey(), e.getValue())
+        );
 
         response.headers().set(HttpHeaders.Names.SERVER, "Fuga Netty Web Server/" + serverVersion);
 
         // Set cookies
         cookiesUpload.addAll(request.getCookiesUpload().values());
-        response.headers().set(HttpHeaders.Names.SET_COOKIE, ServerCookieEncoder.STRICT.encode(cookiesUpload));
+        response.headers().set(HttpHeaders.Names.SET_COOKIE, ServerCookieEncoder.STRICT.encode(NettyCookieConverter.convertListToNetty(cookiesUpload)));
 
         if (resp.getContentLength() >= 0) {
             response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, resp.getContentLength());

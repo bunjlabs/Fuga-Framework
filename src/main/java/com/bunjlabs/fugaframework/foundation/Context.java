@@ -41,7 +41,7 @@ public class Context {
 
     public Session getSession() {
         if (session == null) {
-            app.getSessionManager().process(this);
+            session = app.getSessionManager().getSession(this);
         }
         return session;
     }
@@ -56,9 +56,5 @@ public class Context {
 
     public void put(String name, Object obj) {
         data.put(name, obj);
-    }
-
-    public void setSession(Session session) {
-        this.session = session;
     }
 }

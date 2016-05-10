@@ -14,7 +14,6 @@
 package com.bunjlabs.fugaframework.foundation;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.http.cookie.Cookie;
 import java.net.SocketAddress;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,7 @@ import java.util.Map;
 public class Request {
 
     private final RequestMethod requestMethod;
-    private Map<String, String> headers;
+    private final Map<String, String> headers;
     private final String uri;
     private final String path;
     private final SocketAddress socketAddress;
@@ -31,7 +30,6 @@ public class Request {
     private final Map<String, List<Cookie>> cookiesDownload;
     private final Map<String, Cookie> cookiesUpload;
     private final ByteBuf content;
-    private String s;
 
     public static class Builder {
 
@@ -165,7 +163,7 @@ public class Request {
     }
 
     public void setCookie(Cookie cookie) {
-        this.cookiesUpload.put(cookie.name(), cookie);
+        this.cookiesUpload.put(cookie.getName(), cookie);
     }
 
     public ByteBuf getContent() {
