@@ -78,4 +78,12 @@ public class ServiceManager {
         services.remove(service);
     }
 
+    public <T extends Service> T getService(Class<T> service) {
+        ServiceAgent serviceAgent = services.get(service);
+        if (serviceAgent != null) {
+            return (T) serviceAgent.getService();
+        }
+        return null;
+    }
+
 }
