@@ -7,7 +7,7 @@ Small Java Web Framework for big projects.
 
 ### Project Information
 
-**Documentation**: [PDF](https://bunjlabs.com/fugaframework/docs/fuga-docs.pdf), [Wiki](https://github.com/bunjlabs/Fuga-Framework/wiki)(deprecated)
+**Documentation**: [PDF](https://bunjlabs.com/fugaframework/docs/fuga-docs-en.pdf), [Wiki](https://github.com/bunjlabs/Fuga-Framework/wiki)(deprecated)
 
 **License**: [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
