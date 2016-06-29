@@ -36,7 +36,7 @@ public class RouterTest {
         r.loadFromString("GET ok(\"ok\")");
         r.loadFromString("GET POST ok(\"ok\")");
         r.loadFromString("GET GET ok(\"ok\")");
-        r.loadFromString("$/ ok(\"ok\")");
+        r.loadFromString("@/ ok(\"ok\")");
         r.loadFromString("ok(\"ok\")");
         r.loadFromString("{}");
         r.loadFromString("{ok(\"ok\")}");

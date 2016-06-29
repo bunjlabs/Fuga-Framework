@@ -155,19 +155,26 @@ public class RouteMapLoader {
     private Extension extension() throws RoutesMapLoadException, RoutesMapSyntaxException {
         Set<RequestMethod> methods = EnumSet.noneOf(RequestMethod.class);
         Pattern pattern = null;
+        boolean patternAccumulator = false;
 
         for (;;) {
             if (t.ttype == TK_METHOD) {
                 methods.add(RequestMethod.valueOf(t.sval));
                 t.next();
             } else if (t.ttype == TK_PATTERN) {
-                pattern = Pattern.compile(t.sval);
+                if (t.sval.startsWith("!")) {
+                    patternAccumulator = true;
+                    pattern = Pattern.compile(t.sval.substring(1));
+                } else {
+                    pattern = Pattern.compile(t.sval);
+                }
+
                 t.next();
             } else if (t.ttype == '{') {
                 t.next();
-                return new Extension(methods, pattern, extensionList());
+                return new Extension(methods, pattern, patternAccumulator, extensionList());
             } else if (t.ttype == TK_WORD) {
-                return new Extension(methods, pattern, route());
+                return new Extension(methods, pattern, patternAccumulator, route());
             } else {
                 throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
             }

@@ -18,7 +18,6 @@ import com.bunjlabs.fugaframework.foundation.Context;
 import com.bunjlabs.fugaframework.foundation.Controller;
 import com.bunjlabs.fugaframework.foundation.Response;
 import com.bunjlabs.fugaframework.foundation.Responses;
-import com.bunjlabs.fugaframework.resources.ResourceManager;
 import com.bunjlabs.fugaframework.resources.ResourceRepresenter;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -81,7 +80,7 @@ public class Router {
         Response resp;
 
         try {
-            resp = forward(ctx, extensions);
+            resp = forward(ctx, ctx.getRequest().getPath(), extensions);
         } catch (Exception ex) {
             log.catching(ex);
             return ctx.getApp().getErrorHandler().onServerError(ctx.getRequest(), ex);
@@ -98,19 +97,37 @@ public class Router {
         return resp;
     }
 
-    private Response forward(Context ctx, List<Extension> exts) throws Exception {
+    private Response forward(Context ctx, String path, List<Extension> exts) throws Exception {
         if (exts == null) {
             throw new RoutesMapException("Extensions sublist is null");
         }
-        Matcher m;
+
         for (Extension ext : exts) {
-            if (ext.getRequestMethods() != null && !ext.getRequestMethods().isEmpty() && !ext.getRequestMethods().contains(ctx.getRequest().getRequestMethod())) {
+            if (ext.getRequestMethods() != null
+                    && !ext.getRequestMethods().isEmpty()
+                    && !ext.getRequestMethods().contains(ctx.getRequest().getRequestMethod())) {
                 continue;
             }
+
+            Matcher m;
+            boolean accumulate = false;
             if (ext.getPattern() == null) {
                 m = null;
-            } else if (!(m = ext.getPattern().matcher(ctx.getRequest().getPath())).matches()) {
-                continue;
+                //} else if (!(m = ext.getPattern().matcher(ctx.getRequest().getPath())).matches()) {
+                //    continue;
+            } else {
+                m = ext.getPattern().matcher(path);
+
+                boolean cont;
+                if (ext.isPatternAccumulator()) {
+                    accumulate = cont = m.lookingAt();
+                } else {
+                    cont = m.matches();
+                }
+
+                if (!cont) {
+                    continue;
+                }
             }
 
             if (ext.getRoute() != null) {
@@ -130,7 +147,10 @@ public class Router {
                     return resp;
                 }
             } else if (ext.getNodes() != null && !ext.getNodes().isEmpty()) {
-                Response resp = (Response) forward(ctx, ext.getNodes());
+                if(accumulate) {
+                    path = path.substring(m.end());
+                }
+                Response resp = (Response) forward(ctx, path, ext.getNodes());
                 if (resp != null) {
                     return resp;
                 }

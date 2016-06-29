@@ -72,7 +72,7 @@ public class Tokenizer {
                     case '/':
                         comment();
                         break;
-                    case '$':
+                    case '@':
                         pattern();
                         return TK_PATTERN;
                     case '(':

@@ -17,15 +17,24 @@ use com.bunjlabs.fugaframework.example.controllers.ExampleController
 GET {
     skip()
     
-    $/          index("empty", "223":int)
-    $/(index)   index(1:String, "223":int)
-    $/(\d+)     index(1:String, "223":int)
-    $/ex        throwError()
-    $/nf        nf()
-    $/cdrh      changeDefaultRequestHandler()
-    $/scrh      showCurrentRequestHandler()
+    @/          index("empty", "223":int)
+    @/(index)   index(1:String, "223":int)
+    @/(\d+)     index(1:String, "223":int)
+    @/ex        throwError()
+    @/nf        nf()
+    @/cdrh      changeDefaultRequestHandler()
+    @/scrh      showCurrentRequestHandler()
+
+
+
+    GET @!/test {
+        @   ok("-1")
+        @/  ok("0")
+        @/1 ok("1")
+        @/2 ok("2")
+    }
 }
 
-POST $/post     post()
+POST @/post     post()
 
 HEAD OPTIONS noData()

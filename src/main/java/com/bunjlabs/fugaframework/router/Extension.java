@@ -20,26 +20,30 @@ import java.util.regex.Pattern;
 
 public class Extension {
 
+    private final Set<RequestMethod> requestMethods;
+    private final Pattern pattern;
+    private final boolean patternAccumulator;
+
     private List<Extension> nodes = null;
     private Route route = null;
 
-    private final Set<RequestMethod> requestMethods;
-    private final Pattern pattern;
-
-    Extension(Set<RequestMethod> requestMethods, Pattern pattern) {
+    Extension(Set<RequestMethod> requestMethods, Pattern pattern, boolean patternAccumulator) {
         this.requestMethods = requestMethods;
         this.pattern = pattern;
+        this.patternAccumulator = patternAccumulator;
     }
 
-    Extension(Set<RequestMethod> requestMethods, Pattern pattern, List<Extension> nodes) {
+    Extension(Set<RequestMethod> requestMethods, Pattern pattern, boolean patternAccumulator, List<Extension> nodes) {
         this.requestMethods = requestMethods;
         this.pattern = pattern;
+        this.patternAccumulator = patternAccumulator;
         this.nodes = nodes;
     }
 
-    Extension(Set<RequestMethod> requestMethods, Pattern pattern, Route route) {
+    Extension(Set<RequestMethod> requestMethods, Pattern pattern, boolean patternAccumulator, Route route) {
         this.requestMethods = requestMethods;
         this.pattern = pattern;
+        this.patternAccumulator = patternAccumulator;
         this.route = route;
     }
 
@@ -57,5 +61,9 @@ public class Extension {
 
     public Pattern getPattern() {
         return pattern;
+    }
+
+    public boolean isPatternAccumulator() {
+        return patternAccumulator;
     }
 }
