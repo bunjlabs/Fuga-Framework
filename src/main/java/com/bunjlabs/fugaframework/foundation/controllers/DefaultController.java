@@ -17,6 +17,8 @@ import com.bunjlabs.fugaframework.configuration.Configuration;
 import com.bunjlabs.fugaframework.dependency.Inject;
 import com.bunjlabs.fugaframework.foundation.Controller;
 import com.bunjlabs.fugaframework.foundation.Response;
+import com.bunjlabs.fugaframework.resources.ResourceManager;
+import com.bunjlabs.fugaframework.resources.ResourceRepresenter;
 import com.bunjlabs.fugaframework.templates.TemplateNotFoundException;
 import com.bunjlabs.fugaframework.templates.TemplateRenderException;
 import java.io.InputStream;
@@ -24,10 +26,12 @@ import java.io.InputStream;
 public class DefaultController extends Controller {
 
     private final Configuration conf;
+    private final ResourceRepresenter resourceRepresenter;
 
     @Inject
-    public DefaultController(Configuration conf) {
+    public DefaultController(Configuration conf, ResourceManager resourceManager) {
         this.conf = conf;
+        this.resourceRepresenter = resourceManager.getResourceRepresenter("assets");
     }
 
     public Response generateNotFound() {
@@ -35,7 +39,7 @@ public class DefaultController extends Controller {
     }
 
     public Response generateAsset(String path) {
-        InputStream asset = ctx.getApp().getResourceManager().load("assets/" + path);
+        InputStream asset = resourceRepresenter.load(path);
 
         if (asset == null) {
             return notFound();

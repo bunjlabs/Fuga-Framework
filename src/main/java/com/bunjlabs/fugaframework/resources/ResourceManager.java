@@ -13,26 +13,31 @@
  */
 package com.bunjlabs.fugaframework.resources;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 public final class ResourceManager {
 
-    public InputStream loadFromResources(String name) {
-        if (name == null) {
+    protected InputStream loadFromResources(String... path) {
+        String name = String.join(File.separator, path);
+
+        if (name == null || name.isEmpty()) {
             return null;
         }
 
         return ResourceManager.class.getResourceAsStream(name.startsWith("/") ? name : ("/" + name));
     }
 
-    public InputStream load(String name) {
-        InputStream is;
+    protected InputStream load(String... path) {
+        String name = String.join(File.separator, path);
 
-        if (name == null) {
+        if (name == null || name.isEmpty()) {
             return null;
         }
+
+        InputStream is;
 
         try {
             is = new FileInputStream("." + (name.startsWith("/") ? name : ("/" + name)));
@@ -45,5 +50,9 @@ public final class ResourceManager {
         }
 
         return is;
+    }
+
+    public ResourceRepresenter getResourceRepresenter(String path) {
+        return new ResourceRepresenter(this, path);
     }
 }

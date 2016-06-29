@@ -11,25 +11,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bunjlabs.fugaframework.example;
+package com.bunjlabs.fugaframework.resources;
 
-import com.bunjlabs.fugaframework.FugaApp;
-import com.bunjlabs.fugaframework.example.services.ExampleService;
-import java.util.concurrent.TimeUnit;
+import java.io.InputStream;
 
-public class FugaExampleApp extends FugaApp {
+public class ResourceRepresenter {
 
-    @Override
-    public void prepare() {
-        getRouter().load("example.froutes");
+    private final ResourceManager resourceManager;
+    private final String base;
 
-        getDependencyManager().register(ExampleDependency.class);
-
-        getServiceManager().register(ExampleService.class, 5, TimeUnit.SECONDS);
+    protected ResourceRepresenter(ResourceManager resourceManager, String base) {
+        this.resourceManager = resourceManager;
+        this.base = base;
 
     }
 
-    public static void main(String[] args) throws Exception {
-        new FugaExampleApp().start();
+    public InputStream loadFromResources(String path) {
+        return resourceManager.loadFromResources(base, path);
+    }
+
+    public InputStream load(String path) {
+        return resourceManager.load(base, path);
     }
 }

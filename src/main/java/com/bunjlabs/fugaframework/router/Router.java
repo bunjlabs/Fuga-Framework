@@ -19,10 +19,9 @@ import com.bunjlabs.fugaframework.foundation.Controller;
 import com.bunjlabs.fugaframework.foundation.Response;
 import com.bunjlabs.fugaframework.foundation.Responses;
 import com.bunjlabs.fugaframework.resources.ResourceManager;
-import java.io.BufferedReader;
+import com.bunjlabs.fugaframework.resources.ResourceRepresenter;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -33,16 +32,16 @@ public class Router {
 
     private static final Logger log = LogManager.getLogger(Router.class);
 
-    private final ResourceManager resourceManager;
+    private final ResourceRepresenter resourceRepresenter;
     private final List<Extension> extensions = new ArrayList<>();
 
     public Router(FugaApp app) {
-        this.resourceManager = app.getResourceManager();
+        this.resourceRepresenter = app.getResourceManager().getResourceRepresenter("routes");
     }
 
     public void load(String path) {
         try {
-            load(resourceManager.load(path));
+            load(resourceRepresenter.load(path));
             log.info("Routes loaded from: {}", path);
         } catch (NullPointerException | RoutesMapLoadException | RoutesMapSyntaxException ex) {
             log.error("Unable to load routes from: {}", path, ex);
@@ -51,7 +50,7 @@ public class Router {
 
     public void loadFromResources(String path) {
         try {
-            load(resourceManager.loadFromResources(path));
+            load(resourceRepresenter.loadFromResources(path));
             log.info("Routes loaded from resources: {}", path);
         } catch (NullPointerException | RoutesMapLoadException | RoutesMapSyntaxException ex) {
             log.error("Unable to load routes from: {}", path, ex);
@@ -66,7 +65,7 @@ public class Router {
         if (input == null) {
             throw new NullPointerException();
         }
-        
+
         RouteMapLoader mapLoader = new RouteMapLoader();
 
         extensions.addAll(mapLoader.load(input));

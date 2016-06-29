@@ -14,7 +14,7 @@
 package com.bunjlabs.fugaframework.configuration;
 
 import com.bunjlabs.fugaframework.FugaApp;
-import com.bunjlabs.fugaframework.resources.ResourceManager;
+import com.bunjlabs.fugaframework.resources.ResourceRepresenter;
 import java.util.Properties;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -24,13 +24,13 @@ public final class Configuration {
     private static final Logger log = LogManager.getLogger(Configuration.class);
 
     private final Properties properties = new Properties();
-    private final ResourceManager resourceManager;
+    private final ResourceRepresenter resourceRepresenter;
 
     public Configuration(FugaApp app) {
-        this.resourceManager = app.getResourceManager();
+        this.resourceRepresenter = app.getResourceManager().getResourceRepresenter("config");
 
         try {
-            properties.load(resourceManager.loadFromResources("globals.properties"));
+            properties.load(resourceRepresenter.loadFromResources("globals.properties"));
         } catch (Exception ex) {
             log.error("Unable to load global config file", ex);
         }
@@ -38,7 +38,7 @@ public final class Configuration {
 
     public void load(String path) {
         try {
-            properties.load(resourceManager.load(path));
+            properties.load(resourceRepresenter.load(path));
             log.info("Configuration loaded from: {}", path);
         } catch (Exception ex) {
             log.catching(ex);
@@ -47,7 +47,7 @@ public final class Configuration {
 
     public void loadFromResources(String path) {
         try {
-            properties.load(resourceManager.loadFromResources(path));
+            properties.load(resourceRepresenter.loadFromResources(path));
             log.info("Configuration loaded from resources: {}", path);
         } catch (Exception ex) {
             log.catching(ex);

@@ -32,17 +32,18 @@ public class ExampleController extends Controller {
 
     private static final Logger log = LogManager.getLogger(ExampleController.class);
 
-    @Inject
-    public FugaExampleApp app;
+    public final FugaExampleApp app;
+    public final ExampleDependency ed;
+    public final ExampleService es;
+    public final RequestHandler re;
 
     @Inject
-    public ExampleDependency ed;
-
-    @Inject
-    public ExampleService es;
-
-    @Inject
-    public RequestHandler re;
+    public ExampleController(FugaExampleApp app, ExampleDependency ed, ExampleService es, RequestHandler re) {
+        this.app = app;
+        this.ed = ed;
+        this.es = es;
+        this.re = re;
+    }
 
     public Response skip() {
         ctx.getSession().put("Key", "Some important string");
