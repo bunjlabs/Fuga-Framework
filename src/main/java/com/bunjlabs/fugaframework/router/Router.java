@@ -18,8 +18,7 @@ import com.bunjlabs.fugaframework.foundation.Context;
 import com.bunjlabs.fugaframework.foundation.Controller;
 import com.bunjlabs.fugaframework.foundation.Response;
 import com.bunjlabs.fugaframework.foundation.Responses;
-import com.bunjlabs.fugaframework.resources.ResourceRepresenter;
-import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,42 +30,36 @@ public class Router {
 
     private static final Logger log = LogManager.getLogger(Router.class);
 
-    private final ResourceRepresenter resourceRepresenter;
+    private final RouteMapLoader mapLoader;
     private final List<Extension> extensions = new ArrayList<>();
 
     public Router(FugaApp app) {
-        this.resourceRepresenter = app.getResourceManager().getResourceRepresenter("routes");
+        mapLoader = new RouteMapLoader(app.getResourceManager().getResourceRepresenter("routes"));
     }
 
     public void load(String path) {
         try {
-            load(resourceRepresenter.load(path));
+            extensions.addAll(mapLoader.load(path));
             log.info("Routes loaded from: {}", path);
-        } catch (NullPointerException | RoutesMapLoadException | RoutesMapSyntaxException ex) {
-            log.error("Unable to load routes from: {}", path, ex);
+        } catch (RoutesMapLoadException | RoutesMapSyntaxException | FileNotFoundException ex) {
+            log.error("unable to load routes map", ex);
         }
     }
 
     public void loadFromResources(String path) {
         try {
-            load(resourceRepresenter.loadFromResources(path));
+            extensions.addAll(mapLoader.loadFromResources(path));
             log.info("Routes loaded from resources: {}", path);
-        } catch (NullPointerException | RoutesMapLoadException | RoutesMapSyntaxException ex) {
-            log.error("Unable to load routes from: {}", path, ex);
+        } catch (RoutesMapLoadException | RoutesMapSyntaxException | FileNotFoundException ex) {
+            log.error("unable to load routes map", ex);
         }
     }
 
     public void loadFromString(String input) throws NullPointerException, RoutesMapLoadException, RoutesMapSyntaxException {
-        load(new ByteArrayInputStream(input.getBytes()));
+        extensions.addAll(mapLoader.loadFromString(input));
     }
 
     private void load(InputStream input) throws NullPointerException, RoutesMapLoadException, RoutesMapSyntaxException {
-        if (input == null) {
-            throw new NullPointerException();
-        }
-
-        RouteMapLoader mapLoader = new RouteMapLoader();
-
         extensions.addAll(mapLoader.load(input));
     }
 
@@ -147,7 +140,7 @@ public class Router {
                     return resp;
                 }
             } else if (ext.getNodes() != null && !ext.getNodes().isEmpty()) {
-                if(accumulate) {
+                if (accumulate) {
                     path = path.substring(m.end());
                 }
                 Response resp = (Response) forward(ctx, path, ext.getNodes());

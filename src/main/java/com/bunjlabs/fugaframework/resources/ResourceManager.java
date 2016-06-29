@@ -20,17 +20,24 @@ import java.io.InputStream;
 
 public final class ResourceManager {
 
-    protected InputStream loadFromResources(String... path) {
+    protected InputStream loadFromResources(String... path) throws FileNotFoundException {
         String name = String.join(File.separator, path);
 
         if (name == null || name.isEmpty()) {
             return null;
         }
 
-        return ResourceManager.class.getResourceAsStream(name.startsWith("/") ? name : ("/" + name));
+        InputStream is;
+        is = ResourceManager.class.getResourceAsStream(name.startsWith("/") ? name : ("/" + name));
+
+        if (is == null) {
+            throw new FileNotFoundException(name);
+        }
+
+        return is;
     }
 
-    protected InputStream load(String... path) {
+    protected InputStream load(String... path) throws FileNotFoundException {
         String name = String.join(File.separator, path);
 
         if (name == null || name.isEmpty()) {
@@ -42,13 +49,8 @@ public final class ResourceManager {
         try {
             is = new FileInputStream("." + (name.startsWith("/") ? name : ("/" + name)));
         } catch (FileNotFoundException ex) {
-            is = null;
-        }
-
-        if (is == null) {
             return loadFromResources(name);
         }
-
         return is;
     }
 

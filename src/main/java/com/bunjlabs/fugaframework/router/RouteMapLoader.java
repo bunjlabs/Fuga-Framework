@@ -13,9 +13,13 @@
  */
 package com.bunjlabs.fugaframework.router;
 
+import com.bunjlabs.fugaframework.FugaApp;
 import com.bunjlabs.fugaframework.foundation.RequestMethod;
 import com.bunjlabs.fugaframework.foundation.controllers.DefaultController;
+import com.bunjlabs.fugaframework.resources.ResourceRepresenter;
 import static com.bunjlabs.fugaframework.router.Tokenizer.*;
+import java.io.ByteArrayInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
@@ -24,14 +28,23 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class RouteMapLoader {
+
+    private static final Logger log = LogManager.getLogger(RouteMapLoader.class);
+
+    private final ResourceRepresenter resourceRepresenter;
 
     private Tokenizer t;
     private final List<String> uses = new ArrayList<>();
     private static final Class defaultController = DefaultController.class;
 
-    public RouteMapLoader() {
+    private List<Extension> extensions;
+
+    public RouteMapLoader(ResourceRepresenter resourceRepresenter) {
+        this.resourceRepresenter = resourceRepresenter;
         uses.add("");
     }
 
@@ -194,6 +207,22 @@ public class RouteMapLoader {
                     t.next();
                     break;
                 }
+                case TK_INCLUDE: {
+                    t.next();
+                    if (t.ttype != TK_STRCONST) {
+                        throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
+                    }
+
+                    try {
+                        RouteMapLoader mapLoader = new RouteMapLoader(resourceRepresenter);
+                        list.addAll(mapLoader.load(t.sval));
+                    } catch (RoutesMapLoadException | RoutesMapSyntaxException | FileNotFoundException e) {
+                        throw new RoutesMapLoadException(t, "Unable to include map: " + t.sval, e);
+                    }
+
+                    t.next();
+                    break;
+                }
                 case TK_METHOD:
                 case TK_PATTERN:
                 case TK_WORD:
@@ -213,13 +242,29 @@ public class RouteMapLoader {
         return list;
     }
 
+    public List<Extension> load(String path) throws RoutesMapLoadException, RoutesMapSyntaxException, FileNotFoundException {
+        return load(resourceRepresenter.load(path));
+
+    }
+
+    public List<Extension> loadFromResources(String path) throws RoutesMapLoadException, RoutesMapSyntaxException, FileNotFoundException {
+        return load(resourceRepresenter.loadFromResources(path));
+    }
+
+    public List<Extension> loadFromString(String input) throws NullPointerException, RoutesMapLoadException, RoutesMapSyntaxException {
+        return load(new ByteArrayInputStream(input.getBytes()));
+    }
+
     public List<Extension> load(InputStream input) throws RoutesMapLoadException, RoutesMapSyntaxException {
         t = new Tokenizer(new InputStreamReader(input));
 
         t.next();
 
         return extensionList();
+    }
 
+    public List<Extension> getExtensions() {
+        return extensions;
     }
 
     public static Class getClassTypeBySimpleName(String name) throws ClassNotFoundException {

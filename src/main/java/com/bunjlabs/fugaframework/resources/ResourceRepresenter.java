@@ -13,6 +13,7 @@
  */
 package com.bunjlabs.fugaframework.resources;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 public class ResourceRepresenter {
@@ -26,11 +27,11 @@ public class ResourceRepresenter {
 
     }
 
-    public InputStream loadFromResources(String path) {
+    public InputStream loadFromResources(String path) throws FileNotFoundException {
         return resourceManager.loadFromResources(base, path);
     }
 
-    public InputStream load(String path) {
+    public InputStream load(String path) throws FileNotFoundException {
         return resourceManager.load(base, path);
     }
 }

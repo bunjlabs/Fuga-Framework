@@ -21,4 +21,8 @@ public class TemplateNotFoundException extends Exception {
     public TemplateNotFoundException(String msg) {
         super(msg);
     }
+
+    public TemplateNotFoundException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 }

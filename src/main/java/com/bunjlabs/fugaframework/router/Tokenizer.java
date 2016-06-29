@@ -26,11 +26,12 @@ public class Tokenizer {
     public static final int TK_ERROR = -2;
     public static final int TK_NOTHING = -4;
     public static final int TK_USE = -10;
-    public static final int TK_METHOD = -11;
-    public static final int TK_PATTERN = -12;
-    public static final int TK_WORD = -13;
-    public static final int TK_STRCONST = -14;
-    public static final int TK_INTEGER = -15;
+    public static final int TK_INCLUDE = -11;
+    public static final int TK_METHOD = -20;
+    public static final int TK_PATTERN = -21;
+    public static final int TK_WORD = -22;
+    public static final int TK_STRCONST = -23;
+    public static final int TK_INTEGER = -24;
 
     private final Reader r;
     private int curr = -1;
@@ -97,8 +98,8 @@ public class Tokenizer {
                     case '7':
                     case '8':
                     case '9':
-                        integer();
-                        return TK_INTEGER;
+
+                        return integer();
                     default: {
                         if (!currIsWord()) {
                             char ct = (char) curr;
@@ -115,7 +116,7 @@ public class Tokenizer {
         }
     }
 
-    private void integer() throws RoutesMapSyntaxException, IOException {
+    private int integer() throws RoutesMapSyntaxException, IOException {
         StringBuilder sb = new StringBuilder();
 
         while (currIsDigit()) {
@@ -126,8 +127,9 @@ public class Tokenizer {
         sval = sb.toString();
 
         if (!integerPattern.matcher(sval).matches()) {
-            throw new RoutesMapSyntaxException(this, "Not a integer");
+            return word(sval);
         }
+        return TK_INTEGER;
     }
 
     private void constant() throws RoutesMapSyntaxException, IOException {
@@ -166,7 +168,15 @@ public class Tokenizer {
     }
 
     private int word() throws IOException {
+        return word(null);
+    }
+
+    private int word(String first) throws IOException {
         StringBuilder sb = new StringBuilder();
+        if (first != null && !first.isEmpty()) {
+            sb.append(first);
+        }
+
         while (currIsWord()) {
             sb.append((char) curr);
             skip();
@@ -177,6 +187,8 @@ public class Tokenizer {
             return TK_METHOD;
         } else if (sval.equals("use")) {
             return TK_USE;
+        } else if (sval.equals("include")) {
+            return TK_INCLUDE;
         } else {
             return TK_WORD;
         }

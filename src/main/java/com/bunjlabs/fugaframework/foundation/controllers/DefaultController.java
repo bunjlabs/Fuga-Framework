@@ -21,6 +21,7 @@ import com.bunjlabs.fugaframework.resources.ResourceManager;
 import com.bunjlabs.fugaframework.resources.ResourceRepresenter;
 import com.bunjlabs.fugaframework.templates.TemplateNotFoundException;
 import com.bunjlabs.fugaframework.templates.TemplateRenderException;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 public class DefaultController extends Controller {
@@ -39,9 +40,10 @@ public class DefaultController extends Controller {
     }
 
     public Response generateAsset(String path) {
-        InputStream asset = resourceRepresenter.load(path);
-
-        if (asset == null) {
+        InputStream asset;
+        try {
+            asset = resourceRepresenter.load(path);
+        } catch (FileNotFoundException ex) {
             return notFound();
         }
 
