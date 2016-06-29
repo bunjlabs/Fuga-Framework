@@ -15,6 +15,6 @@ package com.bunjlabs.fugaframework.network;
 
 public interface HttpServer {
 
-    void start() throws Exception;
+    void start();
 
 }

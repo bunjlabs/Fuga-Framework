@@ -29,20 +29,20 @@ import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.DefaultLastHttpContent;
 import io.netty.handler.codec.http.HttpChunkedInput;
 import io.netty.handler.codec.http.HttpContent;
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.HttpUtil;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.handler.codec.http.cookie.ServerCookieEncoder;
 import io.netty.handler.codec.http.multipart.Attribute;
-import io.netty.handler.codec.http.multipart.DefaultHttpDataFactory;
-import io.netty.handler.codec.http.multipart.HttpDataFactory;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.EndOfDataDecoderException;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.ErrorDataDecoderException;
@@ -61,7 +61,6 @@ import org.apache.logging.log4j.Logger;
 class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
     private static final Logger log = LogManager.getLogger(NettyHttpServerHandler.class);
-    private static final HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
     private final FugaApp app;
     private final String serverVersion;
     private ByteBuf content;
@@ -100,12 +99,12 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             requestBuilder = new Request.Builder();
 
             // Decode URI GET query parameters
-            QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httprequest.getUri());
+            QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httprequest.uri());
 
             Map<String, List<Cookie>> cookiesDownload = new HashMap<>();
             cookiesUpload = new ArrayList<>();
 
-            String cookieString = httprequest.headers().get(HttpHeaders.Names.COOKIE);
+            String cookieString = httprequest.headers().get(HttpHeaderNames.COOKIE);
             if (cookieString != null) {
                 ServerCookieDecoder.STRICT.decode(cookieString).stream().forEach((cookie) -> {
                     if (cookiesDownload.containsKey(cookie.name())) {
@@ -119,13 +118,13 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             postmap = new TreeMap<>();
 
             Map<String, String> headers = new HashMap<>();
-            for (Map.Entry<String, String> e : httprequest.headers().entries()) {
+            httprequest.headers().entries().stream().forEach((e) -> {
                 headers.put(e.getKey(), e.getValue());
-            }
+            });
 
-            requestBuilder.requestMethod(RequestMethod.valueOf(httprequest.getMethod().name()))
+            requestBuilder.requestMethod(RequestMethod.valueOf(httprequest.method().name()))
                     .headers(headers)
-                    .uri(httprequest.getUri())
+                    .uri(httprequest.uri())
                     .path(queryStringDecoder.path())
                     .socketAddress(ctx.channel().remoteAddress())
                     .query(queryStringDecoder.parameters())
@@ -134,7 +133,7 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                     .cookiesUpload(new HashMap<>())
                     .content(content);
 
-            if (httprequest.getMethod().equals(HttpMethod.GET)) {
+            if (httprequest.method().equals(HttpMethod.GET)) {
                 writeResponse(ctx, msg);
                 reset();
                 return;
@@ -212,32 +211,32 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                 HttpVersion.HTTP_1_1,
                 HttpResponseStatus.valueOf(resp.getStatus()));
 
-        response.headers().set(HttpHeaders.Names.TRANSFER_ENCODING, HttpHeaders.Values.CHUNKED);
-        response.headers().set(HttpHeaders.Names.CONTENT_TYPE, resp.getContentType());
+        response.headers().set(HttpHeaderNames.TRANSFER_ENCODING, HttpHeaderValues.CHUNKED);
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE, resp.getContentType());
 
         // Disable cache by default
-        response.headers().set(HttpHeaders.Names.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
-        response.headers().set(HttpHeaders.Names.PRAGMA, "no-cache");
-        response.headers().set(HttpHeaders.Names.EXPIRES, "0");
+        response.headers().set(HttpHeaderNames.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+        response.headers().set(HttpHeaderNames.PRAGMA, "no-cache");
+        response.headers().set(HttpHeaderNames.EXPIRES, "0");
 
         resp.getHeaders().entrySet().stream().forEach((e)
                 -> response.headers().set(e.getKey(), e.getValue())
         );
 
-        response.headers().set(HttpHeaders.Names.SERVER, "Fuga Netty Web Server/" + serverVersion);
+        response.headers().set(HttpHeaderNames.SERVER, "Fuga Netty Web Server/" + serverVersion);
 
         // Set cookies
         cookiesUpload.addAll(request.getCookiesUpload().values());
-        response.headers().set(HttpHeaders.Names.SET_COOKIE, ServerCookieEncoder.STRICT.encode(NettyCookieConverter.convertListToNetty(cookiesUpload)));
+        response.headers().set(HttpHeaderNames.SET_COOKIE, ServerCookieEncoder.STRICT.encode(NettyCookieConverter.convertListToNetty(cookiesUpload)));
 
         if (resp.getContentLength() >= 0) {
-            response.headers().set(HttpHeaders.Names.CONTENT_LENGTH, resp.getContentLength());
+            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, resp.getContentLength());
         }
 
-        if (HttpHeaders.isKeepAlive(httprequest)) {
-            response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+        if (HttpUtil.isKeepAlive(httprequest)) {
+            response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
         } else {
-            response.headers().set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.CLOSE);
+            response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
         }
 
         ctx.write(response);
@@ -248,7 +247,7 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
         LastHttpContent fs = new DefaultLastHttpContent();
         ChannelFuture sendContentFuture = ctx.writeAndFlush(fs);
-        if (!HttpHeaders.isKeepAlive(httprequest)) {
+        if (!HttpUtil.isKeepAlive(httprequest)) {
             sendContentFuture.addListener(ChannelFutureListener.CLOSE);
         }
     }

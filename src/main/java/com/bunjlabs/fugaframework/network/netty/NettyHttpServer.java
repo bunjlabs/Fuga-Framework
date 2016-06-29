@@ -37,7 +37,7 @@ public class NettyHttpServer implements HttpServer {
     }
 
     @Override
-    public void start() throws Exception {
+    public void start() {
         if (addr instanceof InetSocketAddress) {
             InetSocketAddress inetAddr = (InetSocketAddress) addr;
             log.info("Starting up HTTP server at {}{}{}/",
@@ -57,6 +57,8 @@ public class NettyHttpServer implements HttpServer {
                     .childHandler(new NettyHttpServerInitializer(app));
             Channel ch = b.bind(addr).sync().channel();
             ch.closeFuture().sync();
+        } catch (Exception ex) {
+            log.error(ex);
         } finally {
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
