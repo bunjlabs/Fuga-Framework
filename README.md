@@ -3,7 +3,7 @@ Fuga Framework
 Small Java Web Framework for big projects.
 
 [![Build Status](https://travis-ci.org/bunjlabs/Fuga-Framework.svg?branch=master)](https://travis-ci.org/bunjlabs/Fuga-Framework)
-[![Dependency Status](https://www.versioneye.com/user/projects/55b8dac9653762001700136e/badge.svg?style=flat)](https://www.versioneye.com/user/projects/55b8dac9653762001700136e)
+[![Dependency Status](https://www.versioneye.com/user/projects/5774a29899ed29004455e299/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/5774a29899ed29004455e299)
 
 ### Project Information
 
