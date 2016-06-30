@@ -32,7 +32,7 @@ public class DefaultController extends Controller {
     @Inject
     public DefaultController(Configuration conf, ResourceManager resourceManager) {
         this.conf = conf;
-        this.resourceRepresenter = resourceManager.getResourceRepresenter("assets");
+        this.resourceRepresenter = resourceManager.getResourceRepresenter(conf.get("fuga.dirs.assets"));
     }
 
     public Response generateNotFound() {

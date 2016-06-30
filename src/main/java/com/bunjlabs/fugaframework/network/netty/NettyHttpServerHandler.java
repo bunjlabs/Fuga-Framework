@@ -14,6 +14,8 @@
 package com.bunjlabs.fugaframework.network.netty;
 
 import com.bunjlabs.fugaframework.FugaApp;
+import com.bunjlabs.fugaframework.foundation.BufferedContent;
+import com.bunjlabs.fugaframework.foundation.Content;
 import com.bunjlabs.fugaframework.foundation.Cookie;
 import com.bunjlabs.fugaframework.foundation.Request;
 import com.bunjlabs.fugaframework.foundation.RequestMethod;
@@ -63,7 +65,7 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
     private static final Logger log = LogManager.getLogger(NettyHttpServerHandler.class);
     private final FugaApp app;
     private final String serverVersion;
-    private ByteBuf content;
+    private ByteBuf contentBuffer;
     private HttpRequest httprequest;
     private Request.Builder requestBuilder;
     private Response resp;
@@ -74,7 +76,7 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
     NettyHttpServerHandler(FugaApp app) {
         this.app = app;
-        content = Unpooled.buffer();
+        contentBuffer = Unpooled.buffer();
 
         serverVersion = app.getConfiguration().get("fuga.version", "(version is unknown)");
     }
@@ -85,7 +87,7 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
         resp = null;
         decoder = false;
         cookiesUpload = null;
-        content = Unpooled.buffer();
+        contentBuffer = Unpooled.buffer();
 
         postmap = null;
     }
@@ -130,8 +132,7 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                     .query(queryStringDecoder.parameters())
                     .parameters(postmap)
                     .cookiesDownload(cookiesDownload)
-                    .cookiesUpload(new HashMap<>())
-                    .content(content);
+                    .cookiesUpload(new HashMap<>());
 
             if (httprequest.method().equals(HttpMethod.GET)) {
                 writeResponse(ctx, msg);
@@ -159,13 +160,13 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
                 readHttpDataChunkByChunk(postDecoder);
             } else {
-                content.writeBytes(httpContent.content());
+                contentBuffer.writeBytes(httpContent.content());
             }
 
             if (httpContent instanceof LastHttpContent) {
+                requestBuilder.content(new BufferedContent(contentBuffer.nioBuffer()));
                 writeResponse(ctx, msg);
                 reset();
-                return;
             }
         }
     }

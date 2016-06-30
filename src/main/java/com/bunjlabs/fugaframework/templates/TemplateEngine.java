@@ -45,7 +45,7 @@ public class TemplateEngine {
         this.app = app;
         this.engine = new ScriptEngineManager().getEngineByName("nashorn");
         this.config = app.getConfiguration();
-        this.resourceRepresenter = app.getResourceManager().getResourceRepresenter("views");
+        this.resourceRepresenter = app.getResourceManager().getResourceRepresenter(config.get("fuga.dirs.views"));
     }
 
     public String compile(String name) throws TemplateNotFoundException, TemplateRenderException {

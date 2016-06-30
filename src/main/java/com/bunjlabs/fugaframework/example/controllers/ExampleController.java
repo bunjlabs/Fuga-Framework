@@ -24,6 +24,8 @@ import com.bunjlabs.fugaframework.foundation.Responses;
 import com.bunjlabs.fugaframework.handlers.RequestHandler;
 import com.bunjlabs.fugaframework.templates.TemplateNotFoundException;
 import com.bunjlabs.fugaframework.templates.TemplateRenderException;
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -63,8 +65,12 @@ public class ExampleController extends Controller {
         return ok(view("defaults/example.html"));
     }
 
-    public Response post() {
-        return ok(ctx.getRequest().getContent().toString(Charset.forName("UTF-8")));
+    public Response postString() {
+        return ok(ctx.getRequest().getContent().asString()).asText();
+    }
+
+    public Response postStream() {
+        return ok(ctx.getRequest().getContent().asInputStream());
     }
 
     public Response throwError() {
@@ -84,6 +90,10 @@ public class ExampleController extends Controller {
         app.setRequestHandler((Request request) -> Responses.ok("I'm dummy request handler!"));
 
         return ok("Done!");
+    }
+
+    public Response file() throws IOException {
+        return ok(new File("/home/show/Symfony_book_3.0.pdf"));
     }
 
     public Response noData() {

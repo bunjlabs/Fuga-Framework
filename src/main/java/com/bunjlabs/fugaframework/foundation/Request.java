@@ -29,7 +29,7 @@ public class Request {
     private final Map<String, List<String>> parameters;
     private final Map<String, List<Cookie>> cookiesDownload;
     private final Map<String, Cookie> cookiesUpload;
-    private final ByteBuf content;
+    private final Content content;
 
     public static class Builder {
 
@@ -42,7 +42,7 @@ public class Request {
         private Map<String, List<String>> parameters;
         private Map<String, List<Cookie>> cookiesDownload;
         private Map<String, Cookie> cookiesUpload;
-        private ByteBuf content;
+        private Content content;
 
         public Builder requestMethod(RequestMethod requestMethod) {
             this.requestMethod = requestMethod;
@@ -89,7 +89,7 @@ public class Request {
             return this;
         }
 
-        public Builder content(ByteBuf content) {
+        public Builder content(Content content) {
             this.content = content;
             return this;
         }
@@ -166,7 +166,7 @@ public class Request {
         this.cookiesUpload.put(cookie.getName(), cookie);
     }
 
-    public ByteBuf getContent() {
+    public Content getContent() {
         return content;
     }
 }

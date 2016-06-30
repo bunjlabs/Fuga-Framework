@@ -30,6 +30,8 @@ GET {
 
 }
 
-POST @/post     post()
+GET  @/file            file()
+POST @/post/?          postString()
+POST @/post/stream     postStream()
 
 HEAD OPTIONS noData()

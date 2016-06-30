@@ -34,7 +34,7 @@ public class Router {
     private final List<Extension> extensions = new ArrayList<>();
 
     public Router(FugaApp app) {
-        mapLoader = new RouteMapLoader(app.getResourceManager().getResourceRepresenter("routes"));
+        mapLoader = new RouteMapLoader(app.getResourceManager().getResourceRepresenter(app.getConfiguration().get("fuga.dirs.routes")));
     }
 
     public void load(String path) {

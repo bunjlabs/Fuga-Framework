@@ -40,24 +40,26 @@ public final class Response {
     }
 
     public Response(InputStream is) {
-        this();
+        contentType = "application/octet-stream";
+        contentLength = -1;
         stream = is;
     }
 
     public Response(byte[] bytes) {
-        this(new ByteArrayInputStream(bytes));
+        stream = new ByteArrayInputStream(bytes);
+        contentType = "application/octet-stream";
         contentLength = bytes.length;
+    }
+
+    public Response(File f) throws IOException {
+        stream = new FileInputStream(f);
+        contentType = Files.probeContentType(f.toPath());
+        contentLength = f.length();
     }
 
     public Response(String s) {
         this(s.getBytes());
         contentType = "text/html";
-    }
-
-    public Response(File f) throws IOException {
-        this(new FileInputStream(f));
-        contentType = Files.probeContentType(f.toPath());
-        contentLength = f.length();
     }
 
     public Response status(int status) {
