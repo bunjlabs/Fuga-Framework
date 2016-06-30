@@ -14,8 +14,7 @@
 package com.bunjlabs.fugaframework.network.netty;
 
 import com.bunjlabs.fugaframework.FugaApp;
-import com.bunjlabs.fugaframework.foundation.BufferedContent;
-import com.bunjlabs.fugaframework.foundation.Content;
+import com.bunjlabs.fugaframework.foundation.content.BufferedContent;
 import com.bunjlabs.fugaframework.foundation.Cookie;
 import com.bunjlabs.fugaframework.foundation.Request;
 import com.bunjlabs.fugaframework.foundation.RequestMethod;
@@ -72,8 +71,6 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
     private boolean decoder;
     private List<Cookie> cookiesUpload;
 
-    private Map<String, List<String>> postmap;
-
     NettyHttpServerHandler(FugaApp app) {
         this.app = app;
         contentBuffer = Unpooled.buffer();
@@ -88,8 +85,6 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
         decoder = false;
         cookiesUpload = null;
         contentBuffer = Unpooled.buffer();
-
-        postmap = null;
     }
 
     @Override
@@ -117,8 +112,6 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                 });
             }
 
-            postmap = new TreeMap<>();
-
             Map<String, String> headers = new HashMap<>();
             httprequest.headers().entries().stream().forEach((e) -> {
                 headers.put(e.getKey(), e.getValue());
@@ -130,7 +123,6 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                     .path(queryStringDecoder.path())
                     .socketAddress(ctx.channel().remoteAddress())
                     .query(queryStringDecoder.parameters())
-                    .parameters(postmap)
                     .cookiesDownload(cookiesDownload)
                     .cookiesUpload(new HashMap<>());
 
@@ -145,23 +137,7 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
         if (msg instanceof HttpContent && decoder) {
             HttpContent httpContent = (HttpContent) msg;
 
-            if (httprequest != null && (httprequest.headers().contains("Content-Type", "application/form-data", true)
-                    || httprequest.headers().contains("Content-Type", "application/x-www-form-urlencoded", true))) {
-                HttpPostRequestDecoder postDecoder = new HttpPostRequestDecoder(httprequest);
-
-                try {
-                    postDecoder.offer(httpContent);
-                } catch (ErrorDataDecoderException ex) {
-                    log.catching(ex);
-                    writeResponse(ctx, msg);
-                    reset();
-                    return;
-                }
-
-                readHttpDataChunkByChunk(postDecoder);
-            } else {
-                contentBuffer.writeBytes(httpContent.content());
-            }
+            contentBuffer.writeBytes(httpContent.content());
 
             if (httpContent instanceof LastHttpContent) {
                 requestBuilder.content(new BufferedContent(contentBuffer.nioBuffer()));
@@ -169,32 +145,6 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                 reset();
             }
         }
-    }
-
-    private void readHttpDataChunkByChunk(HttpPostRequestDecoder decoder) {
-
-        try {
-            while (decoder.hasNext()) {
-                InterfaceHttpData data = decoder.next();
-                if (data != null) {
-                    if (data.getHttpDataType() == HttpDataType.Attribute) {
-                        try {
-                            Attribute attribute = (Attribute) data;
-                            List<String> list = new ArrayList<>();
-                            list.add(attribute.getValue());
-                            postmap.put(attribute.getName(), list);
-                        } catch (IOException ex) {
-                            log.catching(ex);
-                        } finally {
-                            data.release();
-                        }
-                    }
-                }
-            }
-
-        } catch (EndOfDataDecoderException e) { // it's ok
-        }
-
     }
 
     private void writeResponse(ChannelHandlerContext ctx, HttpObject msg) {

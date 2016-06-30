@@ -13,7 +13,6 @@
  */
 package com.bunjlabs.fugaframework.foundation;
 
-import io.netty.buffer.ByteBuf;
 import java.net.SocketAddress;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +25,6 @@ public class Request {
     private final String path;
     private final SocketAddress socketAddress;
     private final Map<String, List<String>> query;
-    private final Map<String, List<String>> parameters;
     private final Map<String, List<Cookie>> cookiesDownload;
     private final Map<String, Cookie> cookiesUpload;
     private final Content content;
@@ -39,7 +37,6 @@ public class Request {
         private String path;
         private SocketAddress socketAddress;
         private Map<String, List<String>> query;
-        private Map<String, List<String>> parameters;
         private Map<String, List<Cookie>> cookiesDownload;
         private Map<String, Cookie> cookiesUpload;
         private Content content;
@@ -74,11 +71,6 @@ public class Request {
             return this;
         }
 
-        public Builder parameters(Map<String, List<String>> parameters) {
-            this.parameters = parameters;
-            return this;
-        }
-
         public Builder cookiesDownload(Map<String, List<Cookie>> cookiesDownload) {
             this.cookiesDownload = cookiesDownload;
             return this;
@@ -106,7 +98,6 @@ public class Request {
         this.path = builder.path;
         this.socketAddress = builder.socketAddress;
         this.query = builder.query;
-        this.parameters = builder.parameters;
         this.cookiesDownload = builder.cookiesDownload;
         this.cookiesUpload = builder.cookiesUpload;
         this.content = builder.content;
@@ -138,10 +129,6 @@ public class Request {
 
     public Map<String, List<String>> getQuery() {
         return query;
-    }
-
-    public Map<String, List<String>> getParameters() {
-        return parameters;
     }
 
     public Cookie getCookie(String name) {

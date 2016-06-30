@@ -1,5 +1,6 @@
-package com.bunjlabs.fugaframework.foundation;
+package com.bunjlabs.fugaframework.foundation.content;
 
+import com.bunjlabs.fugaframework.foundation.Content;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
