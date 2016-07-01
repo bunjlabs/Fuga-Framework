@@ -30,6 +30,6 @@ public class FugaExampleApp extends FugaApp {
     }
 
     public static void main(String[] args) throws Exception {
-        new FugaExampleApp().start();
+        launch(FugaExampleApp.class);
     }
 }

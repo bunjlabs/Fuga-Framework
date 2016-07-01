@@ -63,7 +63,7 @@ public abstract class FugaApp {
         this.serviceManager = new ServiceManager(this);
     }
 
-    public void start() throws Exception {
+    private void start() throws Exception {
         log.info("Fuga Framework {}", configuration.get("fuga.version", "(version is unknown)"));
 
         dependencyManager.register(
@@ -141,4 +141,14 @@ public abstract class FugaApp {
 
     public abstract void prepare();
 
+    public static void launch(Class<? extends FugaApp> appClass) {
+        try {
+            FugaApp app = appClass.newInstance();
+            app.start();
+        } catch (RuntimeException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 }
