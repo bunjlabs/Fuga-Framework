@@ -16,6 +16,7 @@ package com.bunjlabs.fugaframework.foundation;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import org.json.JSONObject;
 
 public class Responses {
 
@@ -39,6 +40,10 @@ public class Responses {
         return new Response(f).status(200);
     }
 
+    public static Response ok(JSONObject json) {
+        return new Response(json.toString()).asJson().status(200);
+    }
+
     public static Response badRequest() {
         return ok().status(400);
     }
@@ -57,6 +62,10 @@ public class Responses {
 
     public static Response badRequest(File f) throws IOException {
         return ok(f).status(400);
+    }
+
+    public static Response badRequest(JSONObject json) {
+        return ok(json).status(400);
     }
 
     public static Response created() {
@@ -79,6 +88,10 @@ public class Responses {
         return ok(f).status(201);
     }
 
+    public static Response created(JSONObject json) {
+        return ok(json).status(201);
+    }
+
     public static Response forbidden() {
         return ok().status(403);
     }
@@ -97,6 +110,10 @@ public class Responses {
 
     public static Response forbidden(File f) throws IOException {
         return ok(f).status(403);
+    }
+
+    public static Response forbidden(JSONObject json){
+        return ok(json).status(403);
     }
 
     public static Response nothing() {
@@ -147,6 +164,10 @@ public class Responses {
         return ok(f).status(500);
     }
 
+    public static Response internalServerError(JSONObject json) {
+        return ok(json).status(500);
+    }
+
     public static Response internalServerError(Throwable e) {
         return ok().status(500);
     }
@@ -171,6 +192,10 @@ public class Responses {
         return ok(f).status(404);
     }
 
+    public static Response notFound(JSONObject json) {
+        return ok(json).status(404);
+    }
+
     public static Response unauthorized() {
         return ok().status(401);
     }
@@ -189,5 +214,9 @@ public class Responses {
 
     public static Response unauthorized(File f) throws IOException {
         return ok(f).status(401);
+    }
+
+    public static Response unauthorized(JSONObject json) {
+        return ok(json).status(401);
     }
 }

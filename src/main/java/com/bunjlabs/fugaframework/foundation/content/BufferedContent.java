@@ -1,13 +1,12 @@
 package com.bunjlabs.fugaframework.foundation.content;
 
-import com.bunjlabs.fugaframework.foundation.Content;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-public class BufferedContent implements Content {
+public class BufferedContent extends BaseContent {
 
     private final ByteBuffer buffer;
 

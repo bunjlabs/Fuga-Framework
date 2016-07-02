@@ -1,13 +1,12 @@
 package com.bunjlabs.fugaframework.foundation.content;
 
-import com.bunjlabs.fugaframework.foundation.Content;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
 
-public class InputStreamContent implements Content {
+public class InputStreamContent extends BaseContent {
 
     private final InputStream is;
     private final long length;
