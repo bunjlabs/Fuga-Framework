@@ -38,6 +38,10 @@ public class DefaultController extends Controller {
     public Response generateNotFound() {
         return notFound();
     }
+    
+    public Response generateSeeOther(String url) {
+        return seeOther(urls.that(url));
+    }
 
     public Response generateAsset(String path) {
         InputStream asset;
@@ -52,7 +56,7 @@ public class DefaultController extends Controller {
         return ok(asset).as(mime);
     }
 
-    public Response generateAssetView(String name) throws TemplateNotFoundException, TemplateRenderException {
+    public Response generateView(String name) throws TemplateNotFoundException, TemplateRenderException {
         return ok(view(name));
     }
 

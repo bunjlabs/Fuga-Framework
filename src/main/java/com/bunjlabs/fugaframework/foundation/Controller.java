@@ -24,15 +24,15 @@ public abstract class Controller extends Responses {
     protected Urls urls;
     protected Forms forms;
 
-    protected static Response proceed() {
+    protected final static Response proceed() {
         return null;
     }
 
-    protected String view(String name) throws TemplateNotFoundException, TemplateRenderException {
+    protected final String view(String name) throws TemplateNotFoundException, TemplateRenderException {
         return ctx.getApp().getViewRenderer().renderToString(name, ctx);
     }
 
-    public static class Builder {
+    public static final class Builder {
 
         public static Controller build(Class<? extends Controller> controller, Context ctxb) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InjectException {
             Controller c = ctxb.getApp().getDependencyManager().inject(controller);

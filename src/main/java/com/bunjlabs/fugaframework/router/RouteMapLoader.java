@@ -138,11 +138,13 @@ public class RouteMapLoader {
 
             switch (classMethod) {
                 case "view":
-                    return new Route(defaultController, tryGetMethod(defaultController, "generateAssetView", classes), parameters);
+                    return new Route(defaultController, tryGetMethod(defaultController, "generateView", classes), parameters);
                 case "asset":
                     return new Route(defaultController, tryGetMethod(defaultController, "generateAsset", classes), parameters);
                 case "notFound":
                     return new Route(defaultController, tryGetMethod(defaultController, "generateNotFound", classes), parameters);
+                case "seeOther":
+                    return new Route(defaultController, tryGetMethod(defaultController, "generateSeeOther", classes), parameters);
                 case "ok":
                     return new Route(defaultController, tryGetMethod(defaultController, "generateOk", classes), parameters);
             }
