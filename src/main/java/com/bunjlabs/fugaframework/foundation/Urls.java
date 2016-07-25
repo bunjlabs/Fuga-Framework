@@ -20,13 +20,16 @@ public class Urls {
 
     private final Context ctx;
 
+    private final String scheme;
+
     public Urls(Context ctx) {
         this.ctx = ctx;
+        this.scheme = ctx.getApp().getConfiguration().get("fuga.http.scheme");
     }
 
     public String that(Object... args) {
         StringBuilder sb = new StringBuilder();
-        sb.append("http://") // TODO!
+        sb.append(scheme).append("://") // TODO!
                 .append(ctx.getRequest().getHost());
 
         if (args.length <= 0) {
