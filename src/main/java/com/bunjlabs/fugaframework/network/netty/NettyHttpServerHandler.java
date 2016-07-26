@@ -19,7 +19,6 @@ import com.bunjlabs.fugaframework.foundation.Cookie;
 import com.bunjlabs.fugaframework.foundation.Request;
 import com.bunjlabs.fugaframework.foundation.RequestMethod;
 import com.bunjlabs.fugaframework.foundation.Response;
-import com.bunjlabs.fugaframework.foundation.Responses;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
@@ -43,19 +42,15 @@ import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import io.netty.handler.codec.http.cookie.ServerCookieEncoder;
-import io.netty.handler.codec.http.multipart.Attribute;
-import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
-import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.EndOfDataDecoderException;
-import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.ErrorDataDecoderException;
-import io.netty.handler.codec.http.multipart.InterfaceHttpData;
-import io.netty.handler.codec.http.multipart.InterfaceHttpData.HttpDataType;
 import io.netty.handler.stream.ChunkedStream;
-import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -64,74 +59,117 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
     private static final Logger log = LogManager.getLogger(NettyHttpServerHandler.class);
     private final FugaApp app;
     private final String serverVersion;
+    private final int forwarded;
     private ByteBuf contentBuffer;
     private HttpRequest httprequest;
     private Request.Builder requestBuilder;
-    private Response resp;
     private boolean decoder;
-    private List<Cookie> cookiesUpload;
 
     NettyHttpServerHandler(FugaApp app) {
         this.app = app;
-        contentBuffer = Unpooled.buffer();
+        this.contentBuffer = Unpooled.buffer();
 
-        serverVersion = app.getConfiguration().get("fuga.version", "(version is unknown)");
+        this.serverVersion = app.getConfiguration().get("fuga.version");
+        this.forwarded = app.getConfiguration().get("fuga.http.forwarded").equals("rfc7239") ? 1 : 0;
     }
 
     private void reset() {
-        httprequest = null;
-        requestBuilder = null;
-        resp = null;
-        decoder = false;
-        cookiesUpload = null;
-        contentBuffer = Unpooled.buffer();
+        this.httprequest = null;
+        this.requestBuilder = null;
+        this.decoder = false;
+        this.contentBuffer = Unpooled.buffer();
     }
 
     @Override
-    public void channelRead0(ChannelHandlerContext ctx, HttpObject msg) throws Exception {
-
+    public void channelRead0(ChannelHandlerContext ctx, HttpObject msg) {
         if (msg instanceof HttpRequest) {
             this.httprequest = (HttpRequest) msg;
 
             requestBuilder = new Request.Builder();
 
-            // Decode URI GET query parameters
-            QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httprequest.uri());
-
-            Map<String, List<Cookie>> cookiesDownload = new HashMap<>();
-            cookiesUpload = new ArrayList<>();
-
-            String cookieString = httprequest.headers().get(HttpHeaderNames.COOKIE);
-            if (cookieString != null) {
-                ServerCookieDecoder.STRICT.decode(cookieString).stream().forEach((cookie) -> {
-                    if (cookiesDownload.containsKey(cookie.name())) {
-                        cookiesDownload.get(cookie.name()).add(NettyCookieConverter.convertToFuga(cookie));
-                    } else {
-                        cookiesDownload.put(cookie.name(), new ArrayList<>(NettyCookieConverter.convertListToFuga(cookie)));
-                    }
-                });
-            }
-
-            Map<String, String> headers = new HashMap<>();
-            httprequest.headers().entries().stream().forEach((e) -> {
-                headers.put(e.getKey(), e.getValue());
-            });
-
             requestBuilder.requestMethod(RequestMethod.valueOf(httprequest.method().name()))
-                    .headers(headers)
                     .uri(httprequest.uri())
-                    .path(queryStringDecoder.path())
-                    .socketAddress(ctx.channel().remoteAddress())
-                    .query(queryStringDecoder.parameters())
-                    .cookiesDownload(cookiesDownload)
                     .cookiesUpload(new HashMap<>());
 
-            if (httprequest.method().equals(HttpMethod.GET)) {
-                writeResponse(ctx, msg);
-                reset();
+            try {
+
+                // Decode URI GET query parameters
+                QueryStringDecoder queryStringDecoder = new QueryStringDecoder(httprequest.uri());
+                requestBuilder.path(queryStringDecoder.path()).query(queryStringDecoder.parameters());
+
+                // Process cookies
+                Map<String, List<Cookie>> cookiesDownload = new HashMap<>();
+
+                String cookieString = httprequest.headers().get(HttpHeaderNames.COOKIE);
+                if (cookieString != null) {
+                    ServerCookieDecoder.STRICT.decode(cookieString).stream().forEach((cookie) -> {
+                        if (cookiesDownload.containsKey(cookie.name())) {
+                            cookiesDownload.get(cookie.name()).add(NettyCookieConverter.convertToFuga(cookie));
+                        } else {
+                            cookiesDownload.put(cookie.name(), new ArrayList<>(NettyCookieConverter.convertListToFuga(cookie)));
+                        }
+                    });
+                }
+
+                requestBuilder.cookiesDownload(cookiesDownload);
+
+                // Process headers
+                Map<String, String> headers = new HashMap<>();
+                httprequest.headers().entries().stream().forEach((e) -> {
+                    headers.put(e.getKey(), e.getValue());
+                });
+
+                requestBuilder.headers(headers);
+
+                // Get real parameters from frontend HTTP server
+                boolean isSecure = false;
+                SocketAddress remoteAddress = ctx.channel().remoteAddress();
+
+                if (forwarded == 1) { // RFC7239
+                    if (headers.containsKey("Forwarded")) {
+                        String fwdStr = headers.get("Forwarded");
+
+                        List<String> fwdparams = Stream.of(fwdStr.split("; ")).map((s) -> s.trim()).collect(Collectors.toList());
+
+                        for (String f : fwdparams) {
+                            String p[] = f.split("=");
+
+                            switch (p[0]) {
+                                case "for":
+                                    remoteAddress = parseAddress(p[1]);
+                                    break;
+                                case "proto":
+                                    isSecure = p[1].equals("https");
+                                    break;
+                            }
+                        }
+                    }
+                } else if (forwarded == 0) { // X-Forwarded
+                    if (headers.containsKey("X-Forwarded-Proto")) {
+                        if (headers.get("X-Forwarded-Proto").equalsIgnoreCase("https")) {
+                            isSecure = true;
+                        }
+                    }
+
+                    if (headers.containsKey("X-Forwarded-For")) {
+                        String fwdfor = headers.get("X-Forwarded-For");
+                        remoteAddress = parseAddress(fwdfor.contains(",") ? fwdfor.substring(0, fwdfor.indexOf(',')) : fwdfor);
+                    } else if (headers.containsKey("X-Real-IP")) {
+                        remoteAddress = parseAddress(headers.get("X-Real-IP"));
+                    }
+                }
+
+                requestBuilder.remoteAddress(remoteAddress).isSecure(isSecure);
+
+                if (httprequest.method().equals(HttpMethod.GET)) {
+                    processResponse(ctx);
+                    return;
+                }
+                decoder = true;
+            } catch (Exception e) {
+                processClientError(ctx, requestBuilder.build(), 400);
                 return;
             }
-            decoder = true;
         }
 
         if (msg instanceof HttpContent && decoder) {
@@ -141,59 +179,78 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
             if (httpContent instanceof LastHttpContent) {
                 requestBuilder.content(new BufferedContent(contentBuffer.nioBuffer()));
-                writeResponse(ctx, msg);
-                reset();
+                processResponse(ctx);
             }
         }
     }
 
-    private void writeResponse(ChannelHandlerContext ctx, HttpObject msg) {
+    private void processClientError(ChannelHandlerContext ctx, Request request, int code) {
+        Response response = app.getErrorHandler().onClientError(request, code);
+
+        writeResponse(ctx, request, response);
+        reset();
+    }
+
+    private void processServerError(ChannelHandlerContext ctx, Request request, Throwable cause) {
+        Response response = app.getErrorHandler().onServerError(request, cause);
+
+        writeResponse(ctx, request, response);
+        reset();
+    }
+
+    private void processResponse(ChannelHandlerContext ctx) {
         Request request = requestBuilder.build();
+        Response response = app.getRequestHandler().onRequest(request);
 
-        resp = app.getRequestHandler().onRequest(request);
-
-        if (resp == null) {
+        if (response == null) {
             log.error("Null response is received");
 
-            resp = Responses.internalServerError();
+            processServerError(ctx, request, new NullPointerException("Null response is received"));
+            return;
         }
 
-        HttpResponse response = new DefaultHttpResponse(
-                HttpVersion.HTTP_1_1,
-                HttpResponseStatus.valueOf(resp.getStatus()));
+        writeResponse(ctx, request, response);
+        reset();
+    }
 
-        response.headers().set(HttpHeaderNames.TRANSFER_ENCODING, HttpHeaderValues.CHUNKED);
-        response.headers().set(HttpHeaderNames.CONTENT_TYPE, resp.getContentType());
+    private void writeResponse(ChannelHandlerContext ctx, Request request, Response response) {
+        HttpResponse httpresponse = new DefaultHttpResponse(
+                HttpVersion.HTTP_1_1,
+                HttpResponseStatus.valueOf(response.getStatus()));
+
+        httpresponse.headers().set(HttpHeaderNames.TRANSFER_ENCODING, HttpHeaderValues.CHUNKED);
+        httpresponse.headers().set(HttpHeaderNames.CONTENT_TYPE, response.getContentType());
 
         // Disable cache by default
-        response.headers().set(HttpHeaderNames.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
-        response.headers().set(HttpHeaderNames.PRAGMA, "no-cache");
-        response.headers().set(HttpHeaderNames.EXPIRES, "0");
+        httpresponse.headers().set(HttpHeaderNames.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+        httpresponse.headers().set(HttpHeaderNames.PRAGMA, "no-cache");
+        httpresponse.headers().set(HttpHeaderNames.EXPIRES, "0");
 
-        resp.getHeaders().entrySet().stream().forEach((e)
-                -> response.headers().set(e.getKey(), e.getValue())
+        response.getHeaders().entrySet().stream().forEach((e)
+                -> httpresponse.headers().set(e.getKey(), e.getValue())
         );
 
-        response.headers().set(HttpHeaderNames.SERVER, "Fuga Netty Web Server/" + serverVersion);
+        httpresponse.headers().set(HttpHeaderNames.SERVER, "Fuga Netty Web Server/" + serverVersion);
 
         // Set cookies
+        List<Cookie> cookiesUpload = new ArrayList<>();
         cookiesUpload.addAll(request.getCookiesUpload().values());
-        response.headers().set(HttpHeaderNames.SET_COOKIE, ServerCookieEncoder.STRICT.encode(NettyCookieConverter.convertListToNetty(cookiesUpload)));
+        httpresponse.headers().set(HttpHeaderNames.SET_COOKIE, ServerCookieEncoder.STRICT.encode(NettyCookieConverter.convertListToNetty(cookiesUpload)));
 
-        if (resp.getContentLength() >= 0) {
-            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, resp.getContentLength());
+        if (response.getContentLength() >= 0) {
+            httpresponse.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.getContentLength());
         }
 
         if (HttpUtil.isKeepAlive(httprequest)) {
-            response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
+            httpresponse.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
         } else {
-            response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
+            httpresponse.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
         }
 
-        ctx.write(response);
+        ctx.write(httpresponse);
 
-        if (resp.getStream() != null) {
-            ctx.write(new HttpChunkedInput(new ChunkedStream(resp.getStream())));
+        if (response.getStream() != null) {
+            ctx.write(new HttpChunkedInput(new ChunkedStream(response.getStream())));
         }
 
         LastHttpContent fs = new DefaultLastHttpContent();
@@ -208,6 +265,12 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
         log.catching(cause);
         ctx.close();
         reset();
+    }
+
+    private static InetSocketAddress parseAddress(String addr) {
+        String ip = addr.contains(":") ? addr.substring(0, addr.lastIndexOf(':')) : addr;
+        String port = addr.contains(":") ? addr.substring(addr.lastIndexOf(':') + 1) : "0";
+        return new InetSocketAddress(ip, Integer.parseInt(port));
     }
 
 }

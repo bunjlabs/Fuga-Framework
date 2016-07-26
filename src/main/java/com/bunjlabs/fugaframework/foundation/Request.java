@@ -23,7 +23,8 @@ public class Request {
     private final Map<String, String> headers;
     private final String uri;
     private final String path;
-    private final SocketAddress socketAddress;
+    private final SocketAddress remoteAddress;
+    private final boolean isSecure;
     private final Map<String, List<String>> query;
     private final Map<String, List<Cookie>> cookiesDownload;
     private final Map<String, Cookie> cookiesUpload;
@@ -35,7 +36,8 @@ public class Request {
         private Map<String, String> headers;
         private String uri;
         private String path;
-        private SocketAddress socketAddress;
+        private SocketAddress remoteAddress;
+        private boolean isSecure;
         private Map<String, List<String>> query;
         private Map<String, List<Cookie>> cookiesDownload;
         private Map<String, Cookie> cookiesUpload;
@@ -61,8 +63,13 @@ public class Request {
             return this;
         }
 
-        public Builder socketAddress(SocketAddress socketAddress) {
-            this.socketAddress = socketAddress;
+        public Builder remoteAddress(SocketAddress remoteAddress) {
+            this.remoteAddress = remoteAddress;
+            return this;
+        }
+
+        public Builder isSecure(boolean isSecure) {
+            this.isSecure = isSecure;
             return this;
         }
 
@@ -96,7 +103,8 @@ public class Request {
         this.headers = builder.headers;
         this.uri = builder.uri;
         this.path = builder.path;
-        this.socketAddress = builder.socketAddress;
+        this.remoteAddress = builder.remoteAddress;
+        this.isSecure = builder.isSecure;
         this.query = builder.query;
         this.cookiesDownload = builder.cookiesDownload;
         this.cookiesUpload = builder.cookiesUpload;
@@ -123,8 +131,12 @@ public class Request {
         return path;
     }
 
-    public SocketAddress getSocketAddress() {
-        return socketAddress;
+    public SocketAddress getRemoteAddress() {
+        return remoteAddress;
+    }
+
+    public boolean isSecure() {
+        return isSecure;
     }
 
     public Map<String, List<String>> getQuery() {

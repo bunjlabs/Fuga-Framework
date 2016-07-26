@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.bunjlabs.fuga</groupId>
     <artifactId>fuga</artifactId>
-    <version>0.4.4-SNAPSHOT</version>
+    <version>0.5.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     
     <name>Fuga</name>
-    <!-- <url>http://example.com/</url> -->
+    <url>https://github.com/bunjlabs/Fuga-Framework</url>
     <description>
         Fuga is a small web framework
     </description>
@@ -35,7 +35,7 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
-            <version>4.1.1.Final</version>
+            <version>4.1.3.Final</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

@@ -36,7 +36,7 @@ public class DefaultRequestHandler implements RequestHandler {
     public Response onRequest(Request request) {
         Context ctx = new Context(request, app);
 
-        log.debug("Access from {}: {}{}", request.getSocketAddress(), request.getHost(), request.getUri());
+        log.debug("Access from {}: {}{}", request.getRemoteAddress(), request.getHost(), request.getUri());
 
         return app.getRouter().forward(ctx);
     }
