@@ -24,7 +24,8 @@ public class Urls {
 
     public Urls(Context ctx) {
         this.ctx = ctx;
-        this.scheme = ctx.getApp().getConfiguration().get("fuga.http.scheme");
+
+        this.scheme = ctx != null ? ctx.getApp().getConfiguration().get("fuga.http.scheme", "http") : "http";
     }
 
     public String that(Object... args) {
