@@ -116,9 +116,9 @@ public abstract class FugaApp {
         return viewRenderer;
     }
 
-    public void setViewRenderer(ViewRenderer renderer) {
-        this.viewRenderer = renderer;
-        dependencyManager.register(RequestHandler.class, requestHandler);
+    public void setViewRenderer(ViewRenderer viewRenderer) {
+        this.viewRenderer = viewRenderer;
+        dependencyManager.register(ViewRenderer.class, viewRenderer);
     }
 
     public ErrorHandler getErrorHandler() {
