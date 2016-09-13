@@ -19,6 +19,11 @@ import java.lang.annotation.Retention;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Target;
 
+/**
+ * Inject annotation used for dependency injection.
+ *
+ * @see DependencyManager
+ */
 @Target(value = {FIELD, CONSTRUCTOR})
 @Retention(value = RUNTIME)
 public @interface Inject {

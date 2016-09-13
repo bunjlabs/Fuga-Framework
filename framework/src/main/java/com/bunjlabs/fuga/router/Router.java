@@ -13,11 +13,11 @@
  */
 package com.bunjlabs.fuga.router;
 
-import com.bunjlabs.fuga.FugaApp;
 import com.bunjlabs.fuga.foundation.Context;
 import com.bunjlabs.fuga.foundation.Controller;
 import com.bunjlabs.fuga.foundation.Response;
 import com.bunjlabs.fuga.foundation.Responses;
+import com.bunjlabs.fuga.resources.ResourceRepresenter;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -28,15 +28,25 @@ import org.apache.logging.log4j.Logger;
 
 public class Router {
 
-    private static final Logger log = LogManager.getLogger(Router.class);
+    private final Logger log = LogManager.getLogger(Router.class);
 
     private final RouteMapLoader mapLoader;
     private final List<Extension> extensions = new ArrayList<>();
 
-    public Router(FugaApp app) {
-        mapLoader = new RouteMapLoader(app.getResourceManager().getResourceRepresenter(app.getConfiguration().get("fuga.dirs.routes")));
+    /**
+     * Create new routes for the given resource representer.
+     *
+     * @param resourceRepresenter Resource representer.
+     */
+    public Router(ResourceRepresenter resourceRepresenter) {
+        mapLoader = new RouteMapLoader(resourceRepresenter);
     }
 
+    /**
+     * Load routes map file from the given path.
+     *
+     * @param path Path to the routes map file.
+     */
     public void load(String path) {
         try {
             extensions.addAll(mapLoader.load(path));
@@ -46,6 +56,11 @@ public class Router {
         }
     }
 
+    /**
+     * Load routes map file from the given path in classpath.
+     *
+     * @param path Path to the routes map file.
+     */
     public void loadFromResources(String path) {
         try {
             extensions.addAll(mapLoader.loadFromResources(path));
@@ -55,14 +70,37 @@ public class Router {
         }
     }
 
+    /**
+     * Load routes map from string.
+     *
+     * @param input Input routes map string.
+     * @throws NullPointerException
+     * @throws RoutesMapLoadException
+     * @throws RoutesMapSyntaxException
+     */
     public void loadFromString(String input) throws NullPointerException, RoutesMapLoadException, RoutesMapSyntaxException {
         extensions.addAll(mapLoader.loadFromString(input));
     }
 
-    private void load(InputStream input) throws NullPointerException, RoutesMapLoadException, RoutesMapSyntaxException {
+    /**
+     * Load routes map from input stream.
+     *
+     * @param input Input stream with routes map.
+     * @throws NullPointerException
+     * @throws RoutesMapLoadException
+     * @throws RoutesMapSyntaxException
+     */
+    public void load(InputStream input) throws NullPointerException, RoutesMapLoadException, RoutesMapSyntaxException {
         extensions.addAll(mapLoader.load(input));
     }
 
+    /**
+     * Forward specified request context to the corresponding route and returns
+     * generate response.
+     *
+     * @param ctx Request context.
+     * @return generated response.
+     */
     public Response forward(Context ctx) {
         if (extensions.isEmpty()) {
             Exception ex = new RoutesMapException("Empty routes map");

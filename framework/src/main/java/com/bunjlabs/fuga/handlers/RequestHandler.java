@@ -18,5 +18,12 @@ import com.bunjlabs.fuga.foundation.Response;
 
 public interface RequestHandler {
 
+    /**
+     * This method called on every client request and must return non-empty
+     * response.
+     *
+     * @param request Current request.
+     * @return response.
+     */
     public Response onRequest(Request request);
 }

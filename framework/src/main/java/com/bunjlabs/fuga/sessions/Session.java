@@ -23,35 +23,89 @@ public class Session extends HashMap<String, Object> {
     private int timeout = 30; // 30 minutes
     private final UUID sessionId;
 
+    /**
+     * Create new session with specified session id.
+     *
+     * @param sessionId session id.
+     */
     public Session(UUID sessionId) {
         updateTime = new Date().getTime();
         this.sessionId = sessionId;
     }
 
+    /**
+     * Returns last session update time.
+     *
+     * @return last session update time.
+     */
     public long getUpdateTime() {
         return updateTime;
     }
 
+    /**
+     * Update session.
+     *
+     * This method actualy sets <code>updateTime</code> to the current local
+     * time.
+     */
     public void update() {
         updateTime = new Date().getTime();
     }
 
+    /**
+     * Returns session timeout.
+     *
+     * @return session timeout.
+     */
     public long getTimeout() {
         return timeout;
     }
 
+    /**
+     * Set session timeout.
+     *
+     * @param timeout Session timeout.
+     */
     public void setTimeout(int timeout) {
         this.timeout = timeout;
     }
 
+    /**
+     * Returns session attribute.
+     *
+     * If specified session attribute does not exists, null value will be
+     * returned.
+     *
+     * @param <T> Type of the attribute.
+     * @param name Name of the attribute.
+     * @param type Type of the attribute.
+     * @return session attribute value or null.
+     */
     public <T> T get(String name, Class<T> type) {
         return (T) this.get(name);
     }
 
+    /**
+     * Returns session attribute.
+     *
+     * If specified session attribute does not exists, null value will be
+     * returned.
+     *
+     * @param <T> Type of the attribute.
+     * @param name Name of the attribute.
+     * @return
+     */
     public <T> T get(String name) {
         return (T) super.get(name);
     }
 
+    /**
+     * Compare specified session attribute with specified object value.
+     *
+     * @param name Name of the attribute.
+     * @param value Compared value.
+     * @return true if session attribute is equal to specified object value.
+     */
     public boolean test(String name, Object value) {
         Object ivalue;
         if ((ivalue = this.get(name)) == null) {
@@ -63,6 +117,11 @@ public class Session extends HashMap<String, Object> {
         return ivalue.equals(value);
     }
 
+    /**
+     * Returns unique session id.
+     *
+     * @return unique session id.
+     */
     public UUID getSessionId() {
         return sessionId;
     }

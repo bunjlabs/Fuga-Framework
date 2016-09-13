@@ -19,27 +19,27 @@ import java.util.regex.Pattern;
 
 public class Tokenizer {
 
-    private static final Pattern methodPattern = Pattern.compile("GET|POST|PUT|PATCH|TRACE|DELETE|HEAD|OPTIONS");
-    private static final Pattern integerPattern = Pattern.compile("([1-9][0-9]+)|[0-9]");
+    private static final Pattern METHOD_PATTERN = Pattern.compile("GET|POST|PUT|PATCH|TRACE|DELETE|HEAD|OPTIONS");
+    private static final Pattern INTEGER_PATTERN = Pattern.compile("([1-9][0-9]+)|[0-9]");
 
-    public static final int TK_EOF = -1;
-    public static final int TK_ERROR = -2;
-    public static final int TK_NOTHING = -4;
-    public static final int TK_USE = -10;
-    public static final int TK_INCLUDE = -11;
-    public static final int TK_METHOD = -20;
-    public static final int TK_PATTERN = -21;
-    public static final int TK_WORD = -22;
-    public static final int TK_STRCONST = -23;
-    public static final int TK_INTEGER = -24;
+    protected static final int TK_EOF = -1;
+    protected static final int TK_ERROR = -2;
+    protected static final int TK_NOTHING = -4;
+    protected static final int TK_USE = -10;
+    protected static final int TK_INCLUDE = -11;
+    protected static final int TK_METHOD = -20;
+    protected static final int TK_PATTERN = -21;
+    protected static final int TK_WORD = -22;
+    protected static final int TK_STRCONST = -23;
+    protected static final int TK_INTEGER = -24;
 
     private final Reader r;
     private int curr = -1;
 
-    public int ttype = TK_NOTHING;
-    public int line = 1;
-    public int column = 1;
-    public String sval = null;
+    protected int ttype = TK_NOTHING;
+    protected int line = 1;
+    protected int column = 1;
+    protected String sval = null;
 
     public Tokenizer(Reader r) {
         this.r = r;
@@ -126,7 +126,7 @@ public class Tokenizer {
 
         sval = sb.toString();
 
-        if (!integerPattern.matcher(sval).matches()) {
+        if (!INTEGER_PATTERN.matcher(sval).matches()) {
             return word(sval);
         }
         return TK_INTEGER;
@@ -183,7 +183,7 @@ public class Tokenizer {
         }
         sval = sb.toString();
 
-        if (methodPattern.matcher(sval).matches()) {
+        if (METHOD_PATTERN.matcher(sval).matches()) {
             return TK_METHOD;
         } else if (sval.equals("use")) {
             return TK_USE;

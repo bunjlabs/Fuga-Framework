@@ -16,6 +16,8 @@ package com.bunjlabs.fuga.foundation;
 import com.bunjlabs.fuga.FugaApp;
 import com.bunjlabs.fuga.sessions.Session;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class Context {
@@ -25,20 +27,41 @@ public class Context {
     private final Map<String, Object> data;
     private Session session;
 
+    /**
+     * Create new context for the current request and application.
+     *
+     * @param request Client request.
+     * @param app Fuga application.
+     */
     public Context(Request request, FugaApp app) {
         this.request = request;
         this.app = app;
         data = new HashMap<>();
     }
 
+    /**
+     * Returns the current request.
+     *
+     * @return the current request.
+     */
     public Request getRequest() {
         return request;
     }
 
+    /**
+     * Returns current fuga application.
+     *
+     * @return current fuga application.
+     */
     public FugaApp getApp() {
         return app;
     }
 
+    /**
+     * Return the session for current request.
+     *
+     * @return the session for current request.
+     */
     public Session getSession() {
         if (session == null) {
             session = app.getSessionManager().getSession(this);
@@ -46,15 +69,61 @@ public class Context {
         return session;
     }
 
+    /**
+     * Return language code for the current request.
+     *
+     * At first this method check client language cookie. If no language cookie
+     * exists it will extract prefered language from Accept-Language http header
+     * and save this value in client cookie.
+     *
+     * @return language code for the current request.
+     */
+    public String getLang() {
+        List<Locale> requestAcceptLocales = request.getAcceptLocales();
+
+        if (requestAcceptLocales.isEmpty()) {
+            return app.getConfiguration().get("fuga.i18n.default");
+        }
+
+        return requestAcceptLocales.get(0).getLanguage();
+    }
+
+    /**
+     * Return custom context attribute.
+     *
+     * Custom context attributes can be set by using
+     * {@link #put(String, Object) put} method.
+     *
+     * @param <T> The type of attribute.
+     * @param name Name of the context value.
+     * @param type The type of attribute.
+     * @return custom context attribute.
+     */
     public <T> T get(String name, Class<T> type) {
         return (T) data.get(name);
     }
 
+    /**
+     * Return custom context attribute.
+     *
+     * Custom context attributes can be set by using
+     * {@link #put(String, Object) put} method.
+     *
+     * @param <T> The type of attribute.
+     * @param name Name of the context attribute.
+     * @return Custom context attribute.
+     */
     public <T> T get(String name) {
         return (T) data.get(name);
     }
 
-    public void put(String name, Object obj) {
-        data.put(name, obj);
+    /**
+     * Puts custom attribute to context.
+     *
+     * @param name Name of the context attribute.
+     * @param value Value of the context attribute.
+     */
+    public void put(String name, Object value) {
+        data.put(name, value);
     }
 }

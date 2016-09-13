@@ -17,7 +17,8 @@ public class RouteParameter {
 
     public static enum ParameterType {
 
-        CAPTURE_GROUP, CONSTANT
+        CAPTURE_GROUP,
+        CONSTANT
     }
     private final ParameterType type;
     private final String dataType;

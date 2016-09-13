@@ -21,16 +21,34 @@ public class Forms {
 
     private final Context ctx;
 
+    /**
+     * Create new forms for the specified context.
+     *
+     * @param ctx Context.
+     */
     public Forms(Context ctx) {
         this.ctx = ctx;
     }
 
+    /**
+     * Generate unique form id for the given form name.
+     *
+     * @param formName Form name.
+     * @return unique form id.
+     */
     public String generateFormId(String formName) {
         String fid = UUID.randomUUID().toString();
         ctx.getSession().put(FORM_ID_PREFIX + formName, fid);
         return fid;
     }
 
+    /**
+     * Test form to the coincidence with form id in current context.
+     *
+     * @param formName Form name.
+     * @param fid Form id.
+     * @return true if given form id is matched with one in current context.
+     */
     public boolean testFormId(String formName, String fid) {
         Object lastfid = ctx.getSession().get(FORM_ID_PREFIX + formName);
         if (lastfid == null) {

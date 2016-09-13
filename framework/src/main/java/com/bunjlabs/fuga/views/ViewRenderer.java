@@ -18,8 +18,24 @@ import java.io.PrintStream;
 
 public interface ViewRenderer {
 
+    /**
+     * Render view to the print stream.
+     *
+     * @param name View name.
+     * @param ctx Request context.
+     * @param output Output print stream.
+     * @throws ViewException
+     */
     public void render(String name, Context ctx, PrintStream output) throws ViewException;
 
+    /**
+     * Render view to the string.
+     *
+     * @param name View name.
+     * @param ctx Request context.
+     * @return string with rendered view.
+     * @throws ViewException
+     */
     public String renderToString(String name, Context ctx) throws ViewException;
 
 }

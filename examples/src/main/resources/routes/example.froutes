@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-use com.bunjlabs.fugaframework.example.controllers.ExampleController
+use com.bunjlabs.fuga.examples.helloworld.controllers.ExampleController
 
 GET {
     skip()

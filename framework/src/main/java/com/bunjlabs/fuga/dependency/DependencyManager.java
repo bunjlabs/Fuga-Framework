@@ -26,13 +26,25 @@ import org.apache.logging.log4j.Logger;
 
 public class DependencyManager {
 
-    private static final Logger log = LogManager.getLogger(DependencyManager.class);
+    private final Logger log = LogManager.getLogger(DependencyManager.class);
 
     private final Map<Class, Object> dependencies = new HashMap<>();
 
+    /**
+     * Create new dependency manager.
+     */
     public DependencyManager() {
     }
 
+    /**
+     * Creates new object from specified class and inject dependences to
+     * contructor and public fields.
+     *
+     * @param <T> Type of injectable object.
+     * @param injectable Injectable class.
+     * @return object with ijected dependences.
+     * @throws InjectException
+     */
     public <T> T inject(Class<T> injectable) throws InjectException {
         Constructor<T> annotatedConstructor = getAnnotatedConstructor(injectable);
 
@@ -52,7 +64,7 @@ public class DependencyManager {
         return obj;
     }
 
-    public <T> T injectToConstructor(Constructor<T> injactableConstructor) throws InjectException {
+    private <T> T injectToConstructor(Constructor<T> injactableConstructor) throws InjectException {
         Object[] parameters = new Object[injactableConstructor.getParameterCount()];
         Class[] parameterTypes = injactableConstructor.getParameterTypes();
 
@@ -66,13 +78,13 @@ public class DependencyManager {
         }
     }
 
-    public void injectToFields(Object injectable, List<Field> injectableFields) throws InjectException {
+    private void injectToFields(Object injectable, List<Field> injectableFields) throws InjectException {
         for (Field f : injectableFields) {
             injectField(injectable, f);
         }
     }
 
-    public void injectField(Object injectable, Field injectableField) throws InjectException {
+    private void injectField(Object injectable, Field injectableField) throws InjectException {
         try {
             Class cls = injectableField.getType();
             Object injectOnject = getDependency(cls);
@@ -84,19 +96,19 @@ public class DependencyManager {
 
     }
 
-    public Constructor getAnnotatedConstructor(Class injactable) {
+    private Constructor getAnnotatedConstructor(Class injactable) {
         return Stream.of(injactable.getConstructors())
                 .filter((Constructor c) -> c.isAnnotationPresent(Inject.class))
                 .findFirst().orElse(null);
     }
 
-    public List<Field> getAnnotatedFields(Class injectable) {
+    private List<Field> getAnnotatedFields(Class injectable) {
         return Stream.of(injectable.getFields())
                 .filter((Field f) -> f.isAnnotationPresent(Inject.class))
                 .collect(Collectors.toList());
     }
 
-    public Object getDependency(Class cls) throws InjectException {
+    private Object getDependency(Class cls) throws InjectException {
         if (dependencies.containsKey(cls)) {
             return getDependency(cls, dependencies.get(cls));
         } else {
@@ -118,22 +130,53 @@ public class DependencyManager {
         return inject(cls);
     }
 
+    /**
+     * Register specified class and object as dependency.
+     *
+     * @param cls Dependency class.
+     * @param obj Dependency object.
+     */
     public void register(Class cls, Object obj) {
         dependencies.put(cls, obj);
     }
 
+    /**
+     * Register specified objects as dependencies.
+     *
+     * @param objs Dependency objects.
+     */
     public void register(Object... objs) {
         for (Object obj : objs) {
             register(obj.getClass(), obj);
         }
     }
 
+    /**
+     * Register specified classes as dependencies.
+     *
+     * @param clss Dependency classess.
+     */
     public void register(Class... clss) {
         for (Class cls : clss) {
             register(cls, null);
         }
     }
 
+    /**
+     * Creates new object from specified class, inject dependences to contructor
+     * and public fields and register this object as dependency.
+     *
+     * Calling this method is identical to code:
+     * <pre>
+     * T obj = inject(injectable);
+     * register(injectable, obj);
+     * </pre>
+     *
+     * @param <T> Type of injectable object.
+     * @param injectable Injectable class.
+     * @return injected object.
+     * @throws InjectException
+     */
     public <T> T registerAndInject(Class<T> injectable) throws InjectException {
         T obj = inject(injectable);
         register(injectable, obj);

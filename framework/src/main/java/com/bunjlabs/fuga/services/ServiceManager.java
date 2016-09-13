@@ -25,16 +25,26 @@ import org.apache.logging.log4j.Logger;
 
 public class ServiceManager {
 
-    private static final Logger log = LogManager.getLogger(ServiceManager.class);
+    private final Logger log = LogManager.getLogger(ServiceManager.class);
 
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     private final Map<Class<? extends Service>, ServiceAgent> services = new HashMap<>();
     private final FugaApp app;
 
+    /**
+     * Create service manager for the specified fuga application.
+     *
+     * @param app Fuga application.
+     */
     public ServiceManager(FugaApp app) {
         this.app = app;
     }
 
+    /**
+     * Register specified service class.
+     *
+     * @param service Service class.
+     */
     public void register(Class<? extends Service> service) {
         try {
             Service serviceInstance = app.getDependencyManager().registerAndInject(service);
@@ -47,11 +57,31 @@ public class ServiceManager {
         }
     }
 
+    /**
+     * Register specified service class and shedule service updates.
+     *
+     * Calling this method is identical to:
+     * <pre>
+     * register(service);
+     * schedule(service, updateTime, timeUnit);
+     * </pre>
+     *
+     * @param service Service class.
+     * @param updateTime Update time period.
+     * @param timeUnit Period time unit.
+     */
     public void register(Class<? extends Service> service, long updateTime, TimeUnit timeUnit) {
         register(service);
         schedule(service, updateTime, timeUnit);
     }
 
+    /**
+     * Shedule specified service updates.
+     *
+     * @param service Service class.
+     * @param updateTime Update time period.
+     * @param timeUnit Period time unit.
+     */
     public void schedule(Class<? extends Service> service, long updateTime, TimeUnit timeUnit) {
         ServiceAgent serviceAgent = services.get(service);
 
@@ -68,6 +98,11 @@ public class ServiceManager {
         serviceAgent.setScheduledFuture(scheduler.scheduleAtFixedRate(serviceAgent.getService()::onUpdate, 0, updateTime, timeUnit));
     }
 
+    /**
+     * Unregister specified service and remove shedule if it presents.
+     *
+     * @param service Service class.
+     */
     public void unregister(Class<? extends Service> service) {
         ServiceAgent serviceAgent = services.get(service);
 
@@ -78,6 +113,13 @@ public class ServiceManager {
         services.remove(service);
     }
 
+    /**
+     * Get service instance by service class.
+     *
+     * @param <T> Type of service instance.
+     * @param service Service class.
+     * @return Service instance.
+     */
     public <T extends Service> T getService(Class<T> service) {
         ServiceAgent serviceAgent = services.get(service);
         if (serviceAgent != null) {

@@ -27,7 +27,7 @@ import org.apache.logging.log4j.Logger;
 
 public class NettyHttpServer implements HttpServer {
 
-    private static final Logger log = LogManager.getLogger(NettyHttpServer.class);
+    private final Logger log = LogManager.getLogger(NettyHttpServer.class);
     private final SocketAddress addr;
     private final FugaApp app;
 

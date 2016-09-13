@@ -19,18 +19,45 @@ import java.lang.reflect.InvocationTargetException;
 
 public abstract class Controller extends Responses {
 
+    /**
+     * Context for the current request and application.
+     */
     protected Context ctx;
+
+    /**
+     * Urls class instance for the current request and application.
+     */
     protected Urls urls;
+
+    /**
+     * Forms class instance for the current request and application.
+     */
     protected Forms forms;
 
+    /**
+     * Helper method that indicate that controller action returns nothing and
+     * give controls to next action in routes map.
+     *
+     * @return null value.
+     */
     protected final static Response proceed() {
         return null;
     }
 
+    /**
+     * Render template by given name and returns result string.
+     *
+     * @param name Name of the template.
+     * @return rendered template.
+     * @throws ViewException
+     */
     protected final String view(String name) throws ViewException {
         return ctx.getApp().getViewRenderer().renderToString(name, ctx);
     }
 
+    /**
+     * Controller builder
+     */
     public static final class Builder {
 
         public static Controller build(Class<? extends Controller> controller, Context ctxb) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InjectException {

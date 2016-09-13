@@ -13,7 +13,6 @@
  */
 package com.bunjlabs.fuga.configuration;
 
-import com.bunjlabs.fuga.FugaApp;
 import com.bunjlabs.fuga.resources.ResourceRepresenter;
 import java.util.Properties;
 import org.apache.logging.log4j.Logger;
@@ -21,13 +20,19 @@ import org.apache.logging.log4j.LogManager;
 
 public final class Configuration {
 
-    private static final Logger log = LogManager.getLogger(Configuration.class);
+    private final Logger log = LogManager.getLogger(Configuration.class);
 
     private final Properties properties = new Properties();
     private final ResourceRepresenter resourceRepresenter;
 
-    public Configuration(FugaApp app) {
-        this.resourceRepresenter = app.getResourceManager().getResourceRepresenter("config");
+    /**
+     * Create a new configuration and load default config from given resource
+     * representer.
+     *
+     * @param resourceRepresenter Resource representer.
+     */
+    public Configuration(ResourceRepresenter resourceRepresenter) {
+        this.resourceRepresenter = resourceRepresenter;
 
         try {
             properties.load(resourceRepresenter.loadFromResources("globals.properties"));
@@ -36,6 +41,12 @@ public final class Configuration {
         }
     }
 
+    /**
+     *
+     * Load configuration file from the given path.
+     *
+     * @param path Path to the configuration file.
+     */
     public void load(String path) {
         try {
             properties.load(resourceRepresenter.load(path));
@@ -45,6 +56,11 @@ public final class Configuration {
         }
     }
 
+    /**
+     * Load configuration file from the given path in classpath.
+     *
+     * @param path Path to the configuration file in classpath.
+     */
     public void loadFromResources(String path) {
         try {
             properties.load(resourceRepresenter.loadFromResources(path));
@@ -54,10 +70,25 @@ public final class Configuration {
         }
     }
 
+    /**
+     * Set configuration entry.
+     *
+     * @param name Entry name.
+     * @param value Entry value.
+     */
     public void set(String name, String value) {
         properties.setProperty(name, value);
     }
 
+    /**
+     * Get configuration entry.
+     *
+     * If given entry name does not exists, the default value will be returned.
+     *
+     * @param name Entry name.
+     * @param defaultValue Default value.
+     * @return Entry value or defaultValue.
+     */
     public String get(String name, String defaultValue) {
         if (properties.containsKey(name)) {
             return (String) properties.getProperty(name);
@@ -66,31 +97,82 @@ public final class Configuration {
         }
     }
 
+    /**
+     * Get configuration entry.
+     *
+     * If given entry name does not exists, the null value will be returned.
+     *
+     * @param name Entry name.
+     * @return Entry value or null.
+     */
     public String get(String name) {
         return (String) properties.getProperty(name);
     }
 
+    /**
+     * Get configuration entry as integer.
+     *
+     * If given entry name does not exists or if the value does not contain a
+     * parsable integer, the default value will be returned.
+     *
+     * @param name Entry name.
+     * @param defaultValue Default value.
+     * @return Entry value or defaultValue
+     */
     public int getInt(String name, int defaultValue) {
-        if (properties.containsKey(name)) {
+        try {
             return Integer.parseInt(properties.getProperty(name));
-        } else {
+        } catch (Exception e) {
             return defaultValue;
         }
     }
 
-    public int getInt(String name) {
-        return Integer.parseInt(properties.getProperty(name));
+    /**
+     * Get configuration entry as integer.
+     *
+     * If given entry name does not exists or if the value does not contain a
+     * parsable integer, the corresponding exseption will be thrown.
+     *
+     * Calling this method is identical to {@code Integer.parseInt(get(name))}
+     *
+     * @param name Entry name.
+     * @return Entry value
+     */
+    public int getInt(String name) throws NumberFormatException {
+        return Integer.parseInt(get(name));
     }
 
+    /**
+     * Get configuration entry as boolean.
+     *
+     * If given entry name does not exists or if the value does not contain a
+     * parsable boolean, the default value will be returned.
+     *
+     * @param name Entry name.
+     * @param defaultValue Default value.
+     * @return Entry value or defaultValue
+     */
     public boolean getBoolean(String name, boolean defaultValue) {
-        if (properties.containsKey(name)) {
-            return Boolean.parseBoolean(properties.getProperty(name));
-        } else {
+        try {
+            return Boolean.parseBoolean(get(name));
+        } catch (Exception e) {
             return defaultValue;
         }
     }
 
+    /**
+     * Get configuration entry as boolean.
+     *
+     * If given entry name does not exists or if the value does not contain a
+     * parsable boolean, the corresponding exseption will be thrown.
+     *
+     * Calling this method is identical to
+     * {@code Boolean.parseBoolean(get(name))}
+     *
+     * @param name
+     * @return
+     */
     public boolean getBoolean(String name) {
-        return Boolean.parseBoolean(properties.getProperty(name));
+        return Boolean.parseBoolean(get(name));
     }
 }

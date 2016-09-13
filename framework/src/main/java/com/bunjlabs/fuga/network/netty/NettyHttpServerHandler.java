@@ -48,6 +48,7 @@ import java.net.SocketAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,7 +57,7 @@ import org.apache.logging.log4j.Logger;
 
 class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
-    private static final Logger log = LogManager.getLogger(NettyHttpServerHandler.class);
+    private final Logger log = LogManager.getLogger(NettyHttpServerHandler.class);
     private final FugaApp app;
     private final String serverVersion;
     private final int forwarded;
@@ -160,6 +161,19 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                 }
 
                 requestBuilder.remoteAddress(remoteAddress).isSecure(isSecure);
+
+                if (headers.containsKey("Accept-Language")) {
+                    String acceptLanguage = headers.get("Accept-Language");
+
+                    List<Locale> acceptLocales
+                            = Stream.of(acceptLanguage.split(","))
+                            .map((s) -> s.contains(";") ? s.substring(0, s.indexOf(";")).trim() : s.trim())
+                            .map((s) -> s.contains("-") ? new Locale(s.split("-")[0], s.split("-")[0]) : new Locale(s))
+                            .collect(Collectors.toList());
+
+                    requestBuilder.acceptLocales(acceptLocales);
+                }
+                //
 
                 if (httprequest.method().equals(HttpMethod.GET)) {
                     processResponse(ctx);

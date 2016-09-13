@@ -20,6 +20,17 @@ import java.io.InputStream;
 
 public final class ResourceManager {
 
+    private static final String APP_DIR = "app";
+
+    /**
+     * Returns input stream of given resource from classpath.
+     *
+     * If specified resource does not exists, null value will be returned.
+     *
+     * @param path Path to the resource.
+     * @return input stream of resource or null.
+     * @throws FileNotFoundException
+     */
     protected InputStream loadFromResources(String... path) throws FileNotFoundException {
         String name = String.join(File.separator, path);
 
@@ -37,6 +48,17 @@ public final class ResourceManager {
         return is;
     }
 
+    /**
+     * Returns input stream of given resource.
+     *
+     * This method at first find resource in current <code>app</code> dir. If it
+     * fails, it try to find resource from class path. If specified resource
+     * does not exists, null value will be returned.
+     *
+     * @param path Path to the resource.
+     * @return input stream of resource or null.
+     * @throws FileNotFoundException
+     */
     protected InputStream load(String... path) throws FileNotFoundException {
         String name = String.join(File.separator, path);
 
@@ -46,14 +68,25 @@ public final class ResourceManager {
 
         InputStream is;
 
+        String resourcePathStr = "."
+                + APP_DIR
+                + (name.startsWith("/") ? name : (File.separator + name));
+
         try {
-            is = new FileInputStream("." + (name.startsWith("/") ? name : ("/" + name)));
+            is = new FileInputStream(resourcePathStr);
         } catch (FileNotFoundException ex) {
             return loadFromResources(name);
         }
+
         return is;
     }
 
+    /**
+     * Returns new resource representer for the given path.
+     *
+     * @param path Path to the represented resources.
+     * @return resource representer for the given path.
+     */
     public ResourceRepresenter getResourceRepresenter(String path) {
         return new ResourceRepresenter(this, path);
     }

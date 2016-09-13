@@ -18,7 +18,23 @@ import com.bunjlabs.fuga.foundation.Response;
 
 public interface ErrorHandler {
 
+    /**
+     * That method called on any client error and must return not empty
+     * response.
+     *
+     * @param request Current request.
+     * @param statusCode Error status code.
+     * @return response.
+     */
     public Response onClientError(Request request, int statusCode);
 
+    /**
+     * That method called on any server error and must return non-empty
+     * response.
+     *
+     * @param request Current request.
+     * @param cause Cause of error.
+     * @return non-empty response.
+     */
     public Response onServerError(Request request, Throwable cause);
 }

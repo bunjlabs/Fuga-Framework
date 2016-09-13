@@ -28,19 +28,42 @@ public class SessionManager {
     private final Map<UUID, Session> sessions = new HashMap<>();
     private final Configuration configuration;
 
+    /**
+     * Create new session manager with specified fuga application.
+     *
+     * @param app Fuga application.
+     */
     public SessionManager(FugaApp app) {
         this.configuration = app.getConfiguration();
 
     }
 
+    /**
+     * Returns session by the session id.
+     *
+     * @param sessionId Unique session id.
+     * @return session by the session id.
+     */
     public Session getSession(UUID sessionId) {
         return sessions.get(sessionId);
     }
 
+    /**
+     * Returns session by the session id.
+     *
+     * @param sessionId Unique session id.
+     * @return session by the session id.
+     */
     public Session getSession(String sessionId) {
         return sessions.get(UUID.fromString(sessionId));
     }
 
+    /**
+     * Returns session by the request context.
+     *
+     * @param ctx Request context.
+     * @return session.
+     */
     public Session getSession(Context ctx) {
         List<Cookie> sessionCookieList = ctx.getRequest().getCookiesDownload().get(configuration.get("fuga.sessions.cookie"));
         Session session = null;
@@ -66,6 +89,9 @@ public class SessionManager {
         return session;
     }
 
+    /**
+     * Update all available sessions.
+     */
     public void update() {
         sessions.entrySet().stream().forEach((e) -> {
             Session session = e.getValue();

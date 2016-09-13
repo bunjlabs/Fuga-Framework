@@ -18,6 +18,7 @@
         <p>Path: <# request.getPath() #></p>
         <p>Host: <# request.getHeaders().get('Host') #></p>
         <p>Remote: <# request.getRemoteAddress().toString() #></p>
+        <p>Lanf: <# ctx.getLang() #></p>
         
         <p><# format("> %s %s %d", "Hello", "world", 10) #></p>
         <% 

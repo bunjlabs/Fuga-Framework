@@ -26,6 +26,12 @@ public class Cookie {
     private boolean secure;
     private boolean httpOnly;
 
+    /**
+     * Create new cookie with given name and value.
+     *
+     * @param name Cookie name.
+     * @param value Cookie value.
+     */
     public Cookie(String name, String value) {
         this.name = name.trim();
         if (name.isEmpty()) {
@@ -34,62 +40,137 @@ public class Cookie {
         this.value = value;
     }
 
+    /**
+     * Returns cookie name.
+     *
+     * @return cookie name.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns cookie value.
+     *
+     * @return cookie value.
+     */
     public String getValue() {
         return value;
     }
 
+    /**
+     * Set cookie value.
+     *
+     * @param value Cookie value
+     */
     public void setValue(String value) {
         this.value = value;
     }
 
+    /**
+     * Returns cookie wrap.
+     *
+     * @return cookie wrap
+     */
     public boolean getWrap() {
         return wrap;
     }
 
+    /**
+     * Set cookie wrap.
+     *
+     * @param wrap Cookie wrap.
+     */
     public void setWrap(boolean wrap) {
         this.wrap = wrap;
     }
 
+    /**
+     * Returns cookie domain.
+     *
+     * @return cookie domain.
+     */
     public String getDomain() {
         return domain;
     }
 
+    /**
+     * Set cookie domain.
+     *
+     * @param domain Cookie domain.
+     */
     public void setDomain(String domain) {
         this.domain = domain;
     }
 
+    /**
+     * Returns cookie path.
+     *
+     * @return cookie path.
+     */
     public String getPath() {
         return path;
     }
 
+    /**
+     * Set cookie path.
+     *
+     * @param path Cookie path.
+     */
     public void setPath(String path) {
         this.path = domain;
     }
 
+    /**
+     * Returns cookie maximum age.
+     *
+     * @return cookie max age.
+     */
     public long getMaxAge() {
         return maxAge;
     }
 
+    /**
+     * Set cookie maximum age.
+     *
+     * @param maxAge Cookie maximum age.
+     */
     public void setMaxAge(long maxAge) {
         this.maxAge = maxAge;
     }
 
+    /**
+     * Returns true if cookie is secure.
+     *
+     * @return true if cookie is secure.
+     */
     public boolean isSecure() {
         return secure;
     }
 
+    /**
+     * Set cookie is secure
+     *
+     * @param secure Cookie is secure value
+     */
     public void setSecure(boolean secure) {
         this.secure = secure;
     }
 
+    /**
+     * Returns true if cookie is HTTP only.
+     *
+     * @return true if cookie is HTTP only.
+     */
     public boolean isHttpOnly() {
         return httpOnly;
     }
 
+    /**
+     * Set cookie is HTTP only.
+     *
+     * @param httpOnly Cookie is HTTP only value.
+     */
     public void setHttpOnly(boolean httpOnly) {
         this.httpOnly = httpOnly;
     }

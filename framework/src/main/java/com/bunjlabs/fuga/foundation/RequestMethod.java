@@ -15,5 +15,12 @@ package com.bunjlabs.fuga.foundation;
 
 public enum RequestMethod {
 
-    GET, POST, PUT, PATCH, TRACE, DELETE, HEAD, OPTIONS,
+    GET,
+    POST,
+    PUT,
+    PATCH,
+    TRACE,
+    DELETE,
+    HEAD,
+    OPTIONS
 }

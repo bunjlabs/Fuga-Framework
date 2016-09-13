@@ -15,6 +15,10 @@ package com.bunjlabs.fuga.network;
 
 public interface HttpServer {
 
+    /**
+     * This method called in application
+     * {@link com.bunjlabs.fuga.FugaApp#start() start} method.
+     */
     void start();
 
 }

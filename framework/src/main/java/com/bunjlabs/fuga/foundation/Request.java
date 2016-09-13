@@ -15,6 +15,7 @@ package com.bunjlabs.fuga.foundation;
 
 import java.net.SocketAddress;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class Request {
@@ -29,7 +30,11 @@ public class Request {
     private final Map<String, List<Cookie>> cookiesDownload;
     private final Map<String, Cookie> cookiesUpload;
     private final Content content;
+    private final List<Locale> acceptLocales;
 
+    /**
+     * Request builder
+     */
     public static class Builder {
 
         private RequestMethod requestMethod;
@@ -42,6 +47,7 @@ public class Request {
         private Map<String, List<Cookie>> cookiesDownload;
         private Map<String, Cookie> cookiesUpload;
         private Content content;
+        private List<Locale> acceptLocales;
 
         public Builder requestMethod(RequestMethod requestMethod) {
             this.requestMethod = requestMethod;
@@ -93,6 +99,11 @@ public class Request {
             return this;
         }
 
+        public Builder acceptLocales(List<Locale> acceptLocales) {
+            this.acceptLocales = acceptLocales;
+            return this;
+        }
+
         public Request build() {
             return new Request(this);
         }
@@ -109,40 +120,89 @@ public class Request {
         this.cookiesDownload = builder.cookiesDownload;
         this.cookiesUpload = builder.cookiesUpload;
         this.content = builder.content;
+        this.acceptLocales = builder.acceptLocales;
     }
 
+    /**
+     * Returns request method.
+     *
+     * @return request method.
+     */
     public RequestMethod getRequestMethod() {
         return requestMethod;
     }
 
+    /**
+     * Returns host.
+     *
+     * @return host.
+     */
     public String getHost() {
         return headers.get("Host");
     }
 
+    /**
+     * Returns map of http client headers.
+     *
+     * @return map of http client headers.
+     */
     public Map<String, String> getHeaders() {
         return headers;
     }
 
+    /**
+     * Returns the URI.
+     *
+     * @return the URI.
+     */
     public String getUri() {
         return uri;
     }
 
+    /**
+     * Returns path.
+     *
+     * @return path.
+     */
     public String getPath() {
         return path;
     }
 
+    /**
+     * Returns remote socket address.
+     *
+     * @return remote socket address.
+     */
     public SocketAddress getRemoteAddress() {
         return remoteAddress;
     }
 
+    /**
+     * Returns true if the request uses secure connection.
+     *
+     * @return true if the request uses secure connection.
+     */
     public boolean isSecure() {
         return isSecure;
     }
 
+    /**
+     * Returns map of get query parameters.
+     *
+     * @return map of get query parameters.
+     */
     public Map<String, List<String>> getQuery() {
         return query;
     }
 
+    /**
+     * Returns request cookie by given cookie name.
+     *
+     * If given cookie name does not exists, null value will be returned.
+     *
+     * @param name Cookie name.
+     * @return request cookie by given cookie name or null.
+     */
     public Cookie getCookie(String name) {
         List<Cookie> cookies = cookiesDownload.get(name);
 
@@ -153,19 +213,50 @@ public class Request {
         return cookies.get(0);
     }
 
+    /**
+     * Returns map of request cookies.
+     *
+     * @return map of request cookies.
+     */
     public Map<String, List<Cookie>> getCookiesDownload() {
         return cookiesDownload;
     }
 
+    /**
+     * Returns map of response cookies.
+     *
+     * @return map of response cookies.
+     */
     public Map<String, Cookie> getCookiesUpload() {
         return cookiesUpload;
     }
 
+    /**
+     * Set cookie for the current request.
+     *
+     * @param cookie Cookie.
+     */
     public void setCookie(Cookie cookie) {
         this.cookiesUpload.put(cookie.getName(), cookie);
     }
 
+    /**
+     * Returns request content.
+     *
+     * @return request content.
+     */
     public Content getContent() {
         return content;
+    }
+
+    /**
+     * Return list of acceptable locales by current request.
+     *
+     * This list extracted from Accept-Language header and sorted by preference.
+     *
+     * @return list of acceptable locales by current request.
+     */
+    public List<Locale> getAcceptLocales() {
+        return acceptLocales;
     }
 }

@@ -20,10 +20,29 @@ public class Urls {
 
     private final Context ctx;
 
+    /**
+     * Create new Urls class instance for the specified context.
+     *
+     * @param ctx
+     */
     public Urls(Context ctx) {
         this.ctx = ctx;
     }
 
+    /**
+     * Returns full url to the specified location.
+     *
+     * Returned url always contains scheme, host and port. If args array length
+     * greater than equal, each element will be merged with slash symbol.
+     *
+     * For example, this calling:
+     * <pre>
+     * urls.that("p1", "p2");
+     * </pre> will return <code>http://localhost/p1/p2</code>
+     *
+     * @param args Location
+     * @return full url to the specified location.
+     */
     public String that(Object... args) {
         StringBuilder sb = new StringBuilder();
         sb.append(ctx.getRequest().isSecure() ? "https" : "http").append("://")
@@ -42,6 +61,20 @@ public class Urls {
         return sb.toString();
     }
 
+    /**
+     * Returns full url to the specified asset.
+     *
+     * Returned url always contains scheme, host and port. If args array length
+     * greater than equal, each element will be merged with slash symbol.
+     *
+     * For example, this calling:
+     * <pre>
+     * urls.that("p1", "p2");
+     * </pre> will return <code>http://localhost/assets/p1/p2</code>
+     *
+     * @param args Asset
+     * @return full url to the specified asset.
+     */
     public String asset(Object... args) {
         StringBuilder sb = new StringBuilder();
 
@@ -62,6 +95,16 @@ public class Urls {
         }
     }
 
+    /**
+     * Returns given string translated into application/x-www-form-urlencoded
+     * format string.
+     *
+     * If args array length greater than equal, each element just will be
+     * merged.
+     *
+     * @param args String
+     * @return url encoded string.
+     */
     public String urlencode(Object... args) {
         StringBuilder sb = new StringBuilder();
 

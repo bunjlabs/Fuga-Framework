@@ -23,7 +23,7 @@ import org.apache.logging.log4j.Logger;
 
 public class DefaultRequestHandler implements RequestHandler {
 
-    private static final Logger log = LogManager.getLogger(DefaultRequestHandler.class);
+    private final Logger log = LogManager.getLogger(DefaultRequestHandler.class);
 
     private final FugaApp app;
 

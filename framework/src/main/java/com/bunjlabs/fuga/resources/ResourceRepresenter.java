@@ -21,16 +21,43 @@ public class ResourceRepresenter {
     private final ResourceManager resourceManager;
     private final String base;
 
+    /**
+     * Create new resource representer for the specified resource manager and
+     * base path.
+     *
+     * @param resourceManager Resource manager
+     * @param base Base path.
+     */
     protected ResourceRepresenter(ResourceManager resourceManager, String base) {
         this.resourceManager = resourceManager;
         this.base = base;
 
     }
 
+    /**
+     * Returns input stream of given resource from classpath.
+     *
+     * If specified resource does not exists, null value will be returned.
+     *
+     * @param path Path to the resource.
+     * @return input stream of resource or null.
+     * @throws FileNotFoundException
+     */
     public InputStream loadFromResources(String path) throws FileNotFoundException {
         return resourceManager.loadFromResources(base, path);
     }
 
+    /**
+     * Returns input stream of given resource.
+     *
+     * This method at first find resource in current <code>app</code> dir. If it
+     * fails, it try to find resource from class path. If specified resource
+     * does not exists, null value will be returned.
+     *
+     * @param path Path to the resource.
+     * @return input stream of resource or null.
+     * @throws FileNotFoundException
+     */
     public InputStream load(String path) throws FileNotFoundException {
         return resourceManager.load(base, path);
     }

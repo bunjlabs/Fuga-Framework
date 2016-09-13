@@ -13,7 +13,6 @@
  */
 package com.bunjlabs.fuga.router;
 
-import com.bunjlabs.fuga.FugaApp;
 import com.bunjlabs.fuga.foundation.RequestMethod;
 import com.bunjlabs.fuga.foundation.controllers.DefaultController;
 import com.bunjlabs.fuga.resources.ResourceRepresenter;
@@ -33,13 +32,13 @@ import org.apache.logging.log4j.Logger;
 
 public class RouteMapLoader {
 
-    private static final Logger log = LogManager.getLogger(RouteMapLoader.class);
+    private final Logger log = LogManager.getLogger(RouteMapLoader.class);
 
     private final ResourceRepresenter resourceRepresenter;
 
     private Tokenizer t;
     private final List<String> uses = new ArrayList<>();
-    private static final Class defaultController = DefaultController.class;
+    private final Class defaultController = DefaultController.class;
 
     private List<Extension> extensions;
 
