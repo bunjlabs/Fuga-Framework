@@ -13,7 +13,7 @@
  */
 package com.bunjlabs.fuga.router;
 
-import com.bunjlabs.fuga.foundation.RequestMethod;
+import com.bunjlabs.fuga.foundation.http.RequestMethod;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;

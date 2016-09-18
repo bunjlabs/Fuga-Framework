@@ -11,16 +11,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bunjlabs.fuga.foundation;
+package com.bunjlabs.fuga.i18n;
 
-public enum RequestMethod {
+import java.text.MessageFormat;
+import java.util.Map;
 
-    GET,
-    POST,
-    PUT,
-    PATCH,
-    TRACE,
-    DELETE,
-    HEAD,
-    OPTIONS
+public class Messages {
+
+    private final Map<String, String> messages;
+
+    public Messages(Map<String, String> messages) {
+        this.messages = messages;
+    }
+
+    public String get(String name) {
+        return messages.get(name);
+    }
+
+    public String get(String name, Object... args) {
+        return MessageFormat.format(messages.get(name), args);
+    }
+
 }

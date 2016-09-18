@@ -11,15 +11,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bunjlabs.fuga.foundation.content;
+package com.bunjlabs.fuga.foundation.http;
 
-import org.json.JSONObject;
-import org.json.JSONTokener;
+public enum RequestMethod {
 
-public abstract class BaseContent implements Content {
-
-    @Override
-    public JSONObject asJson() {
-        return new JSONObject(new JSONTokener(this.asInputStream()));
-    }
+    OPTIONS,
+    GET,
+    HEAD,
+    POST,
+    PUT,
+    PATCH,
+    DELETE,
+    TRACE,
+    CONNECT
 }

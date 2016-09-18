@@ -19,46 +19,46 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
-public final class Response {
+public final class Result {
 
     private int status;
     private InputStream stream;
     private String contentType;
     private long contentLength;
-    private final Map<String, String> headers = new TreeMap<>();
-    private final Collection<Cookie> cookies = new ArrayList<>();
+    private Map<String, String> headers = new TreeMap<>();
 
     /**
      *
      */
-    public Response() {
-        contentType = "application/octet-stream";
-        contentLength = -1;
+    public Result() {
+        this.status = -1;
+        this.contentType = "application/octet-stream";
+        this.contentLength = -1;
     }
 
     /**
      *
      * @param is
      */
-    public Response(InputStream is) {
-        contentType = "application/octet-stream";
-        contentLength = -1;
-        stream = is;
+    public Result(InputStream is) {
+        this.status = -1;
+        this.stream = is;
+        this.contentType = "application/octet-stream";
+        this.contentLength = -1;
     }
 
     /**
      *
      * @param bytes
      */
-    public Response(byte[] bytes) {
-        stream = new ByteArrayInputStream(bytes);
-        contentType = "application/octet-stream";
-        contentLength = bytes.length;
+    public Result(byte[] bytes) {
+        this.status = -1;
+        this.stream = new ByteArrayInputStream(bytes);
+        this.contentType = "application/octet-stream";
+        this.contentLength = bytes.length;
     }
 
     /**
@@ -66,19 +66,20 @@ public final class Response {
      * @param f
      * @throws IOException
      */
-    public Response(File f) throws IOException {
-        stream = new FileInputStream(f);
-        contentType = Files.probeContentType(f.toPath());
-        contentLength = f.length();
+    public Result(File f) throws IOException {
+        this.status = -1;
+        this.stream = new FileInputStream(f);
+        this.contentType = Files.probeContentType(f.toPath());
+        this.contentLength = f.length();
     }
 
     /**
      *
      * @param s
      */
-    public Response(String s) {
+    public Result(String s) {
         this(s.getBytes());
-        contentType = "text/html";
+        this.contentType = "text/html";
     }
 
     /**
@@ -94,8 +95,17 @@ public final class Response {
      * @param status
      * @return
      */
-    public Response status(int status) {
+    public Result status(int status) {
         this.status = status;
+        return this;
+    }
+
+    public Map<String, String> headers() {
+        return headers;
+    }
+
+    public Result header(String header, String value) {
+        headers.put(header, value);
         return this;
     }
 
@@ -112,28 +122,9 @@ public final class Response {
      * @param contentLength
      * @return
      */
-    public Response length(long contentLength) {
+    public Result length(long contentLength) {
         this.contentLength = contentLength;
         return this;
-    }
-
-    /**
-     *
-     * @param name
-     * @param value
-     * @return
-     */
-    public Response header(String name, String value) {
-        headers.put(name, value);
-        return this;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public Map<String, String> headers() {
-        return headers;
     }
 
     /**
@@ -141,7 +132,7 @@ public final class Response {
      * @param stream
      * @return
      */
-    public Response stream(InputStream stream) {
+    public Result stream(InputStream stream) {
         this.stream = stream;
         return this;
     }
@@ -152,26 +143,6 @@ public final class Response {
      */
     public InputStream stream() {
         return stream;
-    }
-
-    /**
-     * Set cookie for the current response.
-     *
-     * @param cookie Cookie to set
-     * @return self
-     */
-    public Response cookie(Cookie cookie) {
-        this.cookies.add(cookie);
-        return this;
-    }
-
-    /**
-     * Returns collection of all cookies for current response.
-     *
-     * @return collection of all cookies for current response.
-     */
-    public Collection<Cookie> cookies() {
-        return cookies;
     }
 
     /**
@@ -186,7 +157,7 @@ public final class Response {
      *
      * @return
      */
-    public Response asText() {
+    public Result asText() {
         this.contentType = "text/plain";
         return this;
     }
@@ -195,7 +166,7 @@ public final class Response {
      *
      * @return
      */
-    public Response asHtml() {
+    public Result asHtml() {
         this.contentType = "text/html";
         return this;
     }
@@ -204,7 +175,7 @@ public final class Response {
      *
      * @return
      */
-    public Response asJson() {
+    public Result asJson() {
         this.contentType = "application/json";
         return this;
     }
@@ -213,7 +184,7 @@ public final class Response {
      *
      * @return
      */
-    public Response asXml() {
+    public Result asXml() {
         this.contentType = "text/xml";
         return this;
     }
@@ -222,7 +193,7 @@ public final class Response {
      *
      * @return
      */
-    public Response asJavascript() {
+    public Result asJavascript() {
         this.contentType = "application/javascript";
         return this;
     }
@@ -231,7 +202,7 @@ public final class Response {
      *
      * @return
      */
-    public Response asCss() {
+    public Result asCss() {
         this.contentType = "text/css";
         return this;
     }
@@ -241,7 +212,7 @@ public final class Response {
      * @param contentType
      * @return
      */
-    public Response as(String contentType) {
+    public Result as(String contentType) {
         this.contentType = contentType;
         return this;
     }

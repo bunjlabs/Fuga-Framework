@@ -15,7 +15,7 @@ package com.bunjlabs.fuga.handlers;
 
 import com.bunjlabs.fuga.foundation.Request;
 import com.bunjlabs.fuga.foundation.Response;
-import com.bunjlabs.fuga.foundation.Responses;
+import com.bunjlabs.fuga.foundation.http.Status;
 
 public class DefaultErrorHandler implements ErrorHandler {
 
@@ -46,7 +46,7 @@ public class DefaultErrorHandler implements ErrorHandler {
             sb.append("</p>");
         }
 
-        return Responses.internalServerError(sb.toString());
+        return new Response(sb.toString()).status(Status.INTERNAL_SERVER_ERROR);
     }
 
 }

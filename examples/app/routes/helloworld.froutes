@@ -12,26 +12,6 @@
  * limitations under the License.
  */
 
-use com.bunjlabs.fuga.examples.helloworld.controllers.ExampleController
+use com.bunjlabs.fuga.examples.helloworld.HelloWorldController
 
-GET {
-    skip()
-    
-    @/          index("empty", "223":int)
-    @/(index)   index(1:String, "223":int)
-    @/(\d+)     index(1:String, "223":int)
-    @/ex        throwError()
-    @/nf        nf()
-    @/cdrh      changeDefaultRequestHandler()
-    @/scrh      showCurrentRequestHandler()
-
-
-    include "example-inc.froutes"
-
-}
-
-GET  @/file            file()
-POST @/post/?          postString()
-POST @/post/stream     postStream()
-
-HEAD OPTIONS noData()
+GET @/ index()

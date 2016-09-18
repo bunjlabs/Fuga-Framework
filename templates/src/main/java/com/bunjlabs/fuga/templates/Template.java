@@ -23,11 +23,12 @@ import javax.script.ScriptException;
 
 public class Template {
 
-    private static final Pattern codePattern = Pattern.compile(
+    private static final Pattern CORE_PATTERN = Pattern.compile(
             "(\\@\\{([^\\{\\}\\n\\r]*?)\\})"
             + "|(\\<%([\\s\\S]*?)%\\>)"
             + "|(\\<#([^\\n\\r]*?)#\\>)");
-    private static final Pattern namePattern = Pattern.compile("[a-zA-Z0-9_-]+");
+    private static final Pattern NAME_PATTERN = Pattern.compile("[a-zA-Z0-9_-]+");
+
     private final String tid;
     private final String templateClassName;
     private final Map<String, String> blocks = new HashMap<>();
@@ -106,7 +107,7 @@ public class Template {
         generateApiFunctions(jsCode);
 
         while (input.length() > 0) {
-            Matcher m = codePattern.matcher(input);
+            Matcher m = CORE_PATTERN.matcher(input);
             if (m.find()) {
                 String text = input.substring(0, m.start());
                 if (text.length() > 0) {
@@ -123,7 +124,7 @@ public class Template {
                         //    throw new TemplateRenderException("Unexpected block start");
                         //}
                         String blockName = codeBlock.substring(6);
-                        if (!namePattern.matcher(blockName).matches()) {
+                        if (!NAME_PATTERN.matcher(blockName).matches()) {
                             throw new TemplateRenderException("Disallowed block name");
                         }
                         input = input.substring(m.end());
@@ -144,29 +145,29 @@ public class Template {
                     input = input.substring(m.end());
                 }
 
-            } else {
-                if (input.length() > 0) {
-                    input = escapeSpaces(input);
-                    jsCode.append("this.stream.print('").append(input).append("');");
-                    input = "";
-                }
+            } else if (input.length() > 0) {
+                input = escapeSpaces(input);
+                jsCode.append("this.stream.print('").append(input).append("');");
+                input = "";
             }
         }
         return jsCode.toString();
     }
 
     private static void generateApiFunctions(StringBuilder jsCode) {
-        jsCode.append("var that = function() { return api.urls.that(Array.prototype.slice.call(arguments, 0)); };");
-        jsCode.append("var asset = function() { return api.urls.asset(Array.prototype.slice.call(arguments, 0)); };");
-        jsCode.append("var urlencode = function() { return api.urls.urlencode(Array.prototype.slice.call(arguments, 0)); };");
+        jsCode.append("var that = function() { return api.ctx.urls().that(Array.prototype.slice.call(arguments, 0)); };");
+        jsCode.append("var asset = function() { return api.ctx.urls().asset(Array.prototype.slice.call(arguments, 0)); };");
+        jsCode.append("var urlencode = function() { return api.ctx.urls().urlencode(Array.prototype.slice.call(arguments, 0)); };");
 
-        jsCode.append("var generateFormId = function() { return api.forms.generateFormId(Array.prototype.slice.call(arguments, 0)); };");
-        jsCode.append("var testFormId = function() { return api.forms.testFormId(Array.prototype.slice.call(arguments, 0)); };");
+        jsCode.append("var generateFormId = function() { return api.ctx.forms().generateFormId(Array.prototype.slice.call(arguments, 0)); };");
+        jsCode.append("var testFormId = function() { return api.ctx.forms().testFormId(Array.prototype.slice.call(arguments, 0)); };");
 
         jsCode.append("var bytes = function() { return api.bytes(Array.prototype.slice.call(arguments, 0)); };");
         jsCode.append("var escape = function() { return api.escape(Array.prototype.slice.call(arguments, 0)); };");
         jsCode.append("var nltobr = function() { return api.nltobr(Array.prototype.slice.call(arguments, 0)); };");
         jsCode.append("var format = function() { return api.format(Array.prototype.slice.call(arguments, 0)); };");
+
+        jsCode.append("var msg = function() { return api.ctx.msg().get(Array.prototype.slice.call(arguments, 0)); };");
     }
 
     private static String escapeSpaces(String input) {

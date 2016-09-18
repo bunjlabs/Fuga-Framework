@@ -13,7 +13,7 @@
  */
 package com.bunjlabs.fuga.router;
 
-import com.bunjlabs.fuga.foundation.RequestMethod;
+import com.bunjlabs.fuga.foundation.http.RequestMethod;
 import com.bunjlabs.fuga.foundation.controllers.DefaultController;
 import com.bunjlabs.fuga.resources.ResourceRepresenter;
 import static com.bunjlabs.fuga.router.Tokenizer.*;
@@ -248,8 +248,8 @@ public class RouteMapLoader {
 
     }
 
-    public List<Extension> loadFromResources(String path) throws RoutesMapLoadException, RoutesMapSyntaxException, FileNotFoundException {
-        return load(resourceRepresenter.loadFromResources(path));
+    public List<Extension> loadFromClasspath(String path) throws RoutesMapLoadException, RoutesMapSyntaxException, FileNotFoundException {
+        return load(resourceRepresenter.loadFromClasspath(path));
     }
 
     public List<Extension> loadFromString(String input) throws NullPointerException, RoutesMapLoadException, RoutesMapSyntaxException {

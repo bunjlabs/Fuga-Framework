@@ -45,8 +45,8 @@ public class Urls {
      */
     public String that(Object... args) {
         StringBuilder sb = new StringBuilder();
-        sb.append(ctx.getRequest().isSecure() ? "https" : "http").append("://")
-                .append(ctx.getRequest().getHost());
+        sb.append(ctx.request().isSecure() ? "https" : "http").append("://")
+                .append(ctx.request().host());
 
         if (args.length <= 0) {
             sb.append("/");
@@ -88,10 +88,10 @@ public class Urls {
             }
         }
 
-        if (!ctx.getApp().getConfiguration().getBoolean("fuga.assets.external")) {
+        if (!ctx.app().getConfiguration().getBoolean("fuga.assets.external")) {
             return that("assets" + sb.toString());
         } else {
-            return ctx.getApp().getConfiguration().get("fuga.assets.path") + sb.toString();
+            return ctx.app().getConfiguration().get("fuga.assets.path") + sb.toString();
         }
     }
 

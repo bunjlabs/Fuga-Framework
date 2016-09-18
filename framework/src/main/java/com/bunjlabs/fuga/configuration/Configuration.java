@@ -13,8 +13,13 @@
  */
 package com.bunjlabs.fuga.configuration;
 
+import com.bunjlabs.fuga.FugaApp;
 import com.bunjlabs.fuga.resources.ResourceRepresenter;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -26,16 +31,14 @@ public final class Configuration {
     private final ResourceRepresenter resourceRepresenter;
 
     /**
-     * Create a new configuration and load default config from given resource
-     * representer.
+     * Create a new configuration and load default config.
      *
-     * @param resourceRepresenter Resource representer.
+     * @param app Fuga application.
      */
-    public Configuration(ResourceRepresenter resourceRepresenter) {
-        this.resourceRepresenter = resourceRepresenter;
-
+    public Configuration(FugaApp app) {
+        this.resourceRepresenter = app.getResourceManager().getResourceRepresenter("config");
         try {
-            properties.load(resourceRepresenter.loadFromResources("globals.properties"));
+            properties.load(resourceRepresenter.loadFromClasspath("globals.properties"));
         } catch (Exception ex) {
             log.error("Unable to load global config file", ex);
         }
@@ -61,9 +64,9 @@ public final class Configuration {
      *
      * @param path Path to the configuration file in classpath.
      */
-    public void loadFromResources(String path) {
+    public void loadFromClasspath(String path) {
         try {
-            properties.load(resourceRepresenter.loadFromResources(path));
+            properties.load(resourceRepresenter.loadFromClasspath(path));
             log.info("Configuration loaded from resources: {}", path);
         } catch (Exception ex) {
             log.catching(ex);
@@ -169,10 +172,29 @@ public final class Configuration {
      * Calling this method is identical to
      * {@code Boolean.parseBoolean(get(name))}
      *
-     * @param name
-     * @return
+     * @param name Entry name.
+     * @return configuration entry as boolean.
      */
     public boolean getBoolean(String name) {
         return Boolean.parseBoolean(get(name));
+    }
+
+    /**
+     * Get configuration entry as list.
+     *
+     * If given entry name does not exists or if the value does not contain a
+     * parsable list, the empty list will be returned.
+     *
+     * @param name Entry name.
+     * @return configuration entry as list.
+     */
+    public List<String> getList(String name) {
+        String raw = get(name);
+
+        if (raw == null || raw.isEmpty()) {
+            return Collections.EMPTY_LIST;
+        }
+
+        return Stream.of(raw.split(",")).map((s) -> s.trim()).collect(Collectors.toList());
     }
 }

@@ -16,6 +16,7 @@ package com.bunjlabs.fuga;
 import com.bunjlabs.fuga.configuration.Configuration;
 import com.bunjlabs.fuga.dependency.DependencyManager;
 import com.bunjlabs.fuga.dependency.InjectException;
+import com.bunjlabs.fuga.i18n.MessagesManager;
 import com.bunjlabs.fuga.handlers.DefaultErrorHandler;
 import com.bunjlabs.fuga.handlers.DefaultRequestHandler;
 import com.bunjlabs.fuga.handlers.ErrorHandler;
@@ -36,11 +37,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * A Play application.
+ * A Fuga Application.
  */
 public abstract class FugaApp {
 
-    private final Logger log = LogManager.getLogger(FugaApp.class);
+    private final Logger log = LogManager.getLogger(this);
 
     private final DependencyManager dependencyManager;
     private final ResourceManager resourceManager;
@@ -49,6 +50,7 @@ public abstract class FugaApp {
 
     private final SessionManager sessionManager;
     private final ServiceManager serviceManager;
+    private final MessagesManager messagesManager;
 
     private ViewRenderer viewRenderer;
     private RequestHandler requestHandler;
@@ -64,10 +66,11 @@ public abstract class FugaApp {
         this.dependencyManager = new DependencyManager();
 
         this.resourceManager = new ResourceManager();
-        this.configuration = new Configuration(resourceManager.getResourceRepresenter("config"));
-        this.router = new Router(resourceManager.getResourceRepresenter(configuration.get("fuga.dirs.routes")));
+        this.configuration = new Configuration(this);
+        this.router = new Router(this);
         this.sessionManager = new SessionManager(this);
         this.serviceManager = new ServiceManager(this);
+        this.messagesManager = new MessagesManager(this);
     }
 
     /**
@@ -82,16 +85,18 @@ public abstract class FugaApp {
                 configuration,
                 router,
                 sessionManager,
-                serviceManager
+                serviceManager,
+                messagesManager
         );
 
         setViewRenderer(DummyViewRenderer.class);
         setRequestHandler(DefaultRequestHandler.class);
         setErrorHandler(DefaultErrorHandler.class);
 
-        serviceManager.register(SessionService.class, configuration.getInt("fuga.sessions.refreshtime"), TimeUnit.SECONDS);
-
         prepare();
+
+        messagesManager.load();
+        serviceManager.register(SessionService.class, configuration.getInt("fuga.sessions.refreshtime"), TimeUnit.SECONDS);
 
         addr = new InetSocketAddress(configuration.get("fuga.http.bindhost"), configuration.getInt("fuga.http.bindport"));
         httpserver = new NettyHttpServer(addr, this);
@@ -150,6 +155,15 @@ public abstract class FugaApp {
      */
     public SessionManager getSessionManager() {
         return sessionManager;
+    }
+
+    /**
+     * Returns the current messages manager.
+     *
+     * @return the current messages manager.
+     */
+    public MessagesManager getMessagesManager() {
+        return messagesManager;
     }
 
     /**

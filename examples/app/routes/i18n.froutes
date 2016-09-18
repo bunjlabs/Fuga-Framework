@@ -11,15 +11,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bunjlabs.fuga.foundation.content;
 
-import org.json.JSONObject;
-import org.json.JSONTokener;
+use com.bunjlabs.fuga.examples.i18n.I18nExampleController
 
-public abstract class BaseContent implements Content {
+GET @/ language()
 
-    @Override
-    public JSONObject asJson() {
-        return new JSONObject(new JSONTokener(this.asInputStream()));
-    }
+GET @/(ru|en).* language(1)
+GET @!/(ru|en) {
+    
+    @/? index()
 }

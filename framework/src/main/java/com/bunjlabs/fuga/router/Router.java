@@ -13,11 +13,11 @@
  */
 package com.bunjlabs.fuga.router;
 
+import com.bunjlabs.fuga.FugaApp;
 import com.bunjlabs.fuga.foundation.Context;
 import com.bunjlabs.fuga.foundation.Controller;
 import com.bunjlabs.fuga.foundation.Response;
-import com.bunjlabs.fuga.foundation.Responses;
-import com.bunjlabs.fuga.resources.ResourceRepresenter;
+import com.bunjlabs.fuga.foundation.Result;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -28,18 +28,18 @@ import org.apache.logging.log4j.Logger;
 
 public class Router {
 
-    private final Logger log = LogManager.getLogger(Router.class);
+    private final Logger log = LogManager.getLogger(this);
 
     private final RouteMapLoader mapLoader;
     private final List<Extension> extensions = new ArrayList<>();
 
     /**
-     * Create new routes for the given resource representer.
+     * Create new router.
      *
-     * @param resourceRepresenter Resource representer.
+     * @param app Fuga app.
      */
-    public Router(ResourceRepresenter resourceRepresenter) {
-        mapLoader = new RouteMapLoader(resourceRepresenter);
+    public Router(FugaApp app) {
+        mapLoader = new RouteMapLoader(app.getResourceManager().getResourceRepresenter("routes"));
     }
 
     /**
@@ -61,9 +61,9 @@ public class Router {
      *
      * @param path Path to the routes map file.
      */
-    public void loadFromResources(String path) {
+    public void loadFromClasspath(String path) {
         try {
-            extensions.addAll(mapLoader.loadFromResources(path));
+            extensions.addAll(mapLoader.loadFromClasspath(path));
             log.info("Routes loaded from resources: {}", path);
         } catch (RoutesMapLoadException | RoutesMapSyntaxException | FileNotFoundException ex) {
             log.error("unable to load routes map", ex);
@@ -96,39 +96,46 @@ public class Router {
 
     /**
      * Forward specified request context to the corresponding route and returns
-     * generate response.
+     * generated response.
      *
      * @param ctx Request context.
-     * @return generated response.
+     * @return generated result.
      */
     public Response forward(Context ctx) {
         if (extensions.isEmpty()) {
             Exception ex = new RoutesMapException("Empty routes map");
             log.catching(ex);
-            return Responses.internalServerError(ex);
+            return ctx.app().getErrorHandler().onServerError(ctx.request(), ex);
         }
 
-        Response resp;
+        Result result;
 
         try {
-            resp = forward(ctx, ctx.getRequest().getPath(), extensions);
+            result = forward(ctx, ctx.request().path(), extensions);
         } catch (Exception ex) {
             log.catching(ex);
-            return ctx.getApp().getErrorHandler().onServerError(ctx.getRequest(), ex);
+            return ctx.app().getErrorHandler().onServerError(ctx.request(), ex);
         }
 
-        if (resp == null) {
-            resp = ctx.getApp().getErrorHandler().onClientError(ctx.getRequest(), 404);
+        if (result == null) {
+            return ctx.app().getErrorHandler().onClientError(ctx.request(), 404);
         }
 
-        if (resp.isEmpty() && resp.getStatus() >= 400 && resp.getStatus() < 500) {
-            resp = ctx.getApp().getErrorHandler().onClientError(ctx.getRequest(), resp.getStatus());
+        if (result.isEmpty() && result.status() >= 400 && result.status() < 500) {
+            return ctx.app().getErrorHandler().onClientError(ctx.request(), result.status());
         }
 
-        return resp;
+        ctx.response().headers().putAll(result.headers());
+        ctx.response()
+                .status(result.status())
+                .stream(result.stream())
+                .length(result.length())
+                .as(result.contentType());
+
+        return ctx.response();
     }
 
-    private Response forward(Context ctx, String path, List<Extension> exts) throws Exception {
+    private Result forward(Context ctx, String path, List<Extension> exts) throws Exception {
         if (exts == null) {
             throw new RoutesMapException("Extensions sublist is null");
         }
@@ -136,7 +143,7 @@ public class Router {
         for (Extension ext : exts) {
             if (ext.getRequestMethods() != null
                     && !ext.getRequestMethods().isEmpty()
-                    && !ext.getRequestMethods().contains(ctx.getRequest().getRequestMethod())) {
+                    && !ext.getRequestMethods().contains(ctx.request().requestMethod())) {
                 continue;
             }
 
@@ -144,8 +151,6 @@ public class Router {
             boolean accumulate = false;
             if (ext.getPattern() == null) {
                 m = null;
-                //} else if (!(m = ext.getPattern().matcher(ctx.getRequest().getPath())).matches()) {
-                //    continue;
             } else {
                 m = ext.getPattern().matcher(path);
 
@@ -173,25 +178,34 @@ public class Router {
                         args[i] = mp.cast();
                     }
                 }
-                Response resp = invoke(ctx, route, args);
-                if (resp != null) {
-                    return resp;
+                Result result = invoke(ctx, route, args);
+                if (result == null) {
+                    throw new NullPointerException("Result is null");
                 }
+
+                if (result.status() > 0) {
+                    return result;
+                }
+
             } else if (ext.getNodes() != null && !ext.getNodes().isEmpty()) {
                 if (accumulate) {
                     path = path.substring(m.end());
                 }
-                Response resp = (Response) forward(ctx, path, ext.getNodes());
-                if (resp != null) {
-                    return resp;
+                Result result = forward(ctx, path, ext.getNodes());
+                if (result == null) {
+                    throw new NullPointerException("Result is null");
+                }
+
+                if (result.status() > 0) {
+                    return result;
                 }
             }
         }
         return null;
     }
 
-    private Response invoke(Context ctx, Route route, Object... args) throws Exception {
+    private Result invoke(Context ctx, Route route, Object... args) throws Exception {
         Controller controller = Controller.Builder.build(route.getController(), ctx);
-        return (Response) route.getMethod().invoke(controller, args);
+        return (Result) route.getMethod().invoke(controller, args);
     }
 }

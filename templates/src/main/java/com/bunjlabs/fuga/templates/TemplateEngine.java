@@ -43,7 +43,7 @@ public class TemplateEngine {
         this.app = app;
         this.engine = new ScriptEngineManager().getEngineByName("nashorn");
         this.config = app.getConfiguration();
-        this.resourceRepresenter = app.getResourceManager().getResourceRepresenter(config.get("fuga.dirs.views"));
+        this.resourceRepresenter = app.getResourceManager().getResourceRepresenter("views");
     }
 
     public String compile(String name) throws TemplateNotFoundException, TemplateRenderException {
@@ -78,7 +78,7 @@ public class TemplateEngine {
         String tid
                 = config.getBoolean("fuga.templates.recompile")
                 && templates.containsKey(name)
-                        ? templates.get(name).getTid() : Template.generateTid();
+                ? templates.get(name).getTid() : Template.generateTid();
 
         Template t = new Template(this, tid, input);
         t.compile();

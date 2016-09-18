@@ -14,19 +14,19 @@
 package com.bunjlabs.fuga.examples.helloworld;
 
 import com.bunjlabs.fuga.FugaApp;
-import com.bunjlabs.fuga.dependency.Inject;
+import com.bunjlabs.fuga.dependency.InjectException;
+import com.bunjlabs.fuga.templates.TemplateViewRenderer;
 
-public class ExampleDependency {
+public class HelloWorldApp extends FugaApp {
 
-    private final FugaApp app;
+    @Override
+    public void prepare() throws InjectException {
+        getRouter().load("helloworld.froutes");
 
-    @Inject
-    public ExampleDependency(FugaApp app) {
-        this.app = app;
-
+        setViewRenderer(TemplateViewRenderer.class);
     }
 
-    public String getString() {
-        return "I'm an example dependency and I have a FugaApp instance: " + app.getClass().getName();
+    public static void main(String[] args) throws Exception {
+        launch(HelloWorldApp.class);
     }
 }

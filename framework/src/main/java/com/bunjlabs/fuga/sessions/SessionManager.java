@@ -19,8 +19,8 @@ import com.bunjlabs.fuga.foundation.Context;
 import com.bunjlabs.fuga.foundation.Cookie;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class SessionManager {
@@ -65,15 +65,11 @@ public class SessionManager {
      * @return session.
      */
     public Session getSession(Context ctx) {
-        List<Cookie> sessionCookieList = ctx.getRequest().getCookiesDownload().get(configuration.get("fuga.sessions.cookie"));
+        Optional<Cookie> sessionCookieOpt = ctx.request().cookie(configuration.get("fuga.sessions.cookie"));
         Session session = null;
 
-        if (sessionCookieList != null) {
-            for (Cookie sessionCookie : sessionCookieList) {
-                if (sessionCookie != null && (session = sessions.get(UUID.fromString(sessionCookie.getValue()))) != null) {
-                    break;
-                }
-            }
+        if (sessionCookieOpt.isPresent()) {
+            session = sessions.get(UUID.fromString(sessionCookieOpt.get().value()));
         }
 
         if (session == null) {
@@ -82,9 +78,10 @@ public class SessionManager {
 
             sessions.put(sessionId, session);
 
-            Cookie sessionCookie = new Cookie(configuration.get("fuga.sessions.cookie"), session.getSessionId().toString());
-            sessionCookie.setPath("/");
-            ctx.getRequest().setCookie(sessionCookie);
+            ctx.response().cookie(
+                    new Cookie(configuration.get("fuga.sessions.cookie"), session.getSessionId().toString())
+                    .path("/")
+            );
         }
         return session;
     }

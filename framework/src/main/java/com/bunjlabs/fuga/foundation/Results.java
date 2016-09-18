@@ -13,6 +13,7 @@
  */
 package com.bunjlabs.fuga.foundation;
 
+import com.bunjlabs.fuga.foundation.http.Status;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,14 +22,14 @@ import org.json.JSONObject;
 /**
  * Helper class that contains useful methods to generate responses.
  */
-public class Responses {
+public class Results implements Status {
 
     /**
      *
      * @return response with ok (200) status.
      */
-    public static Response ok() {
-        return new Response().status(200);
+    public static Result ok() {
+        return new Result().status(OK);
     }
 
     /**
@@ -36,8 +37,8 @@ public class Responses {
      * @param is InputStream content.
      * @return response with ok (200) status and input stream content.
      */
-    public static Response ok(InputStream is) {
-        return new Response(is).status(200);
+    public static Result ok(InputStream is) {
+        return new Result(is).status(OK);
     }
 
     /**
@@ -45,8 +46,8 @@ public class Responses {
      * @param bytes Byte array content.
      * @return response with ok (200) status and bytes content.
      */
-    public static Response ok(byte[] bytes) {
-        return new Response(bytes).status(200);
+    public static Result ok(byte[] bytes) {
+        return new Result(bytes).status(OK);
     }
 
     /**
@@ -54,8 +55,8 @@ public class Responses {
      * @param s String content
      * @return response with ok (200) status and string content.
      */
-    public static Response ok(String s) {
-        return new Response(s).status(200);
+    public static Result ok(String s) {
+        return new Result(s).status(OK);
     }
 
     /**
@@ -64,8 +65,8 @@ public class Responses {
      * @return response with ok (200) status and file content.
      * @throws IOException
      */
-    public static Response ok(File f) throws IOException {
-        return new Response(f).status(200);
+    public static Result ok(File f) throws IOException {
+        return new Result(f).status(OK);
     }
 
     /**
@@ -73,16 +74,16 @@ public class Responses {
      * @param json Json content.
      * @return response with ok (200) status and json content.
      */
-    public static Response ok(JSONObject json) {
-        return new Response(json.toString()).asJson().status(200);
+    public static Result ok(JSONObject json) {
+        return new Result(json.toString()).status(OK).asJson();
     }
 
     /**
      *
      * @return response with bad request (400) status.
      */
-    public static Response badRequest() {
-        return ok().status(400);
+    public static Result badRequest() {
+        return new Result().status(BAD_REQUEST);
     }
 
     /**
@@ -90,8 +91,8 @@ public class Responses {
      * @param is Input stream content.
      * @return response with bad request (400) status and input stream content.
      */
-    public static Response badRequest(InputStream is) {
-        return ok(is).status(400);
+    public static Result badRequest(InputStream is) {
+        return new Result(is).status(BAD_REQUEST);
     }
 
     /**
@@ -99,8 +100,8 @@ public class Responses {
      * @param bytes Byte array content.
      * @return response with bad request (400) status and bytes content.
      */
-    public static Response badRequest(byte[] bytes) {
-        return ok(bytes).status(400);
+    public static Result badRequest(byte[] bytes) {
+        return new Result(bytes).status(BAD_REQUEST);
     }
 
     /**
@@ -108,8 +109,8 @@ public class Responses {
      * @param s String content.
      * @return response with bad request (400) status and string content.
      */
-    public static Response badRequest(String s) {
-        return ok(s).status(400);
+    public static Result badRequest(String s) {
+        return new Result(s).status(BAD_REQUEST);
     }
 
     /**
@@ -118,8 +119,8 @@ public class Responses {
      * @return response with bad request (400) status and file content.
      * @throws IOException
      */
-    public static Response badRequest(File f) throws IOException {
-        return ok(f).status(400);
+    public static Result badRequest(File f) throws IOException {
+        return new Result(f).status(BAD_REQUEST);
     }
 
     /**
@@ -127,16 +128,16 @@ public class Responses {
      * @param json Json content.
      * @return response with bad request (400) status and json content.
      */
-    public static Response badRequest(JSONObject json) {
-        return ok(json).status(400);
+    public static Result badRequest(JSONObject json) {
+        return new Result(json.toString()).status(BAD_REQUEST).asJson();
     }
 
     /**
      *
      * @return response with created (201) status.
      */
-    public static Response created() {
-        return ok().status(201);
+    public static Result created() {
+        return new Result().status(CREATED);
     }
 
     /**
@@ -144,8 +145,8 @@ public class Responses {
      * @param is InputStream content.
      * @return response with created (201) status and input stream content.
      */
-    public static Response created(InputStream is) {
-        return ok(is).status(201);
+    public static Result created(InputStream is) {
+        return new Result(is).status(CREATED);
     }
 
     /**
@@ -153,8 +154,8 @@ public class Responses {
      * @param bytes Byte array content.
      * @return response with created (201) status and bytes content.
      */
-    public static Response created(byte[] bytes) {
-        return ok(bytes).status(201);
+    public static Result created(byte[] bytes) {
+        return new Result(bytes).status(CREATED);
     }
 
     /**
@@ -162,8 +163,8 @@ public class Responses {
      * @param s String content.
      * @return response with created (201) status and string content.
      */
-    public static Response created(String s) {
-        return ok(s).status(201);
+    public static Result created(String s) {
+        return new Result(s).status(CREATED);
     }
 
     /**
@@ -172,8 +173,8 @@ public class Responses {
      * @return response with created (201) status and file content.
      * @throws IOException
      */
-    public static Response created(File f) throws IOException {
-        return ok(f).status(201);
+    public static Result created(File f) throws IOException {
+        return new Result(f).status(CREATED);
     }
 
     /**
@@ -181,16 +182,16 @@ public class Responses {
      * @param json Json content.
      * @return response with created (201) status and json content.
      */
-    public static Response created(JSONObject json) {
-        return ok(json).status(201);
+    public static Result created(JSONObject json) {
+        return new Result(json.toString()).status(CREATED).asJson();
     }
 
     /**
      *
      * @return response with forbidden (403) status.
      */
-    public static Response forbidden() {
-        return ok().status(403);
+    public static Result forbidden() {
+        return new Result().status(FORBIDDEN);
     }
 
     /**
@@ -198,8 +199,8 @@ public class Responses {
      * @param is Input stream content.
      * @return response with forbidden (403) status and input stream content.
      */
-    public static Response forbidden(InputStream is) {
-        return ok(is).status(403);
+    public static Result forbidden(InputStream is) {
+        return new Result(is).status(FORBIDDEN);
     }
 
     /**
@@ -207,8 +208,8 @@ public class Responses {
      * @param bytes Byte array content.
      * @return response with forbidden (403) status and bytes content.
      */
-    public static Response forbidden(byte[] bytes) {
-        return ok(bytes).status(403);
+    public static Result forbidden(byte[] bytes) {
+        return new Result(bytes).status(FORBIDDEN);
     }
 
     /**
@@ -216,8 +217,8 @@ public class Responses {
      * @param s String content.
      * @return response with forbidden (403) status and string content.
      */
-    public static Response forbidden(String s) {
-        return ok(s).status(403);
+    public static Result forbidden(String s) {
+        return new Result(s).status(FORBIDDEN);
     }
 
     /**
@@ -226,8 +227,8 @@ public class Responses {
      * @return response with forbidden (403) status and file content.
      * @throws IOException
      */
-    public static Response forbidden(File f) throws IOException {
-        return ok(f).status(403);
+    public static Result forbidden(File f) throws IOException {
+        return new Result(f).status(FORBIDDEN);
     }
 
     /**
@@ -235,15 +236,15 @@ public class Responses {
      * @param json Json content.
      * @return response with forbidden (403) status and json content.
      */
-    public static Response forbidden(JSONObject json) {
-        return ok(json).status(403);
+    public static Result forbidden(JSONObject json) {
+        return new Result(json.toString()).status(FORBIDDEN);
     }
 
     /**
      *
      * @return response with no content (204) status.
      */
-    public static Response nothing() {
+    public static Result nothing() {
         return noContent();
     }
 
@@ -251,8 +252,8 @@ public class Responses {
      *
      * @return response with no content (204) status.
      */
-    public static Response noContent() {
-        return ok().status(204);
+    public static Result noContent() {
+        return new Result().status(NO_CONTENT);
     }
 
     /**
@@ -260,8 +261,8 @@ public class Responses {
      * @param url Location url.
      * @return response with found (302) status and location url.
      */
-    public static Response found(String url) {
-        return ok().status(302).header("Location", url);
+    public static Result found(String url) {
+        return new Result().status(FOUND).header("Location", url);
     }
 
     /**
@@ -269,8 +270,8 @@ public class Responses {
      * @param url Location url.
      * @return response with moved permanently (301) status and location url.
      */
-    public static Response movedPermanently(String url) {
-        return ok().status(301).header("Location", url);
+    public static Result movedPermanently(String url) {
+        return new Result().status(MOVED_PERMANENTLY).header("Location", url);
     }
 
     /**
@@ -278,7 +279,7 @@ public class Responses {
      * @param url Location url.
      * @return response with see other (303) status and location url.
      */
-    public static Response redirect(String url) {
+    public static Result redirect(String url) {
         return seeOther(url);
     }
 
@@ -287,8 +288,8 @@ public class Responses {
      * @param url Location url.
      * @return response with see other (303) status and location url.
      */
-    public static Response seeOther(String url) {
-        return ok().status(303).header("Location", url);
+    public static Result seeOther(String url) {
+        return new Result().status(SEE_OTHER).header("Location", url);
     }
 
     /**
@@ -296,16 +297,16 @@ public class Responses {
      * @param url Location url.
      * @return response with temporary redirect (307) status and location url.
      */
-    public static Response temporaryRedirect(String url) {
-        return ok().status(307).header("Location", url);
+    public static Result temporaryRedirect(String url) {
+        return new Result().status(TEMPORARY_REDIRECT).header("Location", url);
     }
 
     /**
      *
      * @return response with internal server error (500) status.
      */
-    public static Response internalServerError() {
-        return ok().status(500);
+    public static Result internalServerError() {
+        return new Result().status(INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -314,8 +315,8 @@ public class Responses {
      * @return response with internal server error (500) status and input stream
      * content.
      */
-    public static Response internalServerError(InputStream is) {
-        return ok(is).status(500);
+    public static Result internalServerError(InputStream is) {
+        return new Result(is).status(INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -324,8 +325,8 @@ public class Responses {
      * @return response with internal server error (500) status and bytes
      * content.
      */
-    public static Response internalServerError(byte[] bytes) {
-        return ok(bytes).status(500);
+    public static Result internalServerError(byte[] bytes) {
+        return new Result(bytes).status(INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -334,8 +335,8 @@ public class Responses {
      * @return response with internal server error (500) status and string
      * content.
      */
-    public static Response internalServerError(String s) {
-        return ok(s).status(500);
+    public static Result internalServerError(String s) {
+        return new Result(s).status(INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -345,8 +346,8 @@ public class Responses {
      * content.
      * @throws IOException
      */
-    public static Response internalServerError(File f) throws IOException {
-        return ok(f).status(500);
+    public static Result internalServerError(File f) throws IOException {
+        return new Result(f).status(INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -355,8 +356,8 @@ public class Responses {
      * @return response with internal server error (500) status and json
      * content.
      */
-    public static Response internalServerError(JSONObject json) {
-        return ok(json).status(500);
+    public static Result internalServerError(JSONObject json) {
+        return new Result(json.toString()).status(INTERNAL_SERVER_ERROR);
     }
 
     /**
@@ -365,16 +366,16 @@ public class Responses {
      * @return response with internal server error (500) status and throwable
      * content.
      */
-    public static Response internalServerError(Throwable e) {
-        return ok().status(500);
+    public static Result internalServerError(Throwable e) {
+        return new Result().status(INTERNAL_SERVER_ERROR);
     }
 
     /**
      *
      * @return response with not found (404) status.
      */
-    public static Response notFound() {
-        return ok().status(404);
+    public static Result notFound() {
+        return new Result().status(NOT_FOUND);
     }
 
     /**
@@ -382,8 +383,8 @@ public class Responses {
      * @param is Input stream content.
      * @return response with not found (404) status and input stream content.
      */
-    public static Response notFound(InputStream is) {
-        return ok(is).status(404);
+    public static Result notFound(InputStream is) {
+        return new Result(is).status(NOT_FOUND);
     }
 
     /**
@@ -391,8 +392,8 @@ public class Responses {
      * @param bytes Byte array content.
      * @return response with not found (404) status and bytes content.
      */
-    public static Response notFound(byte[] bytes) {
-        return ok(bytes).status(404);
+    public static Result notFound(byte[] bytes) {
+        return new Result(bytes).status(NOT_FOUND);
     }
 
     /**
@@ -400,8 +401,8 @@ public class Responses {
      * @param s String content.
      * @return response with not found (404) status and string content.
      */
-    public static Response notFound(String s) {
-        return ok(s).status(404);
+    public static Result notFound(String s) {
+        return new Result(s).status(NOT_FOUND);
     }
 
     /**
@@ -410,8 +411,8 @@ public class Responses {
      * @return response with not found (404) status and file content.
      * @throws IOException
      */
-    public static Response notFound(File f) throws IOException {
-        return ok(f).status(404);
+    public static Result notFound(File f) throws IOException {
+        return new Result(f).status(NOT_FOUND);
     }
 
     /**
@@ -419,16 +420,16 @@ public class Responses {
      * @param json Json content.
      * @return response with not found (404) status and json content.
      */
-    public static Response notFound(JSONObject json) {
-        return ok(json).status(404);
+    public static Result notFound(JSONObject json) {
+        return new Result(json.toString()).status(NOT_FOUND);
     }
 
     /**
      *
      * @return response with unauthorized (401) status.
      */
-    public static Response unauthorized() {
-        return ok().status(401);
+    public static Result unauthorized() {
+        return new Result().status(UNAUTHORIZED);
     }
 
     /**
@@ -436,8 +437,8 @@ public class Responses {
      * @param is Input stream content.
      * @return response with unauthorized (401) status and input stream content.
      */
-    public static Response unauthorized(InputStream is) {
-        return ok(is).status(401);
+    public static Result unauthorized(InputStream is) {
+        return new Result(is).status(UNAUTHORIZED);
     }
 
     /**
@@ -445,8 +446,8 @@ public class Responses {
      * @param bytes Byte array content.
      * @return response with unauthorized (401) status and bytes content.
      */
-    public static Response unauthorized(byte[] bytes) {
-        return ok(bytes).status(401);
+    public static Result unauthorized(byte[] bytes) {
+        return new Result(bytes).status(UNAUTHORIZED);
     }
 
     /**
@@ -454,8 +455,8 @@ public class Responses {
      * @param s String content.
      * @return response with unauthorized (401) status and string content.
      */
-    public static Response unauthorized(String s) {
-        return ok(s).status(401);
+    public static Result unauthorized(String s) {
+        return new Result(s).status(UNAUTHORIZED);
     }
 
     /**
@@ -464,8 +465,8 @@ public class Responses {
      * @return response with unauthorized (401) status and file content.
      * @throws IOException
      */
-    public static Response unauthorized(File f) throws IOException {
-        return ok(f).status(401);
+    public static Result unauthorized(File f) throws IOException {
+        return new Result(f).status(UNAUTHORIZED);
     }
 
     /**
@@ -473,7 +474,7 @@ public class Responses {
      * @param json Json content.
      * @return response with unauthorized (401) status and json content.
      */
-    public static Response unauthorized(JSONObject json) {
-        return ok(json).status(401);
+    public static Result unauthorized(JSONObject json) {
+        return new Result(json.toString()).status(UNAUTHORIZED);
     }
 }

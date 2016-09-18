@@ -18,27 +18,30 @@ import com.bunjlabs.fuga.dependency.Inject;
 import com.bunjlabs.fuga.foundation.Context;
 import com.bunjlabs.fuga.foundation.Request;
 import com.bunjlabs.fuga.foundation.Response;
+import com.bunjlabs.fuga.router.Router;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class DefaultRequestHandler implements RequestHandler {
 
-    private final Logger log = LogManager.getLogger(DefaultRequestHandler.class);
+    private final Logger log = LogManager.getLogger(this);
 
     private final FugaApp app;
+    private final Router router;
 
     @Inject
-    public DefaultRequestHandler(FugaApp app) {
+    public DefaultRequestHandler(FugaApp app, Router router) {
         this.app = app;
+        this.router = router;
     }
 
     @Override
     public Response onRequest(Request request) {
-        Context ctx = new Context(request, app);
+        Context ctx = new Context(app, request, new Response());
 
-        log.debug("Access from {}: {}{}", request.getRemoteAddress(), request.getHost(), request.getUri());
+        log.debug("Access from {}: {}{}", request.remoteAddress(), request.host(), request.uri());
 
-        return app.getRouter().forward(ctx);
+        return router.forward(ctx);
     }
 
 }

@@ -11,28 +11,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bunjlabs.fuga.examples.helloworld;
+package com.bunjlabs.fuga.examples.i18n;
 
 import com.bunjlabs.fuga.FugaApp;
+import static com.bunjlabs.fuga.FugaApp.launch;
 import com.bunjlabs.fuga.dependency.InjectException;
-import com.bunjlabs.fuga.examples.helloworld.services.ExampleService;
 import com.bunjlabs.fuga.templates.TemplateViewRenderer;
-import java.util.concurrent.TimeUnit;
 
-public class FugaExampleApp extends FugaApp {
+public class I18nExampleApp extends FugaApp {
 
     @Override
     public void prepare() throws InjectException {
-        getRouter().load("example.froutes");
-
-        getDependencyManager().register(ExampleDependency.class);
-
-        getServiceManager().register(ExampleService.class, 5, TimeUnit.SECONDS);
+        getRouter().load("i18n.froutes");
+        getConfiguration().load("i18nexample.properties");
 
         setViewRenderer(TemplateViewRenderer.class);
     }
 
     public static void main(String[] args) throws Exception {
-        launch(FugaExampleApp.class);
+        launch(I18nExampleApp.class);
     }
 }

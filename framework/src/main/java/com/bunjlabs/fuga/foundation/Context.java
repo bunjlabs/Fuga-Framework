@@ -13,30 +13,40 @@
  */
 package com.bunjlabs.fuga.foundation;
 
+import com.bunjlabs.fuga.i18n.Messages;
 import com.bunjlabs.fuga.FugaApp;
 import com.bunjlabs.fuga.sessions.Session;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 public class Context {
 
-    private final Request request;
     private final FugaApp app;
-    private final Map<String, Object> data;
+    private final Request request;
+    private final Response response;
+    private final Map<String, Object> attributes;
     private Session session;
+    private String lang;
+    private final Urls urls;
+    private final Forms forms;
 
     /**
      * Create new context for the current request and application.
      *
-     * @param request Client request.
      * @param app Fuga application.
+     * @param request Client request.
+     * @param response Server response.
      */
-    public Context(Request request, FugaApp app) {
-        this.request = request;
+    public Context(FugaApp app, Request request, Response response) {
         this.app = app;
-        data = new HashMap<>();
+        this.request = request;
+        this.response = response;
+        this.attributes = new HashMap<>();
+        this.urls = new Urls(this);
+        this.forms = new Forms(this);
     }
 
     /**
@@ -44,8 +54,17 @@ public class Context {
      *
      * @return the current request.
      */
-    public Request getRequest() {
+    public Request request() {
         return request;
+    }
+
+    /**
+     * Returns the current response.
+     *
+     * @return the current response.
+     */
+    public Response response() {
+        return response;
     }
 
     /**
@@ -53,16 +72,16 @@ public class Context {
      *
      * @return current fuga application.
      */
-    public FugaApp getApp() {
+    public FugaApp app() {
         return app;
     }
 
     /**
-     * Return the session for current request.
+     * Returns the session for current request.
      *
      * @return the session for current request.
      */
-    public Session getSession() {
+    public Session session() {
         if (session == null) {
             session = app.getSessionManager().getSession(this);
         }
@@ -70,26 +89,77 @@ public class Context {
     }
 
     /**
-     * Return language code for the current request.
+     * Returns language code for the current context.
      *
-     * At first this method check client language cookie. If no language cookie
+     * At first this method check request language cookie. If no language cookie
      * exists it will extract prefered language from Accept-Language http header
-     * and save this value in client cookie.
+     * and save this value in request cookie.
      *
-     * @return language code for the current request.
+     * @return language code for the current context.
      */
-    public String getLang() {
-        List<Locale> requestAcceptLocales = request.getAcceptLocales();
+    public String lang() {
+        if (lang != null && !lang.isEmpty()) {
+            return lang;
+        }
+
+        Optional<Cookie> flcCookie = request.cookie(app.getConfiguration().get("fuga.i18n.cookie"));
+
+        if (flcCookie.isPresent() && !flcCookie.get().value().isEmpty()) {
+            return flcCookie.get().value();
+        }
+
+        List<Locale> requestAcceptLocales = request.acceptLocales();
 
         if (requestAcceptLocales.isEmpty()) {
             return app.getConfiguration().get("fuga.i18n.default");
         }
 
-        return requestAcceptLocales.get(0).getLanguage();
+        String language = requestAcceptLocales.get(0).getLanguage();
+
+        lang(language);
+
+        return language;
     }
 
     /**
-     * Return custom context attribute.
+     * Rewrite user language by setting locale cookie.
+     *
+     * @param lang language code
+     */
+    public void lang(String lang) {
+        this.lang = lang;
+        response.cookie(new Cookie(app.getConfiguration().get("fuga.i18n.cookie"), lang).path("/"));
+    }
+
+    /**
+     * Returns instance of Messages class for the current context.
+     *
+     * @return instance of Messages class for the current context.
+     */
+    public Messages msg() {
+        return app.getMessagesManager().getMessages(this);
+    }
+
+    /**
+     * Returns instance of Urls class for the current context.
+     *
+     * @return instance of Urls class for the current context.
+     */
+    public Urls urls() {
+        return urls;
+    }
+
+    /**
+     * Returns instance of Forms class for the current context.
+     *
+     * @return instance of Forms class for the current context.
+     */
+    public Forms forms() {
+        return forms;
+    }
+
+    /**
+     * Returns custom context attribute.
      *
      * Custom context attributes can be set by using
      * {@link #put(String, Object) put} method.
@@ -100,11 +170,11 @@ public class Context {
      * @return custom context attribute.
      */
     public <T> T get(String name, Class<T> type) {
-        return (T) data.get(name);
+        return (T) attributes.get(name);
     }
 
     /**
-     * Return custom context attribute.
+     * Returns custom context attribute.
      *
      * Custom context attributes can be set by using
      * {@link #put(String, Object) put} method.
@@ -114,7 +184,7 @@ public class Context {
      * @return Custom context attribute.
      */
     public <T> T get(String name) {
-        return (T) data.get(name);
+        return (T) attributes.get(name);
     }
 
     /**
@@ -124,6 +194,6 @@ public class Context {
      * @param value Value of the context attribute.
      */
     public void put(String name, Object value) {
-        data.put(name, value);
+        attributes.put(name, value);
     }
 }

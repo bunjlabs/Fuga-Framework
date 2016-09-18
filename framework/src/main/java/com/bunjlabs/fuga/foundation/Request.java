@@ -13,10 +13,14 @@
  */
 package com.bunjlabs.fuga.foundation;
 
+import com.bunjlabs.fuga.foundation.content.Content;
+import com.bunjlabs.fuga.foundation.http.RequestMethod;
 import java.net.SocketAddress;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 public class Request {
 
@@ -27,8 +31,7 @@ public class Request {
     private final SocketAddress remoteAddress;
     private final boolean isSecure;
     private final Map<String, List<String>> query;
-    private final Map<String, List<Cookie>> cookiesDownload;
-    private final Map<String, Cookie> cookiesUpload;
+    private final Collection<Cookie> cookies;
     private final Content content;
     private final List<Locale> acceptLocales;
 
@@ -44,8 +47,7 @@ public class Request {
         private SocketAddress remoteAddress;
         private boolean isSecure;
         private Map<String, List<String>> query;
-        private Map<String, List<Cookie>> cookiesDownload;
-        private Map<String, Cookie> cookiesUpload;
+        private Collection<Cookie> cookies;
         private Content content;
         private List<Locale> acceptLocales;
 
@@ -84,13 +86,8 @@ public class Request {
             return this;
         }
 
-        public Builder cookiesDownload(Map<String, List<Cookie>> cookiesDownload) {
-            this.cookiesDownload = cookiesDownload;
-            return this;
-        }
-
-        public Builder cookiesUpload(Map<String, Cookie> cookiesUpload) {
-            this.cookiesUpload = cookiesUpload;
+        public Builder cookies(Collection<Cookie> cookies) {
+            this.cookies = cookies;
             return this;
         }
 
@@ -117,8 +114,7 @@ public class Request {
         this.remoteAddress = builder.remoteAddress;
         this.isSecure = builder.isSecure;
         this.query = builder.query;
-        this.cookiesDownload = builder.cookiesDownload;
-        this.cookiesUpload = builder.cookiesUpload;
+        this.cookies = builder.cookies;
         this.content = builder.content;
         this.acceptLocales = builder.acceptLocales;
     }
@@ -128,7 +124,7 @@ public class Request {
      *
      * @return request method.
      */
-    public RequestMethod getRequestMethod() {
+    public RequestMethod requestMethod() {
         return requestMethod;
     }
 
@@ -137,8 +133,18 @@ public class Request {
      *
      * @return host.
      */
-    public String getHost() {
+    public String host() {
         return headers.get("Host");
+    }
+
+    /**
+     * Returns HTTP header value by it's name.
+     *
+     * @param name Header name.
+     * @return header value.
+     */
+    public String header(String name) {
+        return headers.get(name);
     }
 
     /**
@@ -146,25 +152,25 @@ public class Request {
      *
      * @return map of http client headers.
      */
-    public Map<String, String> getHeaders() {
+    public Map<String, String> headers() {
         return headers;
     }
 
     /**
-     * Returns the URI.
+     * Returns the request URI, containing both path and query string.
      *
      * @return the URI.
      */
-    public String getUri() {
+    public String uri() {
         return uri;
     }
 
     /**
-     * Returns path.
+     * Returns path from uri.
      *
-     * @return path.
+     * @return path from uri.
      */
-    public String getPath() {
+    public String path() {
         return path;
     }
 
@@ -173,7 +179,7 @@ public class Request {
      *
      * @return remote socket address.
      */
-    public SocketAddress getRemoteAddress() {
+    public SocketAddress remoteAddress() {
         return remoteAddress;
     }
 
@@ -191,7 +197,7 @@ public class Request {
      *
      * @return map of get query parameters.
      */
-    public Map<String, List<String>> getQuery() {
+    public Map<String, List<String>> query() {
         return query;
     }
 
@@ -203,14 +209,8 @@ public class Request {
      * @param name Cookie name.
      * @return request cookie by given cookie name or null.
      */
-    public Cookie getCookie(String name) {
-        List<Cookie> cookies = cookiesDownload.get(name);
-
-        if (cookies == null) {
-            return null;
-        }
-
-        return cookies.get(0);
+    public Optional<Cookie> cookie(String name) {
+        return cookies.stream().filter(x -> x.name().equals(name)).findFirst();
     }
 
     /**
@@ -218,26 +218,8 @@ public class Request {
      *
      * @return map of request cookies.
      */
-    public Map<String, List<Cookie>> getCookiesDownload() {
-        return cookiesDownload;
-    }
-
-    /**
-     * Returns map of response cookies.
-     *
-     * @return map of response cookies.
-     */
-    public Map<String, Cookie> getCookiesUpload() {
-        return cookiesUpload;
-    }
-
-    /**
-     * Set cookie for the current request.
-     *
-     * @param cookie Cookie.
-     */
-    public void setCookie(Cookie cookie) {
-        this.cookiesUpload.put(cookie.getName(), cookie);
+    public Collection<Cookie> cookies() {
+        return cookies;
     }
 
     /**
@@ -245,7 +227,7 @@ public class Request {
      *
      * @return request content.
      */
-    public Content getContent() {
+    public Content content() {
         return content;
     }
 
@@ -256,7 +238,7 @@ public class Request {
      *
      * @return list of acceptable locales by current request.
      */
-    public List<Locale> getAcceptLocales() {
+    public List<Locale> acceptLocales() {
         return acceptLocales;
     }
 }

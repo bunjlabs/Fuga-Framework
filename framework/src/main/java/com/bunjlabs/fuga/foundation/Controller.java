@@ -17,7 +17,7 @@ import com.bunjlabs.fuga.dependency.InjectException;
 import com.bunjlabs.fuga.views.ViewException;
 import java.lang.reflect.InvocationTargetException;
 
-public abstract class Controller extends Responses {
+public abstract class Controller extends Results {
 
     /**
      * Context for the current request and application.
@@ -25,23 +25,13 @@ public abstract class Controller extends Responses {
     protected Context ctx;
 
     /**
-     * Urls class instance for the current request and application.
-     */
-    protected Urls urls;
-
-    /**
-     * Forms class instance for the current request and application.
-     */
-    protected Forms forms;
-
-    /**
      * Helper method that indicate that controller action returns nothing and
      * give controls to next action in routes map.
      *
      * @return null value.
      */
-    protected final static Response proceed() {
-        return null;
+    protected final static Result proceed() {
+        return new Result().status(-1);
     }
 
     /**
@@ -52,7 +42,7 @@ public abstract class Controller extends Responses {
      * @throws ViewException
      */
     protected final String view(String name) throws ViewException {
-        return ctx.getApp().getViewRenderer().renderToString(name, ctx);
+        return ctx.app().getViewRenderer().renderToString(name, ctx);
     }
 
     /**
@@ -61,10 +51,9 @@ public abstract class Controller extends Responses {
     public static final class Builder {
 
         public static Controller build(Class<? extends Controller> controller, Context ctxb) throws NoSuchMethodException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, InjectException {
-            Controller c = ctxb.getApp().getDependencyManager().inject(controller);
+            Controller c = ctxb.app().getDependencyManager().inject(controller);
+
             c.ctx = ctxb;
-            c.urls = new Urls(ctxb);
-            c.forms = new Forms(ctxb);
 
             return c;
         }

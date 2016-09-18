@@ -45,7 +45,7 @@ public class Cookie {
      *
      * @return cookie name.
      */
-    public String getName() {
+    public String name() {
         return name;
     }
 
@@ -54,7 +54,7 @@ public class Cookie {
      *
      * @return cookie value.
      */
-    public String getValue() {
+    public String value() {
         return value;
     }
 
@@ -62,9 +62,11 @@ public class Cookie {
      * Set cookie value.
      *
      * @param value Cookie value
+     * @return self
      */
-    public void setValue(String value) {
+    public Cookie value(String value) {
         this.value = value;
+        return this;
     }
 
     /**
@@ -72,7 +74,7 @@ public class Cookie {
      *
      * @return cookie wrap
      */
-    public boolean getWrap() {
+    public boolean wrap() {
         return wrap;
     }
 
@@ -80,9 +82,11 @@ public class Cookie {
      * Set cookie wrap.
      *
      * @param wrap Cookie wrap.
+     * @return self
      */
-    public void setWrap(boolean wrap) {
+    public Cookie wrap(boolean wrap) {
         this.wrap = wrap;
+        return this;
     }
 
     /**
@@ -90,7 +94,7 @@ public class Cookie {
      *
      * @return cookie domain.
      */
-    public String getDomain() {
+    public String domain() {
         return domain;
     }
 
@@ -98,9 +102,11 @@ public class Cookie {
      * Set cookie domain.
      *
      * @param domain Cookie domain.
+     * @return self
      */
-    public void setDomain(String domain) {
+    public Cookie domain(String domain) {
         this.domain = domain;
+        return this;
     }
 
     /**
@@ -108,7 +114,7 @@ public class Cookie {
      *
      * @return cookie path.
      */
-    public String getPath() {
+    public String path() {
         return path;
     }
 
@@ -116,9 +122,11 @@ public class Cookie {
      * Set cookie path.
      *
      * @param path Cookie path.
+     * @return self
      */
-    public void setPath(String path) {
-        this.path = domain;
+    public Cookie path(String path) {
+        this.path = path;
+        return this;
     }
 
     /**
@@ -126,7 +134,7 @@ public class Cookie {
      *
      * @return cookie max age.
      */
-    public long getMaxAge() {
+    public long maxAge() {
         return maxAge;
     }
 
@@ -134,9 +142,11 @@ public class Cookie {
      * Set cookie maximum age.
      *
      * @param maxAge Cookie maximum age.
+     * @return self
      */
-    public void setMaxAge(long maxAge) {
+    public Cookie maxAge(long maxAge) {
         this.maxAge = maxAge;
+        return this;
     }
 
     /**
@@ -152,9 +162,11 @@ public class Cookie {
      * Set cookie is secure
      *
      * @param secure Cookie is secure value
+     * @return self
      */
-    public void setSecure(boolean secure) {
+    public Cookie isSecure(boolean secure) {
         this.secure = secure;
+        return this;
     }
 
     /**
@@ -170,9 +182,11 @@ public class Cookie {
      * Set cookie is HTTP only.
      *
      * @param httpOnly Cookie is HTTP only value.
+     * @return self
      */
-    public void setHttpOnly(boolean httpOnly) {
+    public Cookie isHttpOnly(boolean httpOnly) {
         this.httpOnly = httpOnly;
+        return this;
     }
 
     @Override

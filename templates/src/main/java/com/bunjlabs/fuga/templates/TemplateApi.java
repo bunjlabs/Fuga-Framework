@@ -14,23 +14,16 @@
 package com.bunjlabs.fuga.templates;
 
 import com.bunjlabs.fuga.foundation.Context;
-import com.bunjlabs.fuga.foundation.Forms;
-import com.bunjlabs.fuga.foundation.Urls;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 public class TemplateApi {
 
-    private final Context ctx;
-
-    public final Urls urls;
-    public final Forms forms;
+    public final Context ctx;
 
     public TemplateApi(Context ctx) {
         this.ctx = ctx;
-        this.urls = new Urls(ctx);
-        this.forms = new Forms(ctx);
     }
 
     public byte[] bytes(Object... args) {

@@ -38,7 +38,7 @@ public class Forms {
      */
     public String generateFormId(String formName) {
         String fid = UUID.randomUUID().toString();
-        ctx.getSession().put(FORM_ID_PREFIX + formName, fid);
+        ctx.session().put(FORM_ID_PREFIX + formName, fid);
         return fid;
     }
 
@@ -50,11 +50,11 @@ public class Forms {
      * @return true if given form id is matched with one in current context.
      */
     public boolean testFormId(String formName, String fid) {
-        Object lastfid = ctx.getSession().get(FORM_ID_PREFIX + formName);
+        Object lastfid = ctx.session().get(FORM_ID_PREFIX + formName);
         if (lastfid == null) {
             return false;
         }
-        ctx.getSession().remove(FORM_ID_PREFIX + formName);
+        ctx.session().remove(FORM_ID_PREFIX + formName);
         return fid.equals((String) lastfid);
     }
 }

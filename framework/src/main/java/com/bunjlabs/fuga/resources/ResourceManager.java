@@ -31,7 +31,7 @@ public final class ResourceManager {
      * @return input stream of resource or null.
      * @throws FileNotFoundException
      */
-    protected InputStream loadFromResources(String... path) throws FileNotFoundException {
+    protected InputStream loadFromClasspath(String... path) throws FileNotFoundException {
         String name = String.join(File.separator, path);
 
         if (name == null || name.isEmpty()) {
@@ -68,14 +68,14 @@ public final class ResourceManager {
 
         InputStream is;
 
-        String resourcePathStr = "."
+        String resourcePathStr = "./"
                 + APP_DIR
                 + (name.startsWith("/") ? name : (File.separator + name));
 
         try {
             is = new FileInputStream(resourcePathStr);
         } catch (FileNotFoundException ex) {
-            return loadFromResources(name);
+            return loadFromClasspath(name);
         }
 
         return is;

@@ -11,15 +11,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.bunjlabs.fuga.foundation.content;
+package com.bunjlabs.fuga.examples.i18n;
 
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import com.bunjlabs.fuga.foundation.Controller;
+import com.bunjlabs.fuga.foundation.Result;
+import com.bunjlabs.fuga.views.ViewException;
 
-public abstract class BaseContent implements Content {
+public class I18nExampleController extends Controller {
 
-    @Override
-    public JSONObject asJson() {
-        return new JSONObject(new JSONTokener(this.asInputStream()));
+    public Result language() {
+        String langCode = ctx.lang();
+
+        return redirect(ctx.urls().that(langCode));
+    }
+
+    public Result language(String langCode) {
+        ctx.lang(langCode);
+        return proceed();
+    }
+
+    public Result index() throws ViewException {
+        return ok(view("i18n.html"));
     }
 }

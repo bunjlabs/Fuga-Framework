@@ -17,7 +17,7 @@ import com.bunjlabs.fuga.FugaApp;
 import com.bunjlabs.fuga.foundation.content.BufferedContent;
 import com.bunjlabs.fuga.foundation.Cookie;
 import com.bunjlabs.fuga.foundation.Request;
-import com.bunjlabs.fuga.foundation.RequestMethod;
+import com.bunjlabs.fuga.foundation.http.RequestMethod;
 import com.bunjlabs.fuga.foundation.Response;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -60,6 +60,7 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
     private final Logger log = LogManager.getLogger(NettyHttpServerHandler.class);
     private final FugaApp app;
     private final String serverVersion;
+
     private final int forwarded;
     private ByteBuf contentBuffer;
     private HttpRequest httprequest;
@@ -89,8 +90,7 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
             requestBuilder = new Request.Builder();
 
             requestBuilder.requestMethod(RequestMethod.valueOf(httprequest.method().name()))
-                    .uri(httprequest.uri())
-                    .cookiesUpload(new HashMap<>());
+                    .uri(httprequest.uri());
 
             try {
 
@@ -99,20 +99,16 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                 requestBuilder.path(queryStringDecoder.path()).query(queryStringDecoder.parameters());
 
                 // Process cookies
-                Map<String, List<Cookie>> cookiesDownload = new HashMap<>();
+                List<Cookie> cookies = new ArrayList<>();
 
                 String cookieString = httprequest.headers().get(HttpHeaderNames.COOKIE);
                 if (cookieString != null) {
                     ServerCookieDecoder.STRICT.decode(cookieString).stream().forEach((cookie) -> {
-                        if (cookiesDownload.containsKey(cookie.name())) {
-                            cookiesDownload.get(cookie.name()).add(NettyCookieConverter.convertToFuga(cookie));
-                        } else {
-                            cookiesDownload.put(cookie.name(), new ArrayList<>(NettyCookieConverter.convertListToFuga(cookie)));
-                        }
+                        cookies.add(NettyCookieConverter.convertToFuga(cookie));
                     });
                 }
 
-                requestBuilder.cookiesDownload(cookiesDownload);
+                requestBuilder.cookies(cookies);
 
                 // Process headers
                 Map<String, String> headers = new HashMap<>();
@@ -230,29 +226,32 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
     private void writeResponse(ChannelHandlerContext ctx, Request request, Response response) {
         HttpResponse httpresponse = new DefaultHttpResponse(
                 HttpVersion.HTTP_1_1,
-                HttpResponseStatus.valueOf(response.getStatus()));
+                HttpResponseStatus.valueOf(response.status()));
 
         httpresponse.headers().set(HttpHeaderNames.TRANSFER_ENCODING, HttpHeaderValues.CHUNKED);
-        httpresponse.headers().set(HttpHeaderNames.CONTENT_TYPE, response.getContentType());
+        httpresponse.headers().set(HttpHeaderNames.CONTENT_TYPE, response.contentType());
 
         // Disable cache by default
         httpresponse.headers().set(HttpHeaderNames.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
         httpresponse.headers().set(HttpHeaderNames.PRAGMA, "no-cache");
         httpresponse.headers().set(HttpHeaderNames.EXPIRES, "0");
 
-        response.getHeaders().entrySet().stream().forEach((e)
+        response.headers().entrySet().stream().forEach((e)
                 -> httpresponse.headers().set(e.getKey(), e.getValue())
         );
 
         httpresponse.headers().set(HttpHeaderNames.SERVER, "Fuga Netty Web Server/" + serverVersion);
 
         // Set cookies
-        List<Cookie> cookiesUpload = new ArrayList<>();
-        cookiesUpload.addAll(request.getCookiesUpload().values());
-        httpresponse.headers().set(HttpHeaderNames.SET_COOKIE, ServerCookieEncoder.STRICT.encode(NettyCookieConverter.convertListToNetty(cookiesUpload)));
+        httpresponse.headers().set(
+                HttpHeaderNames.SET_COOKIE,
+                ServerCookieEncoder.STRICT.encode(
+                        NettyCookieConverter.convertListToNetty(response.cookies())
+                )
+        );
 
-        if (response.getContentLength() >= 0) {
-            httpresponse.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.getContentLength());
+        if (response.length() >= 0) {
+            httpresponse.headers().set(HttpHeaderNames.CONTENT_LENGTH, response.length());
         }
 
         if (HttpUtil.isKeepAlive(httprequest)) {
@@ -263,8 +262,8 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
 
         ctx.write(httpresponse);
 
-        if (response.getStream() != null) {
-            ctx.write(new HttpChunkedInput(new ChunkedStream(response.getStream())));
+        if (response.stream() != null) {
+            ctx.write(new HttpChunkedInput(new ChunkedStream(response.stream())));
         }
 
         LastHttpContent fs = new DefaultLastHttpContent();

@@ -16,7 +16,7 @@ package com.bunjlabs.fuga.foundation.controllers;
 import com.bunjlabs.fuga.configuration.Configuration;
 import com.bunjlabs.fuga.dependency.Inject;
 import com.bunjlabs.fuga.foundation.Controller;
-import com.bunjlabs.fuga.foundation.Response;
+import com.bunjlabs.fuga.foundation.Result;
 import com.bunjlabs.fuga.resources.ResourceManager;
 import com.bunjlabs.fuga.resources.ResourceRepresenter;
 import com.bunjlabs.fuga.views.ViewException;
@@ -31,18 +31,18 @@ public class DefaultController extends Controller {
     @Inject
     public DefaultController(Configuration conf, ResourceManager resourceManager) {
         this.conf = conf;
-        this.resourceRepresenter = resourceManager.getResourceRepresenter(conf.get("fuga.dirs.assets"));
+        this.resourceRepresenter = resourceManager.getResourceRepresenter("assets");
     }
 
-    public Response generateNotFound() {
+    public Result generateNotFound() {
         return notFound();
     }
 
-    public Response generateSeeOther(String url) {
-        return seeOther(urls.that(url));
+    public Result generateSeeOther(String url) {
+        return seeOther(ctx.urls().that(url));
     }
 
-    public Response generateAsset(String path) {
+    public Result generateAsset(String path) {
         InputStream asset;
         try {
             asset = resourceRepresenter.load(path);
@@ -55,11 +55,11 @@ public class DefaultController extends Controller {
         return ok(asset).as(mime);
     }
 
-    public Response generateView(String name) throws ViewException {
+    public Result generateView(String name) throws ViewException {
         return ok(view(name));
     }
 
-    public Response generateOk(String data) {
+    public Result generateOk(String data) {
 
         return ok(data);
     }
