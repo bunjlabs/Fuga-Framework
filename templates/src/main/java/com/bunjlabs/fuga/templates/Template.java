@@ -77,6 +77,11 @@ public class Template {
 
         for (Map.Entry<String, String> e : blocks.entrySet()) {
             jsCode.append(templateClassName).append(".prototype.block_").append(e.getKey()).append("=function(ctx,api){");
+            if (extendClassName.length() > 0) {
+                jsCode.append("try{");
+                jsCode.append(extendClassName).append(".prototype.block_").append(e.getKey()).append(".call(this,ctx,api);");
+                jsCode.append("}catch(e){};");
+            }
             jsCode.append(e.getValue());
             jsCode.append("};");
         }
