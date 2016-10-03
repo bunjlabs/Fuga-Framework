@@ -147,6 +147,11 @@ public class Router {
                 continue;
             }
 
+            if (ext.getHost() != null
+                    && !ext.getHost().matcher(ctx.request().host()).matches()) {
+                continue;
+            }
+
             Matcher m;
             boolean accumulate = false;
             if (ext.getPattern() == null) {

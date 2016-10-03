@@ -27,6 +27,7 @@ public class Tokenizer {
     protected static final int TK_NOTHING = -4;
     protected static final int TK_USE = -10;
     protected static final int TK_INCLUDE = -11;
+    protected static final int TK_HOST = -12;
     protected static final int TK_METHOD = -20;
     protected static final int TK_PATTERN = -21;
     protected static final int TK_WORD = -22;
@@ -189,6 +190,8 @@ public class Tokenizer {
             return TK_USE;
         } else if (sval.equals("include")) {
             return TK_INCLUDE;
+        } else if (sval.equals("host")) {
+            return TK_HOST;
         } else {
             return TK_WORD;
         }

@@ -68,7 +68,7 @@ public class RouteMapLoader {
         String type = "String";
 
         if (t.ttype != TK_INTEGER && t.ttype != TK_STRCONST) {
-            throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
+            throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : t.sval));
         }
 
         boolean isConst = t.ttype == TK_STRCONST;
@@ -79,7 +79,7 @@ public class RouteMapLoader {
         if (t.ttype == ':') {
             t.next();
             if (t.ttype != TK_WORD) {
-                throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
+                throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : t.sval));
             }
             type = t.sval;
             t.next();
@@ -95,7 +95,7 @@ public class RouteMapLoader {
         String classMethodFull = t.sval;
         t.next();
         if (t.ttype != '(') {
-            throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
+            throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : t.sval));
         }
         t.next();
 
@@ -169,6 +169,7 @@ public class RouteMapLoader {
     private Extension extension() throws RoutesMapLoadException, RoutesMapSyntaxException {
         Set<RequestMethod> methods = EnumSet.noneOf(RequestMethod.class);
         Pattern pattern = null;
+        Pattern host = null;
         boolean patternAccumulator = false;
 
         for (;;) {
@@ -184,13 +185,20 @@ public class RouteMapLoader {
                 }
 
                 t.next();
+            } else if (t.ttype == TK_HOST) {
+                t.next();
+                if (t.ttype != TK_PATTERN) {
+                    throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : t.sval));
+                }
+                host = Pattern.compile(t.sval);
+                t.next();
             } else if (t.ttype == '{') {
                 t.next();
-                return new Extension(methods, pattern, patternAccumulator, extensionList());
+                return new Extension(methods, pattern, host, patternAccumulator, extensionList());
             } else if (t.ttype == TK_WORD) {
-                return new Extension(methods, pattern, patternAccumulator, route());
+                return new Extension(methods, pattern, host, patternAccumulator, route());
             } else {
-                throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
+                throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : t.sval));
             }
         }
     }
@@ -202,7 +210,7 @@ public class RouteMapLoader {
                 case TK_USE: {
                     t.next();
                     if (t.ttype != TK_WORD) {
-                        throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
+                        throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : t.sval));
                     }
                     uses.add(t.sval);
                     t.next();
@@ -211,7 +219,7 @@ public class RouteMapLoader {
                 case TK_INCLUDE: {
                     t.next();
                     if (t.ttype != TK_STRCONST) {
-                        throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
+                        throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : t.sval));
                     }
 
                     try {
@@ -227,6 +235,7 @@ public class RouteMapLoader {
                 case TK_METHOD:
                 case TK_PATTERN:
                 case TK_WORD:
+                case TK_HOST:
                 case '{': {
                     list.add(extension());
                     break;
@@ -236,7 +245,7 @@ public class RouteMapLoader {
                     return list;
                 }
                 default: {
-                    throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : ' '));
+                    throw new RoutesMapSyntaxException(t, "Unexpected token: " + (t.ttype >= 0 ? (char) t.ttype : t.sval));
                 }
             }
         }

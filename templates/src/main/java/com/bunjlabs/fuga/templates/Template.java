@@ -172,7 +172,7 @@ public class Template {
         jsCode.append("var nltobr = function() { return api.nltobr(Array.prototype.slice.call(arguments, 0)); };");
         jsCode.append("var format = function() { return api.format(Array.prototype.slice.call(arguments, 0)); };");
 
-        jsCode.append("var msg = function() { return api.ctx.msg().get(Array.prototype.slice.call(arguments, 0)); };");
+        jsCode.append("var msg = function(key) { return api.ctx.msg().get(key, Array.prototype.slice.call(arguments, 1)); };");
     }
 
     private static String escapeSpaces(String input) {

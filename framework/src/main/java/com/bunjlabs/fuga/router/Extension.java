@@ -22,27 +22,31 @@ public class Extension {
 
     private final Set<RequestMethod> requestMethods;
     private final Pattern pattern;
+    private final Pattern host;
     private final boolean patternAccumulator;
 
     private List<Extension> nodes = null;
     private Route route = null;
 
-    Extension(Set<RequestMethod> requestMethods, Pattern pattern, boolean patternAccumulator) {
+    Extension(Set<RequestMethod> requestMethods, Pattern pattern, Pattern host, boolean patternAccumulator) {
         this.requestMethods = requestMethods;
         this.pattern = pattern;
+        this.host = host;
         this.patternAccumulator = patternAccumulator;
     }
 
-    Extension(Set<RequestMethod> requestMethods, Pattern pattern, boolean patternAccumulator, List<Extension> nodes) {
+    Extension(Set<RequestMethod> requestMethods, Pattern pattern, Pattern host, boolean patternAccumulator, List<Extension> nodes) {
         this.requestMethods = requestMethods;
         this.pattern = pattern;
+        this.host = host;
         this.patternAccumulator = patternAccumulator;
         this.nodes = nodes;
     }
 
-    Extension(Set<RequestMethod> requestMethods, Pattern pattern, boolean patternAccumulator, Route route) {
+    Extension(Set<RequestMethod> requestMethods, Pattern pattern, Pattern host, boolean patternAccumulator, Route route) {
         this.requestMethods = requestMethods;
         this.pattern = pattern;
+        this.host = host;
         this.patternAccumulator = patternAccumulator;
         this.route = route;
     }
@@ -65,5 +69,9 @@ public class Extension {
 
     public boolean isPatternAccumulator() {
         return patternAccumulator;
+    }
+
+    public Pattern getHost() {
+        return host;
     }
 }
