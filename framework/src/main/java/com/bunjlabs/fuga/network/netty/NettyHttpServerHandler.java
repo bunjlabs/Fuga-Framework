@@ -232,7 +232,7 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
         httpresponse.headers().set(HttpHeaderNames.CONTENT_TYPE, response.contentType());
 
         // Disable cache by default
-        httpresponse.headers().set(HttpHeaderNames.CACHE_CONTROL, "no-cache, no-store, must-revalidate");
+        httpresponse.headers().set(HttpHeaderNames.CACHE_CONTROL, "no-cache, no-store, must-revalidate, max-age=0");
         httpresponse.headers().set(HttpHeaderNames.PRAGMA, "no-cache");
         httpresponse.headers().set(HttpHeaderNames.EXPIRES, "0");
 

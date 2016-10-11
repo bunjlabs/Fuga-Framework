@@ -25,11 +25,13 @@ public class Messages {
     }
 
     public String get(String name) {
-        return messages.get(name);
+        String msg = messages.get(name);
+        return msg == null ? name : msg;
     }
 
     public String get(String name, Object... args) {
-        return MessageFormat.format(messages.get(name), args);
+        String msg = messages.get(name);
+        return msg == null ? name : MessageFormat.format(messages.get(name), args);
     }
 
 }
