@@ -69,8 +69,8 @@
             <url>https://maven.bunjlabs.com/releases</url>
         </repository>
         <snapshotRepository>
-            <id>bunjlabs.repo</id>
-            <name>Bunjlabs Maven Repository</name>
+            <id>bunjlabs.repo.snapshots</id>
+            <name>Bunjlabs Maven Snapshots Repository</name>
             <url>https://maven.bunjlabs.com/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
