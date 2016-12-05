@@ -20,7 +20,7 @@ import org.junit.Test;
 
 public class TemplateTest {
 
-    private FugaApp prepareTestApp() {
+    /*private FugaApp prepareTestApp() {
         FugaApp fa = new FugaApp() {
 
             @Override
@@ -93,5 +93,5 @@ public class TemplateTest {
         Assert.assertEquals("<##", vr.renderToString("test-09", null));
         Assert.assertEquals("##>", vr.renderToString("test-10", null));
     }
-
+    */
 }

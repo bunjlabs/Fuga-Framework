@@ -24,7 +24,12 @@ public class TemplateNotFoundException extends ViewException {
         super(msg);
     }
 
-    public TemplateNotFoundException(String msg, Throwable cause) {
-        super(msg, cause);
+    public TemplateNotFoundException(String message, Throwable cause) {
+        super(message, cause);
     }
+
+    public TemplateNotFoundException(Throwable cause) {
+        super(cause);
+    }
+
 }

@@ -1,0 +1,3 @@
+use com.bunjlabs.fuga.examples.template2
+
+Template2Controller.index()

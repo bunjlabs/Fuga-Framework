@@ -1,16 +1,3 @@
-/* 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.bunjlabs.fuga.templates;
 
 import com.bunjlabs.fuga.foundation.Context;
@@ -24,6 +11,56 @@ public class TemplateApi {
 
     public TemplateApi(Context ctx) {
         this.ctx = ctx;
+    }
+
+    public String that(Object... args) {
+        return ctx.urls().that(args);
+    }
+
+    public String asset(Object... args) {
+        return ctx.urls().asset(args);
+    }
+
+    public String urlencode(Object... args) {
+        return ctx.urls().urlencode(args);
+    }
+
+    public String generateFormId(Object... args) {
+        if (args.length < 1 || args[0] == null) {
+            return "";
+        }
+        return ctx.forms().generateFormId(args[0].toString());
+    }
+
+    public boolean testFormId(Object... args) {
+        if (args.length < 2 || args[0] == null || args[1] == null) {
+            return false;
+        }
+        return ctx.forms().testFormId(args[0].toString(), args[1].toString());
+    }
+
+    public String msg(Object... args) {
+        if (args.length == 0) {
+            return "";
+        }
+
+        if (args.length == 1) {
+            return args[0] != null ? ctx.msg().get(args[0].toString()) : "";
+        }
+
+        return ctx.msg().get(args[0].toString(), Arrays.copyOfRange(args, 1, args.length));
+    }
+
+    public String combine(Object... args) {
+        StringBuilder sb = new StringBuilder();
+
+        for (Object arg : args) {
+            if (arg != null) {
+                sb.append(arg);
+            }
+        }
+
+        return sb.toString();
     }
 
     public byte[] bytes(Object... args) {
@@ -72,5 +109,4 @@ public class TemplateApi {
 
         return String.format(args[0].toString(), Arrays.copyOfRange(args, 1, args.length));
     }
-
 }
