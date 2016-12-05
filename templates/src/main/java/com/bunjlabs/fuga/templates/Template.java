@@ -16,37 +16,43 @@ import javax.script.SimpleScriptContext;
 public class Template {
 
     private final Map<String, ScriptBlock> blocks = new HashMap<>();
+    private final Map<String, ScriptBlock> tags = new HashMap<>();
     private final List<ScriptBlock> codeblocks = new LinkedList<>();
 
     public Template() {
     }
 
-    public void render(Context ctx, PrintStream ps) throws TemplateRenderException {
-        ScriptContext context = new SimpleScriptContext();
-
+    public void render(Context context, PrintStream ps) throws TemplateRenderException {
+        ScriptContext scriptContext = new SimpleScriptContext();
         Bindings bindings = new SimpleBindings();
 
-        insertApi(ctx, bindings);
+        insertApi(context, bindings);
 
         bindings.put("block", (VariadicConsumer<Object>) (args) -> {
             if (args.length > 0 && args[0] != null) {
-                renderBlock(context, args[0].toString());
+                renderBlock(scriptContext, args[0].toString());
             }
         });
 
-        bindings.put("ctx", ctx);
+        bindings.put("tag", (VariadicConsumer<Object>) (args) -> {
+            if (args.length > 0 && args[0] != null) {
+                renderTag(scriptContext, args[0].toString(), args.length > 1 ? args[1] : null);
+            }
+        });
 
-        context.setWriter(new PrintWriter(ps));
-        context.setReader(null);
-        context.setErrorWriter(null);
-        context.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
+        bindings.put("ctx", context);
+
+        scriptContext.setWriter(new PrintWriter(ps));
+        scriptContext.setReader(null);
+        scriptContext.setErrorWriter(null);
+        scriptContext.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
 
         try {
             for (ScriptBlock sb : codeblocks) {
-                sb.getScript().eval(context);
+                sb.getScript().eval(scriptContext);
             }
 
-            renderBlock(context, "main");
+            renderBlock(scriptContext, "main");
         } catch (ScriptException ex) {
             throw new TemplateRenderException(ex);
         }
@@ -54,6 +60,7 @@ public class Template {
 
     protected void extend(Template extendable) {
         this.blocks.putAll(extendable.blocks);
+        this.tags.putAll(extendable.tags);
         this.codeblocks.addAll(extendable.codeblocks);
     }
 
@@ -65,6 +72,10 @@ public class Template {
         this.blocks.put(name, block);
     }
 
+    void addTag(String tagName, ScriptBlock compileBlock) {
+        this.tags.put(tagName, compileBlock);
+    }
+
     protected void addCodeBlock(ScriptBlock block) {
         this.codeblocks.add(block);
     }
@@ -72,11 +83,27 @@ public class Template {
     private void renderBlock(ScriptContext context, String blockName) throws ScriptException {
         ScriptBlock block = blocks.get(blockName);
 
-        if (block == null) {
-            return;
+        if (block != null) {
+            block.getScript().eval(context);
         }
+    }
 
-        block.getScript().eval(context);
+    private void renderTag(ScriptContext context, String TagName, Object args) throws ScriptException {
+        ScriptBlock tag = tags.get(TagName);
+        if (tag != null) {
+            Bindings oldBindings = context.getBindings(ScriptContext.ENGINE_SCOPE);
+            Bindings bindings = new SimpleBindings(oldBindings);
+
+            if (args != null) {
+                bindings.put("args", args);
+            }
+
+            context.setBindings(bindings, ScriptContext.ENGINE_SCOPE);
+
+            tag.getScript().eval(context);
+
+            context.setBindings(oldBindings, ScriptContext.ENGINE_SCOPE);
+        }
     }
 
     private void insertApi(Context ctx, Bindings bindings) {
@@ -94,4 +121,5 @@ public class Template {
         bindings.put("nltobr", (VariadicFunction<Object, Object>) api::nltobr);
         bindings.put("format", (VariadicFunction<Object, Object>) api::format);
     }
+
 }

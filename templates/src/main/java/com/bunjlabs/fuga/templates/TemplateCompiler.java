@@ -1,15 +1,12 @@
 package com.bunjlabs.fuga.templates;
 
 import com.bunjlabs.fuga.resources.ResourceRepresenter;
-import com.bunjlabs.fuga.templates.TemplateNotFoundException;
 import com.bunjlabs.fuga.templates.TemplateReader.Token;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.script.Compilable;
@@ -31,10 +28,12 @@ public class TemplateCompiler {
             + "|(\\<#([^\\n\\r]*?)#\\>)");
 
     private final ResourceRepresenter resourceRepresenter;
-    private final ScriptEngine engine = new NashornScriptEngineFactory().getScriptEngine();
+    private final ScriptEngine engine;
 
     public TemplateCompiler(ResourceRepresenter resourceRepresenter) {
         this.resourceRepresenter = resourceRepresenter;
+        this.engine = new NashornScriptEngineFactory()
+                .getScriptEngine("--print-no-newline");
     }
 
     public Template compile(String name) throws TemplateNotFoundException, TemplateCompileException {
@@ -47,42 +46,44 @@ public class TemplateCompiler {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
-        return compileTemplate(new TemplateReader(reader));
+        return compile(new TemplateReader(reader));
     }
 
-    private Template compileTemplate(TemplateReader input) throws TemplateNotFoundException, TemplateCompileException {
+    private Template compile(TemplateReader input) throws TemplateNotFoundException, TemplateCompileException {
         Template template = new Template();
 
         Token token;
-        try {
-            while ((token = input.next()).type != Token.EOS) {
-                if (token.type == Token.EXTENDS) {
-                    String extendName = token.args[0];
-                    if (extendName.length() > 0) {
-                        template.extend(compile(extendName));
-                    }
-                } else if (token.type == Token.USE) {
-                    String useName = token.args[0];
-                    if (useName.length() > 0) {
-                        template.use(compile(useName));
-                    }
-                } else if (token.type == Token.BLOCK) {
-                    String blockName = token.args[0];
-                    String blockSource = token.args[1];
-                    if (blockName.length() > 0 && blockSource.length() > 0) {
-                        template.addBlock(blockName, compileBlock(blockSource));
-                    }
-                } else if (token.type == Token.CODE) {
-                    String blockSource = token.args[0];
-                    if (blockSource.length() > 0) {
-                        template.addCodeBlock(compileCodeBlock(blockSource));
-                    }
-                } else {
-                    throw new TemplateCompileException("Unexpected keyword: " + token.type);
+        while ((token = input.next()).type != Token.EOS) {
+            if (token.type == Token.EXTENDS) {
+                String extendName = token.args[0];
+                if (extendName.length() > 0) {
+                    template.extend(compile(extendName));
                 }
+            } else if (token.type == Token.USE) {
+                String useName = token.args[0];
+                if (useName.length() > 0) {
+                    template.use(compile(useName));
+                }
+            } else if (token.type == Token.BLOCK) {
+                String blockName = token.args[0];
+                String blockSource = token.args[1];
+                if (blockName.length() > 0 && blockSource.length() > 0) {
+                    template.addBlock(blockName, compileBlock(blockSource));
+                }
+            } else if (token.type == Token.TAG) {
+                String tagName = token.args[0];
+                String tagSource = token.args[1];
+                if (tagName.length() > 0 && tagSource.length() > 0) {
+                    template.addTag(tagName, compileBlock(tagSource));
+                }
+            } else if (token.type == Token.CODE) {
+                String blockSource = token.args[0];
+                if (blockSource.length() > 0) {
+                    template.addCodeBlock(compileCodeBlock(blockSource));
+                }
+            } else {
+                throw new TemplateCompileException("Unexpected keyword: " + token.type);
             }
-        } catch (IOException ex) {
-            throw new TemplateCompileException("Unable to load template", ex);
         }
 
         return template;

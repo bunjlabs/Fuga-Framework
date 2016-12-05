@@ -1,4 +1,4 @@
-package com.bunjlabs.fuga.examples.template2;
+package com.bunjlabs.fuga.examples.template;
 
 import com.bunjlabs.fuga.FugaApp;
 import com.bunjlabs.fuga.templates.TemplateViewRenderer;
@@ -7,16 +7,17 @@ import com.bunjlabs.fuga.templates.TemplateViewRenderer;
  *
  * @author Artem Shurygin <artem.shurygin@bunjlabs.com>
  */
-public class Template2App extends FugaApp {
+public class TemplateApp extends FugaApp {
 
     @Override
     public void prepare() throws Exception {
-        getRouter().load("template2.froutes");
+        getRouter().loadFromString("view(\"template.html\")");
+        getConfiguration().set("fuga.templates.recompile", "true");
 
         setViewRenderer(TemplateViewRenderer.class);
     }
 
     public static void main(String[] args) throws Exception {
-        launch(Template2App.class);
+        launch(TemplateApp.class);
     }
 }
