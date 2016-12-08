@@ -65,9 +65,10 @@ public class TemplateCompiler {
                 }
             } else if (token.type == Token.BLOCK) {
                 String blockName = token.args[0];
-                String blockSource = token.args[1];
+                String blockAppend = token.args[1];
+                String blockSource = token.args[2];
                 if (blockName.length() > 0 && blockSource.length() > 0) {
-                    template.addBlock(blockName, compileBlock(blockSource));
+                    template.addBlock(blockName, compileBlock(blockSource), blockAppend.equals("append"));
                 }
             } else if (token.type == Token.TAG) {
                 String tagName = token.args[0];

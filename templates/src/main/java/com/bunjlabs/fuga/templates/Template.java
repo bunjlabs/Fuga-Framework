@@ -3,6 +3,7 @@ package com.bunjlabs.fuga.templates;
 import com.bunjlabs.fuga.foundation.Context;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,7 +16,7 @@ import javax.script.SimpleScriptContext;
 
 public class Template {
 
-    private final Map<String, ScriptBlock> blocks = new HashMap<>();
+    private final Map<String, List<ScriptBlock>> blocks = new HashMap<>();
     private final Map<String, ScriptBlock> tags = new HashMap<>();
     private final List<ScriptBlock> codeblocks = new LinkedList<>();
 
@@ -59,32 +60,40 @@ public class Template {
     }
 
     protected void extend(Template extendable) {
-        this.blocks.putAll(extendable.blocks);
-        this.tags.putAll(extendable.tags);
-        this.codeblocks.addAll(extendable.codeblocks);
+        blocks.putAll(extendable.blocks);
+        tags.putAll(extendable.tags);
+        codeblocks.addAll(extendable.codeblocks);
     }
 
     protected void use(Template extendable) {
         this.codeblocks.addAll(extendable.codeblocks);
     }
 
-    protected void addBlock(String name, ScriptBlock block) {
-        this.blocks.put(name, block);
+    protected void addBlock(String name, ScriptBlock block, boolean append) {
+        if (blocks.containsKey(name) && append) {
+            blocks.get(name).add(block);
+        } else {
+            List<ScriptBlock> list = new LinkedList<>();
+            list.add(block);
+            blocks.put(name, list);
+        }
     }
 
     void addTag(String tagName, ScriptBlock compileBlock) {
-        this.tags.put(tagName, compileBlock);
+        tags.put(tagName, compileBlock);
     }
 
     protected void addCodeBlock(ScriptBlock block) {
-        this.codeblocks.add(block);
+        codeblocks.add(block);
     }
 
     private void renderBlock(ScriptContext context, String blockName) throws ScriptException {
-        ScriptBlock block = blocks.get(blockName);
+        List<ScriptBlock> blockList = blocks.get(blockName);
 
-        if (block != null) {
-            block.getScript().eval(context);
+        if (blockList != null) {
+            for (ScriptBlock b : blockList) {
+                b.getScript().eval(context);
+            }
         }
     }
 

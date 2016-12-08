@@ -1,10 +1,12 @@
 package com.bunjlabs.fuga.templates;
 
+import com.bunjlabs.fuga.views.ViewException;
+
 /**
  *
  * @author Artem Shurygin <artem.shurygin@bunjlabs.com>
  */
-public class TemplateReaderException extends Exception {
+public class TemplateReaderException extends ViewException {
 
     public TemplateReaderException() {
     }
@@ -19,10 +21,6 @@ public class TemplateReaderException extends Exception {
 
     public TemplateReaderException(Throwable cause) {
         super(cause);
-    }
-
-    public TemplateReaderException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
     }
 
     public TemplateReaderException(String message, int line, int col) {

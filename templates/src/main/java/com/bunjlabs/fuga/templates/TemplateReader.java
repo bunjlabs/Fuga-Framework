@@ -83,12 +83,15 @@ public class TemplateReader {
 
         while (true) {
             while (cur >= 0 && cur != ',' && cur != ')') {
+                if(cur == '\n') {
+                    throw new TemplateReaderException("Unclosed argument list", linenomber, colnumber);
+                }
                 sb.append((char) cur);
                 read();
             }
 
             if (sb.length() > 0) {
-                args.add(sb.toString());
+                args.add(sb.toString().trim());
             }
 
             sb.setLength(0);
@@ -147,7 +150,7 @@ public class TemplateReader {
 
                     read();
 
-                    return token(Token.BLOCK, args.get(0), sb.toString());
+                    return token(Token.BLOCK, args.get(0), args.size() > 1 ? args.get(1) : "", sb.toString());
 
                 }
                 sb.append((char) cur);
