@@ -12,17 +12,20 @@ import java.util.List;
 public class TemplateReader {
 
     private final Reader reader;
-    private int ch;
+    private int cur;
+
+    private int linenomber = 1;
+    private int colnumber = 1;
 
     public TemplateReader(Reader reader) {
         this.reader = reader;
     }
 
-    public Token next() throws TemplateCompileException {
+    public Token next() throws TemplateReaderException {
         while (read() >= 0) {
-            if (Character.isWhitespace((char) ch)) {
+            if (Character.isWhitespace((char) cur)) {
                 continue;
-            } else if (ch == '@') {
+            } else if (cur == '@') {
                 read();
                 return keyword();
             } else {
@@ -32,11 +35,20 @@ public class TemplateReader {
         return token(Token.EOS);
     }
 
-    private int read() throws TemplateCompileException {
+    private int read() throws TemplateReaderException {
         try {
-            return ch = reader.read();
+            cur = reader.read();
+
+            colnumber++;
+
+            if (cur == '\n') {
+                linenomber++;
+                colnumber = 1;
+            }
+
+            return cur;
         } catch (IOException ex) {
-            throw new TemplateCompileException("Unable to read tempalte", ex);
+            throw new TemplateReaderException("Unable to read tempalte", ex, linenomber, colnumber);
         }
     }
 
@@ -44,23 +56,23 @@ public class TemplateReader {
         return new Token(type, args);
     }
 
-    private Token keyword() throws TemplateCompileException {
+    private Token keyword() throws TemplateReaderException {
         StringBuilder sb = new StringBuilder();
 
-        while (ch >= 0 && !Character.isWhitespace((char) ch) && ch != '(') {
-            sb.append((char) ch);
+        while (cur >= 0 && !Character.isWhitespace((char) cur) && cur != '(') {
+            sb.append((char) cur);
             read();
         }
 
         String keyword = sb.toString();
 
         // skip space
-        while (ch >= 0 && Character.isWhitespace((char) ch)) {
+        while (cur >= 0 && Character.isWhitespace((char) cur)) {
             read();
         }
 
-        if (ch != '(') {
-            throw new TemplateCompileException("Unexpected symbol: " + ((char) ch));
+        if (cur != '(') {
+            throw new TemplateReaderException("Unexpected symbol: " + ((char) cur), linenomber, colnumber);
         }
 
         read(); // skip '('
@@ -70,8 +82,8 @@ public class TemplateReader {
         List<String> args = new ArrayList<>();
 
         while (true) {
-            while (ch >= 0 && ch != ',' && ch != ')') {
-                sb.append((char) ch);
+            while (cur >= 0 && cur != ',' && cur != ')') {
+                sb.append((char) cur);
                 read();
             }
 
@@ -81,14 +93,14 @@ public class TemplateReader {
 
             sb.setLength(0);
 
-            if (ch == ')') {
+            if (cur == ')') {
                 read();
                 break;
-            } else if (ch == ',') {
+            } else if (cur == ',') {
                 read();
                 continue;
             } else {
-                throw new TemplateCompileException("Unexpected end of file");
+                throw new TemplateReaderException("Unexpected end of file", linenomber, colnumber);
             }
         }
 
@@ -96,27 +108,27 @@ public class TemplateReader {
 
         if (keyword.equals("use")) {
             if (args.size() < 1) {
-                throw new TemplateCompileException("At least one argument is required for 'use'");
+                throw new TemplateReaderException("At least one argument is required for 'use'", linenomber, colnumber);
             }
             return token(Token.USE, args.get(0));
         }
 
         if (keyword.equals("extends")) {
             if (args.size() < 1) {
-                throw new TemplateCompileException("At least one argument is required for 'extends'");
+                throw new TemplateReaderException("At least one argument is required for 'extends'", linenomber, colnumber);
             }
             return token(Token.EXTENDS, args.get(0));
         }
 
         if (keyword.equals("block")) {
             if (args.size() < 1) {
-                throw new TemplateCompileException("At least one argument is required for 'block'");
+                throw new TemplateReaderException("At least one argument is required for 'block'", linenomber, colnumber);
             }
 
             while (true) {
-                if (ch == '@') {
+                if (cur == '@') {
                     StringBuilder sbb = new StringBuilder();
-                    sbb.append((char) ch);
+                    sbb.append((char) cur);
 
                     boolean falseAlarm = false;
                     String endblock = "endblock";
@@ -138,20 +150,20 @@ public class TemplateReader {
                     return token(Token.BLOCK, args.get(0), sb.toString());
 
                 }
-                sb.append((char) ch);
+                sb.append((char) cur);
                 read();
             }
         }
 
         if (keyword.equals("tag")) {
             if (args.size() < 1) {
-                throw new TemplateCompileException("At least one argument is required for 'tag'");
+                throw new TemplateReaderException("At least one argument is required for 'tag'", linenomber, colnumber);
             }
 
             while (true) {
-                if (ch == '@') {
+                if (cur == '@') {
                     StringBuilder sbb = new StringBuilder();
-                    sbb.append((char) ch);
+                    sbb.append((char) cur);
 
                     boolean falseAlarm = false;
                     String endblock = "endtag";
@@ -173,16 +185,16 @@ public class TemplateReader {
                     return token(Token.TAG, args.get(0), sb.toString());
 
                 }
-                sb.append((char) ch);
+                sb.append((char) cur);
                 read();
             }
         }
 
         if (keyword.equals("code")) {
             while (true) {
-                if (ch == '@') {
+                if (cur == '@') {
                     StringBuilder sbb = new StringBuilder();
-                    sbb.append((char) ch);
+                    sbb.append((char) cur);
 
                     boolean falseAlarm = false;
                     String endblock = "endcode";
@@ -204,7 +216,7 @@ public class TemplateReader {
                     return token(Token.CODE, sb.toString());
 
                 }
-                sb.append((char) ch);
+                sb.append((char) cur);
                 read();
             }
         }

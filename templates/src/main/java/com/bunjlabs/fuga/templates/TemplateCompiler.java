@@ -4,7 +4,6 @@ import com.bunjlabs.fuga.resources.ResourceRepresenter;
 import com.bunjlabs.fuga.templates.TemplateReader.Token;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.regex.Matcher;
@@ -36,7 +35,7 @@ public class TemplateCompiler {
                 .getScriptEngine("--print-no-newline");
     }
 
-    public Template compile(String name) throws TemplateNotFoundException, TemplateCompileException {
+    public Template compile(String name) throws TemplateNotFoundException, TemplateCompileException, TemplateReaderException {
         InputStream is;
         try {
             is = resourceRepresenter.load(name.startsWith("/") ? name.substring(1) : name);
@@ -49,7 +48,7 @@ public class TemplateCompiler {
         return compile(new TemplateReader(reader));
     }
 
-    private Template compile(TemplateReader input) throws TemplateNotFoundException, TemplateCompileException {
+    private Template compile(TemplateReader input) throws TemplateNotFoundException, TemplateCompileException, TemplateReaderException {
         Template template = new Template();
 
         Token token;
