@@ -15,6 +15,10 @@ package com.bunjlabs.fuga.templates;
 
 import com.bunjlabs.fuga.views.ViewException;
 
+/**
+ *
+ * @author Artem Shurygin <artem.shurygin@bunjlabs.com>
+ */
 public class TemplateNotFoundException extends ViewException {
 
     public TemplateNotFoundException() {

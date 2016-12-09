@@ -84,26 +84,38 @@ public final class Result {
 
     /**
      *
-     * @return
+     * @return result status
      */
     public int status() {
         return status;
     }
 
     /**
+     * Set status of current result
      *
-     * @param status
-     * @return
+     * @param status status
+     * @return self
      */
     public Result status(int status) {
         this.status = status;
         return this;
     }
 
+    /**
+     *
+     * @return crrent headers map of this result.
+     */
     public Map<String, String> headers() {
         return headers;
     }
 
+    /**
+     * Add or change response http header.
+     *
+     * @param name Header name
+     * @param value Header value
+     * @return self
+     */
     public Result header(String header, String value) {
         headers.put(header, value);
         return this;
@@ -111,7 +123,7 @@ public final class Result {
 
     /**
      *
-     * @return
+     * @return result content length
      */
     public long length() {
         return contentLength;
@@ -119,8 +131,8 @@ public final class Result {
 
     /**
      *
-     * @param contentLength
-     * @return
+     * @param contentLength content length of this result
+     * @return self
      */
     public Result length(long contentLength) {
         this.contentLength = contentLength;
@@ -129,8 +141,8 @@ public final class Result {
 
     /**
      *
-     * @param stream
-     * @return
+     * @param stream content stream
+     * @return self
      */
     public Result stream(InputStream stream) {
         this.stream = stream;
@@ -139,7 +151,7 @@ public final class Result {
 
     /**
      *
-     * @return
+     * @return content stream of this result
      */
     public InputStream stream() {
         return stream;
@@ -147,15 +159,16 @@ public final class Result {
 
     /**
      *
-     * @return
+     * @return content type of this result
      */
     public String contentType() {
         return contentType;
     }
 
     /**
-     *
-     * @return
+     * Set content type of current result to text/plain
+     * 
+     * @return self
      */
     public Result asText() {
         this.contentType = "text/plain";
@@ -163,8 +176,9 @@ public final class Result {
     }
 
     /**
-     *
-     * @return
+     * Set content type of current result to text/html
+     * 
+     * @return self
      */
     public Result asHtml() {
         this.contentType = "text/html";
@@ -172,8 +186,9 @@ public final class Result {
     }
 
     /**
-     *
-     * @return
+     * Set content type of current result to application/json
+     * 
+     * @return self
      */
     public Result asJson() {
         this.contentType = "application/json";
@@ -181,8 +196,9 @@ public final class Result {
     }
 
     /**
-     *
-     * @return
+     * Set content type of current result to text/xml
+     * 
+     * @return self
      */
     public Result asXml() {
         this.contentType = "text/xml";
@@ -190,8 +206,9 @@ public final class Result {
     }
 
     /**
-     *
-     * @return
+     * Set content type of current result to application/javascript
+     * 
+     * @return self
      */
     public Result asJavascript() {
         this.contentType = "application/javascript";
@@ -199,8 +216,9 @@ public final class Result {
     }
 
     /**
-     *
-     * @return
+     * Set content type of current result to text/css
+     * 
+     * @return self
      */
     public Result asCss() {
         this.contentType = "text/css";
@@ -208,9 +226,10 @@ public final class Result {
     }
 
     /**
-     *
+     * Set content type of current result
+     * 
      * @param contentType
-     * @return
+     * @return self
      */
     public Result as(String contentType) {
         this.contentType = contentType;
@@ -218,8 +237,8 @@ public final class Result {
     }
 
     /**
-     *
-     * @return
+     * Check that content stream of this result is null.
+     * @return content stream is null
      */
     public boolean isEmpty() {
         return stream == null;

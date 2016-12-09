@@ -4,12 +4,12 @@
     <parent>
         <groupId>com.bunjlabs.fuga</groupId>
         <artifactId>fuga-parent</artifactId>
-        <version>0.6.3-SNAPSHOT</version>
+        <version>0.6.2-SNAPSHOT</version>
     </parent>
-    <artifactId>fuga-all</artifactId>
+    <artifactId>fuga-examples</artifactId>
     <packaging>jar</packaging>
     
-    <name>Fuga All-in-One</name>
+    <name>Fuga Examples</name>
     
     <dependencies>
         <dependency>
@@ -22,14 +22,33 @@
             <artifactId>fuga-templates</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>fuga-examples</artifactId>
-            <version>${project.version}</version>
-        </dependency>
     </dependencies>
+    
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

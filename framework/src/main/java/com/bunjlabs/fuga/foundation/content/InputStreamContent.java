@@ -28,7 +28,8 @@ public class InputStreamContent extends BaseContent {
     private final long length;
 
     /**
-     *
+     * Create new InputStreamContent from input stream and length
+     * 
      * @param is
      * @param length
      */
@@ -37,20 +38,11 @@ public class InputStreamContent extends BaseContent {
         this.length = length;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public String asString() {
         return asString(StandardCharsets.UTF_8);
     }
 
-    /**
-     *
-     * @param charset
-     * @return
-     */
     @Override
     public String asString(Charset charset) {
         try {
@@ -60,19 +52,11 @@ public class InputStreamContent extends BaseContent {
         }
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public InputStream asInputStream() {
         return is;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public long getLength() {
         return length;

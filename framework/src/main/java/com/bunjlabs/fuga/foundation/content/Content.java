@@ -23,9 +23,9 @@ import org.json.JSONObject;
 public interface Content {
 
     /**
-     * Returns current content as string.
+     * Returns current content as string with UTF_8 charset.
      *
-     * @return current content as string
+     * @return current content as string with UTF_8 charset
      */
     public String asString();
 
@@ -33,7 +33,7 @@ public interface Content {
      * Returns current content as string with given charset.
      *
      * @param charset content charset.
-     * @return
+     * @return current content as string with given charset
      */
     public String asString(Charset charset);
 

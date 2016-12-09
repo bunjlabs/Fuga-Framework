@@ -93,7 +93,7 @@ public class Session extends HashMap<String, Object> {
      *
      * @param <T> Type of the attribute.
      * @param name Name of the attribute.
-     * @return
+     * @return session attribute
      */
     public <T> T get(String name) {
         return (T) super.get(name);

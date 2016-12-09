@@ -83,16 +83,17 @@ public final class Response {
 
     /**
      *
-     * @return
+     * @return response status
      */
     public int status() {
         return status;
     }
 
     /**
-     *
-     * @param status
-     * @return
+     * Set status of current response
+     * 
+     * @param status status
+     * @return self
      */
     public Response status(int status) {
         this.status = status;
@@ -101,7 +102,7 @@ public final class Response {
 
     /**
      *
-     * @return
+     * @return response content length
      */
     public long length() {
         return contentLength;
@@ -109,8 +110,8 @@ public final class Response {
 
     /**
      *
-     * @param contentLength
-     * @return
+     * @param response content contentLength
+     * @return self
      */
     public Response length(long contentLength) {
         this.contentLength = contentLength;
@@ -118,10 +119,11 @@ public final class Response {
     }
 
     /**
-     *
-     * @param name
-     * @param value
-     * @return
+     * Add or change response http header.
+     * 
+     * @param name Header name
+     * @param value Header value
+     * @return self
      */
     public Response header(String name, String value) {
         headers.put(name, value);
@@ -130,7 +132,7 @@ public final class Response {
 
     /**
      *
-     * @return
+     * @return current headers map of this response.
      */
     public Map<String, String> headers() {
         return headers;
@@ -138,8 +140,8 @@ public final class Response {
 
     /**
      *
-     * @param stream
-     * @return
+     * @param stream content stream of this response.
+     * @return self
      */
     public Response stream(InputStream stream) {
         this.stream = stream;
@@ -148,7 +150,7 @@ public final class Response {
 
     /**
      *
-     * @return
+     * @return current response content stream.
      */
     public InputStream stream() {
         return stream;
@@ -176,15 +178,16 @@ public final class Response {
 
     /**
      *
-     * @return
+     * @return content type of current response.
      */
     public String contentType() {
         return contentType;
     }
 
     /**
-     *
-     * @return
+     * Set content type of current response to text/plain
+     * 
+     * @return self
      */
     public Response asText() {
         this.contentType = "text/plain";
@@ -192,8 +195,9 @@ public final class Response {
     }
 
     /**
-     *
-     * @return
+     * Set content type of current response to text/html
+     * 
+     * @return self
      */
     public Response asHtml() {
         this.contentType = "text/html";
@@ -201,8 +205,9 @@ public final class Response {
     }
 
     /**
-     *
-     * @return
+     * Set content type of current response to application/json
+     * 
+     * @return self
      */
     public Response asJson() {
         this.contentType = "application/json";
@@ -210,8 +215,9 @@ public final class Response {
     }
 
     /**
+     * Set content type of current response to text/xml
      *
-     * @return
+     * @return self
      */
     public Response asXml() {
         this.contentType = "text/xml";
@@ -219,8 +225,9 @@ public final class Response {
     }
 
     /**
+     * Set content type of current response to application/javascript
      *
-     * @return
+     * @return self
      */
     public Response asJavascript() {
         this.contentType = "application/javascript";
@@ -228,8 +235,9 @@ public final class Response {
     }
 
     /**
+     * Set content type of current response to text/css
      *
-     * @return
+     * @return self
      */
     public Response asCss() {
         this.contentType = "text/css";
@@ -237,9 +245,10 @@ public final class Response {
     }
 
     /**
+     * Set content type of current response
      *
      * @param contentType
-     * @return
+     * @return self
      */
     public Response as(String contentType) {
         this.contentType = contentType;
@@ -247,8 +256,9 @@ public final class Response {
     }
 
     /**
-     *
-     * @return
+     * Check that content stream of this response is null.
+     * 
+     * @return content stream is null
      */
     public boolean isEmpty() {
         return stream == null;

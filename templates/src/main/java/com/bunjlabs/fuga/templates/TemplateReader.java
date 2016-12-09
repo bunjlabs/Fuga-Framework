@@ -1,3 +1,16 @@
+/* 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.bunjlabs.fuga.templates;
 
 import java.io.IOException;
@@ -17,10 +30,19 @@ public class TemplateReader {
     private int linenomber = 1;
     private int colnumber = 1;
 
+    /**
+     *
+     * @param reader Input reader
+     */
     public TemplateReader(Reader reader) {
         this.reader = reader;
     }
 
+    /**
+     *
+     * @return Token
+     * @throws TemplateReaderException
+     */
     public Token next() throws TemplateReaderException {
         while (read() >= 0) {
             if (Character.isWhitespace((char) cur)) {
@@ -83,7 +105,7 @@ public class TemplateReader {
 
         while (true) {
             while (cur >= 0 && cur != ',' && cur != ')') {
-                if(cur == '\n') {
+                if (cur == '\n') {
                     throw new TemplateReaderException("Unclosed argument list", linenomber, colnumber);
                 }
                 sb.append((char) cur);
