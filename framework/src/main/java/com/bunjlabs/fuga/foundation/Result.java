@@ -41,7 +41,7 @@ public final class Result {
 
     /**
      *
-     * @param is
+     * @param is content input stream
      */
     public Result(InputStream is) {
         this.status = -1;
@@ -52,7 +52,7 @@ public final class Result {
 
     /**
      *
-     * @param bytes
+     * @param bytes content bytes
      */
     public Result(byte[] bytes) {
         this.status = -1;
@@ -63,8 +63,8 @@ public final class Result {
 
     /**
      *
-     * @param f
-     * @throws IOException
+     * @param f content file
+     * @throws IOException if file read error
      */
     public Result(File f) throws IOException {
         this.status = -1;
@@ -75,7 +75,7 @@ public final class Result {
 
     /**
      *
-     * @param s
+     * @param s content string
      */
     public Result(String s) {
         this(s.getBytes());
@@ -116,8 +116,8 @@ public final class Result {
      * @param value Header value
      * @return self
      */
-    public Result header(String header, String value) {
-        headers.put(header, value);
+    public Result header(String name, String value) {
+        headers.put(name, value);
         return this;
     }
 
@@ -167,7 +167,7 @@ public final class Result {
 
     /**
      * Set content type of current result to text/plain
-     * 
+     *
      * @return self
      */
     public Result asText() {
@@ -177,7 +177,7 @@ public final class Result {
 
     /**
      * Set content type of current result to text/html
-     * 
+     *
      * @return self
      */
     public Result asHtml() {
@@ -187,7 +187,7 @@ public final class Result {
 
     /**
      * Set content type of current result to application/json
-     * 
+     *
      * @return self
      */
     public Result asJson() {
@@ -197,7 +197,7 @@ public final class Result {
 
     /**
      * Set content type of current result to text/xml
-     * 
+     *
      * @return self
      */
     public Result asXml() {
@@ -207,7 +207,7 @@ public final class Result {
 
     /**
      * Set content type of current result to application/javascript
-     * 
+     *
      * @return self
      */
     public Result asJavascript() {
@@ -217,7 +217,7 @@ public final class Result {
 
     /**
      * Set content type of current result to text/css
-     * 
+     *
      * @return self
      */
     public Result asCss() {
@@ -227,8 +227,8 @@ public final class Result {
 
     /**
      * Set content type of current result
-     * 
-     * @param contentType
+     *
+     * @param contentType result content type
      * @return self
      */
     public Result as(String contentType) {
@@ -238,6 +238,7 @@ public final class Result {
 
     /**
      * Check that content stream of this result is null.
+     *
      * @return content stream is null
      */
     public boolean isEmpty() {

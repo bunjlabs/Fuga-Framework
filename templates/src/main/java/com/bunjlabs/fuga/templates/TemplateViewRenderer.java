@@ -24,10 +24,6 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- *
- * @author Artem Shurygin <artem.shurygin@bunjlabs.com>
- */
 public class TemplateViewRenderer implements ViewRenderer {
 
     private final TemplateCompiler compiler;
@@ -37,7 +33,7 @@ public class TemplateViewRenderer implements ViewRenderer {
 
     /**
      *
-     * @param app
+     * @param app Current fuga app
      */
     @Inject
     public TemplateViewRenderer(FugaApp app) {

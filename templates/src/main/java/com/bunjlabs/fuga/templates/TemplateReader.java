@@ -18,10 +18,6 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author Artem Shurygin <artem.shurygin@bunjlabs.com>
- */
 public class TemplateReader {
 
     private final Reader reader;
@@ -41,7 +37,7 @@ public class TemplateReader {
     /**
      *
      * @return Token
-     * @throws TemplateReaderException
+     * @throws TemplateReaderException if any error occured while reading template file
      */
     public Token next() throws TemplateReaderException {
         while (read() >= 0) {
@@ -70,7 +66,7 @@ public class TemplateReader {
 
             return cur;
         } catch (IOException ex) {
-            throw new TemplateReaderException("Unable to read tempalte", ex, linenomber, colnumber);
+            throw new TemplateReaderException("Unable to read template", ex, linenomber, colnumber);
         }
     }
 

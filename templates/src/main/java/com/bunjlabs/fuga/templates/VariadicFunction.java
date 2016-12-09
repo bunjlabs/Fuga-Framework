@@ -15,7 +15,6 @@ package com.bunjlabs.fuga.templates;
 
 /**
  *
- * @author Artem Shurygin <artem.shurygin@bunjlabs.com>
  * @param <T> Input arguments type
  * @param <R> Output type
  */

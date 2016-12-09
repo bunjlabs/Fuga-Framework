@@ -30,8 +30,8 @@ public class InputStreamContent extends BaseContent {
     /**
      * Create new InputStreamContent from input stream and length
      * 
-     * @param is
-     * @param length
+     * @param is content input stream
+     * @param length content length
      */
     public InputStreamContent(InputStream is, long length) {
         this.is = is;

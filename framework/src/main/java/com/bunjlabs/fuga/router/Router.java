@@ -74,11 +74,10 @@ public class Router {
      * Load routes map from string.
      *
      * @param input Input routes map string.
-     * @throws NullPointerException
-     * @throws RoutesMapLoadException
-     * @throws RoutesMapSyntaxException
+     * @throws RoutesMapLoadException if is unable to load map
+     * @throws RoutesMapSyntaxException if a syntax error in routes map 
      */
-    public void loadFromString(String input) throws NullPointerException, RoutesMapLoadException, RoutesMapSyntaxException {
+    public void loadFromString(String input) throws RoutesMapLoadException, RoutesMapSyntaxException {
         extensions.addAll(mapLoader.loadFromString(input));
     }
 
@@ -86,11 +85,10 @@ public class Router {
      * Load routes map from input stream.
      *
      * @param input Input stream with routes map.
-     * @throws NullPointerException
-     * @throws RoutesMapLoadException
-     * @throws RoutesMapSyntaxException
+     * @throws RoutesMapLoadException if is unable to load map
+     * @throws RoutesMapSyntaxException if a syntax error in routes map 
      */
-    public void load(InputStream input) throws NullPointerException, RoutesMapLoadException, RoutesMapSyntaxException {
+    public void load(InputStream input) throws RoutesMapLoadException, RoutesMapSyntaxException {
         extensions.addAll(mapLoader.load(input));
     }
 

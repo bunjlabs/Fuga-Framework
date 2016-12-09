@@ -3,10 +3,6 @@ package com.bunjlabs.fuga.examples.template;
 import com.bunjlabs.fuga.FugaApp;
 import com.bunjlabs.fuga.templates.TemplateViewRenderer;
 
-/**
- *
- * @author Artem Shurygin <artem.shurygin@bunjlabs.com>
- */
 public class TemplateApp extends FugaApp {
 
     @Override

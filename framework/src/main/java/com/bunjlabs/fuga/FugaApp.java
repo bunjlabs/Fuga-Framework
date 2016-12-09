@@ -189,7 +189,7 @@ public abstract class FugaApp {
      * Set current view renderer class.
      *
      * @param rendererClass View renderer class.
-     * @throws InjectException
+     * @throws InjectException if unable to inject dependencies
      */
     public void setViewRenderer(Class<? extends ViewRenderer> rendererClass) throws InjectException {
         this.viewRenderer = dependencyManager.registerAndInject(rendererClass);
@@ -219,7 +219,7 @@ public abstract class FugaApp {
      * Set current request handler class.
      *
      * @param requestHandlerClass Request handler class.
-     * @throws InjectException
+     * @throws InjectException if unable to inject dependencies
      */
     public void setRequestHandler(Class<? extends RequestHandler> requestHandlerClass) throws InjectException {
         this.requestHandler = dependencyManager.registerAndInject(requestHandlerClass);
@@ -248,7 +248,7 @@ public abstract class FugaApp {
      * Set current error handler class.
      *
      * @param errorHandlerClass Error handler class.
-     * @throws InjectException
+     * @throws InjectException if unable to inject dependencies
      */
     public void setErrorHandler(Class<? extends ErrorHandler> errorHandlerClass) throws InjectException {
         this.errorHandler = dependencyManager.registerAndInject(errorHandlerClass);
@@ -257,7 +257,7 @@ public abstract class FugaApp {
     /**
      * Initialization method.
      *
-     * @throws Exception
+     * @throws Exception if any error occurred
      */
     public abstract void prepare() throws Exception;
 

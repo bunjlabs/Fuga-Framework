@@ -15,10 +15,6 @@ package com.bunjlabs.fuga.templates;
 
 import javax.script.CompiledScript;
 
-/**
- *
- * @author Artem Shurygin <artem.shurygin@bunjlabs.com>
- */
 public class ScriptBlock {
 
     private CompiledScript script;

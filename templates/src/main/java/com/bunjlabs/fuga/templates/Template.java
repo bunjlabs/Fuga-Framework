@@ -26,10 +26,6 @@ import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 import javax.script.SimpleScriptContext;
 
-/**
- *
- * @author Artem Shurygin <artem.shurygin@bunjlabs.com>
- */
 public class Template {
 
     private final Map<String, List<ScriptBlock>> blocks = new HashMap<>();
@@ -46,7 +42,7 @@ public class Template {
      *
      * @param context The request context
      * @param ps Print stream to render template
-     * @throws TemplateRenderException
+     * @throws TemplateRenderException if any error is occurred while rendering 
      */
     public void render(Context context, PrintStream ps) throws TemplateRenderException {
         ScriptContext scriptContext = new SimpleScriptContext();

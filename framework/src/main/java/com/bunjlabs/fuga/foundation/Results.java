@@ -63,7 +63,7 @@ public class Results implements Status {
      *
      * @param f File content.
      * @return response with ok (200) status and file content.
-     * @throws IOException
+     * @throws IOException if file read error
      */
     public static Result ok(File f) throws IOException {
         return new Result(f).status(OK);
@@ -117,7 +117,7 @@ public class Results implements Status {
      *
      * @param f File content.
      * @return response with bad request (400) status and file content.
-     * @throws IOException
+     * @throws IOException if file read error
      */
     public static Result badRequest(File f) throws IOException {
         return new Result(f).status(BAD_REQUEST);
@@ -171,7 +171,7 @@ public class Results implements Status {
      *
      * @param f File content.
      * @return response with created (201) status and file content.
-     * @throws IOException
+     * @throws IOException if file read error
      */
     public static Result created(File f) throws IOException {
         return new Result(f).status(CREATED);
@@ -225,7 +225,7 @@ public class Results implements Status {
      *
      * @param f File content.
      * @return response with forbidden (403) status and file content.
-     * @throws IOException
+     * @throws IOException if file read error
      */
     public static Result forbidden(File f) throws IOException {
         return new Result(f).status(FORBIDDEN);
@@ -344,7 +344,7 @@ public class Results implements Status {
      * @param f File content.
      * @return response with internal server error (500) status and file
      * content.
-     * @throws IOException
+     * @throws IOException if file read error
      */
     public static Result internalServerError(File f) throws IOException {
         return new Result(f).status(INTERNAL_SERVER_ERROR);
@@ -409,7 +409,7 @@ public class Results implements Status {
      *
      * @param f File content.
      * @return response with not found (404) status and file content.
-     * @throws IOException
+     * @throws IOException if file read error
      */
     public static Result notFound(File f) throws IOException {
         return new Result(f).status(NOT_FOUND);
@@ -463,7 +463,7 @@ public class Results implements Status {
      *
      * @param f File content.
      * @return response with unauthorized (401) status and file content.
-     * @throws IOException
+     * @throws IOException if file read error
      */
     public static Result unauthorized(File f) throws IOException {
         return new Result(f).status(UNAUTHORIZED);

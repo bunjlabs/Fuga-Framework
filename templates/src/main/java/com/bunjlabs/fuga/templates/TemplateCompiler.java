@@ -27,10 +27,6 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
-/**
- *
- * @author Artem Shurygin <artem.shurygin@bunjlabs.com>
- */
 public class TemplateCompiler {
 
     private static final Pattern CODE_PATTERN = Pattern.compile(
@@ -58,9 +54,9 @@ public class TemplateCompiler {
      * 
      * @param name path or/and name of template
      * @return Compiled template
-     * @throws TemplateNotFoundException
-     * @throws TemplateCompileException
-     * @throws TemplateReaderException
+     * @throws TemplateNotFoundException if template file not founded
+     * @throws TemplateCompileException if compiling error is occured
+     * @throws TemplateReaderException  if any error is occurred while rendering
      */
     public Template compile(String name) throws TemplateNotFoundException, TemplateCompileException, TemplateReaderException {
         InputStream is;

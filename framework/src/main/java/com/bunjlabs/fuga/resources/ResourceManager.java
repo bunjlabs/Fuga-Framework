@@ -29,7 +29,7 @@ public final class ResourceManager {
      *
      * @param path Path to the resource.
      * @return input stream of resource or null.
-     * @throws FileNotFoundException
+     * @throws FileNotFoundException if any specified file not founded 
      */
     protected InputStream loadFromClasspath(String... path) throws FileNotFoundException {
         String name = String.join(File.separator, path);
@@ -57,7 +57,7 @@ public final class ResourceManager {
      *
      * @param path Path to the resource.
      * @return input stream of resource or null.
-     * @throws FileNotFoundException
+     * @throws FileNotFoundException if any specified file not founded 
      */
     protected InputStream load(String... path) throws FileNotFoundException {
         String name = String.join(File.separator, path);

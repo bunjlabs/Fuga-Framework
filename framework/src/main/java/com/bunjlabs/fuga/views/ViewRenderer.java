@@ -24,7 +24,7 @@ public interface ViewRenderer {
      * @param name View name.
      * @param ctx Request context.
      * @param output Output print stream.
-     * @throws ViewException
+     * @throws ViewException if any error is occurred while rendering
      */
     public void render(String name, Context ctx, PrintStream output) throws ViewException;
 
@@ -34,7 +34,7 @@ public interface ViewRenderer {
      * @param name View name.
      * @param ctx Request context.
      * @return string with rendered view.
-     * @throws ViewException
+     * @throws ViewException if any error is occurred while rendering
      */
     public String renderToString(String name, Context ctx) throws ViewException;
 

@@ -43,7 +43,7 @@ public final class Response {
 
     /**
      *
-     * @param is
+     * @param is content input stream
      */
     public Response(InputStream is) {
         contentType = "application/octet-stream";
@@ -53,7 +53,7 @@ public final class Response {
 
     /**
      *
-     * @param bytes
+     * @param bytes content bytes
      */
     public Response(byte[] bytes) {
         stream = new ByteArrayInputStream(bytes);
@@ -63,8 +63,8 @@ public final class Response {
 
     /**
      *
-     * @param f
-     * @throws IOException
+     * @param f content file
+     * @throws IOException if file read error
      */
     public Response(File f) throws IOException {
         stream = new FileInputStream(f);
@@ -74,7 +74,7 @@ public final class Response {
 
     /**
      *
-     * @param s
+     * @param s content string
      */
     public Response(String s) {
         this(s.getBytes());
@@ -110,7 +110,7 @@ public final class Response {
 
     /**
      *
-     * @param response content contentLength
+     * @param contentLength content contentLength
      * @return self
      */
     public Response length(long contentLength) {
@@ -247,7 +247,7 @@ public final class Response {
     /**
      * Set content type of current response
      *
-     * @param contentType
+     * @param contentType response content type
      * @return self
      */
     public Response as(String contentType) {

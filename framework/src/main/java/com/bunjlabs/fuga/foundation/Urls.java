@@ -23,7 +23,7 @@ public class Urls {
     /**
      * Create new Urls class instance for the specified context.
      *
-     * @param ctx
+     * @param ctx request context
      */
     public Urls(Context ctx) {
         this.ctx = ctx;

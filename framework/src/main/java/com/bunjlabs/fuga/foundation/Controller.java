@@ -39,7 +39,7 @@ public abstract class Controller extends Results {
      *
      * @param name Name of the template.
      * @return rendered template.
-     * @throws ViewException
+     * @throws ViewException if any error while rendering view
      */
     protected final String view(String name) throws ViewException {
         return ctx.app().getViewRenderer().renderToString(name, ctx);

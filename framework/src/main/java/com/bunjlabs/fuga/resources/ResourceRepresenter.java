@@ -41,7 +41,7 @@ public class ResourceRepresenter {
      *
      * @param path Path to the resource.
      * @return input stream of resource or null.
-     * @throws FileNotFoundException
+     * @throws FileNotFoundException if any specified file not founded 
      */
     public InputStream loadFromClasspath(String path) throws FileNotFoundException {
         return resourceManager.loadFromClasspath(base, path);
@@ -56,7 +56,7 @@ public class ResourceRepresenter {
      *
      * @param path Path to the resource.
      * @return input stream of resource or null.
-     * @throws FileNotFoundException
+     * @throws FileNotFoundException if any specified file not founded 
      */
     public InputStream load(String path) throws FileNotFoundException {
         return resourceManager.load(base, path);

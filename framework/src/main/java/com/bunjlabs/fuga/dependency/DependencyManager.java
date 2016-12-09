@@ -43,7 +43,7 @@ public class DependencyManager {
      * @param <T> Type of injectable object.
      * @param injectable Injectable class.
      * @return object with ijected dependences.
-     * @throws InjectException
+     * @throws InjectException if is unable to iject dependences
      */
     public <T> T inject(Class<T> injectable) throws InjectException {
         Constructor<T> annotatedConstructor = getAnnotatedConstructor(injectable);
@@ -175,7 +175,7 @@ public class DependencyManager {
      * @param <T> Type of injectable object.
      * @param injectable Injectable class.
      * @return injected object.
-     * @throws InjectException
+     * @throws InjectException if is unable to iject dependences
      */
     public <T> T registerAndInject(Class<T> injectable) throws InjectException {
         T obj = inject(injectable);

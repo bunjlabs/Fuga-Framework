@@ -15,10 +15,6 @@ package com.bunjlabs.fuga.templates;
 
 import com.bunjlabs.fuga.views.ViewException;
 
-/**
- *
- * @author Artem Shurygin <artem.shurygin@bunjlabs.com>
- */
 public class TemplateCompileException extends ViewException {
 
     public TemplateCompileException() {

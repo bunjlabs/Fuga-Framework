@@ -18,10 +18,6 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import org.apache.commons.lang3.StringEscapeUtils;
 
-/**
- *
- * @author Artem Shurygin <artem.shurygin@bunjlabs.com>
- */
 public class TemplateApi {
 
     /**
