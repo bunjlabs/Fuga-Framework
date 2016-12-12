@@ -13,7 +13,6 @@
  */
 package com.bunjlabs.fuga;
 
-
 public class TemplateTest {
 
     /*private FugaApp prepareTestApp() {

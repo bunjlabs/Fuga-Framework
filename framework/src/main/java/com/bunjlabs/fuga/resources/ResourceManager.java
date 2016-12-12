@@ -39,7 +39,7 @@ public final class ResourceManager {
         }
 
         InputStream is;
-        is = ResourceManager.class.getResourceAsStream(name.startsWith("/") ? name : ("/" + name));
+        is = ClassLoader.getSystemClassLoader().getResourceAsStream(name);
 
         if (is == null) {
             throw new FileNotFoundException(name);
