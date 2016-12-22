@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.bunjlabs.fuga</groupId>
     <artifactId>fuga-parent</artifactId>
-    <version>fuga-0.6.3-RC1</version>
+    <version>0.6.6-SNAPSHOT</version>
     
     <packaging>pom</packaging>
     
