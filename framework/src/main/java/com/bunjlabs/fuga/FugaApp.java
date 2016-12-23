@@ -86,7 +86,8 @@ public abstract class FugaApp {
                 router,
                 sessionManager,
                 serviceManager,
-                messagesManager
+                messagesManager,
+                dependencyManager
         );
 
         setViewRenderer(DummyViewRenderer.class);
