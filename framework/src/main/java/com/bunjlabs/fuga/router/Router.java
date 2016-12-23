@@ -75,7 +75,7 @@ public class Router {
      *
      * @param input Input routes map string.
      * @throws RoutesMapLoadException if is unable to load map
-     * @throws RoutesMapSyntaxException if a syntax error in routes map 
+     * @throws RoutesMapSyntaxException if a syntax error in routes map
      */
     public void loadFromString(String input) throws RoutesMapLoadException, RoutesMapSyntaxException {
         extensions.addAll(mapLoader.loadFromString(input));
@@ -86,7 +86,7 @@ public class Router {
      *
      * @param input Input stream with routes map.
      * @throws RoutesMapLoadException if is unable to load map
-     * @throws RoutesMapSyntaxException if a syntax error in routes map 
+     * @throws RoutesMapSyntaxException if a syntax error in routes map
      */
     public void load(InputStream input) throws RoutesMapLoadException, RoutesMapSyntaxException {
         extensions.addAll(mapLoader.load(input));
@@ -183,7 +183,9 @@ public class Router {
                 }
                 Result result = invoke(ctx, route, args);
                 if (result == null) {
-                    throw new NullPointerException("Result is null");
+                    throw new NullPointerException("Result is null in "
+                            + route.getController().getName() + "."
+                            + route.getMethod().toGenericString());
                 }
 
                 if (result.status() > 0) {
@@ -195,11 +197,8 @@ public class Router {
                     path = path.substring(m.end());
                 }
                 Result result = forward(ctx, path, ext.getNodes());
-                if (result == null) {
-                    throw new NullPointerException("Result is null");
-                }
 
-                if (result.status() > 0) {
+                if (result != null && result.status() > 0) {
                     return result;
                 }
             }
