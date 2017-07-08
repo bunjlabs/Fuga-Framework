@@ -13,6 +13,7 @@ Desktop.ini
 build/
 dist/
 target/
+pom.xml.releaseBackup
 
 ############
 ## NetBeans

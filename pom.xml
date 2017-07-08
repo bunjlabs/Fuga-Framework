@@ -3,23 +3,23 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.bunjlabs.fuga</groupId>
     <artifactId>fuga-parent</artifactId>
-    <version>0.7.0-SNAPSHOT</version>
-    
+    <version>0.7.1-SNAPSHOT</version>
+
     <packaging>pom</packaging>
-    
+
     <modules>
         <module>all</module>
         <module>framework</module>
         <module>templates</module>
         <module>examples</module>
     </modules>
-    
+
     <name>Fuga</name>
     <url>https://github.com/bunjlabs/Fuga-Framework</url>
     <description>
         Fuga is a small web framework
     </description>
-    
+
     <organization>
         <name>Bunjlabs</name>
         <url>http://bunjlabs.com/</url>
@@ -32,7 +32,7 @@
         </license>
     </licenses>
     <inceptionYear>2016</inceptionYear>
-    
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -65,12 +65,12 @@
         <repository>
             <id>bunjlabs.repo</id>
             <name>Bunjlabs Maven Repository</name>
-            <url>https://maven.bunjlabs.com/releases</url>
+            <url>http://maven.bunjlabs.com/releases</url>
         </repository>
         <snapshotRepository>
             <id>bunjlabs.repo.snapshots</id>
             <name>Bunjlabs Maven Snapshots Repository</name>
-            <url>https://maven.bunjlabs.com/snapshots</url>
+            <url>http://maven.bunjlabs.com/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
     <build>
@@ -78,6 +78,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
+                <configuration>
+                    <preparationGoals>clean install deploy</preparationGoals>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <tagNameFormat>fuga-@{project.version}</tagNameFormat>
+                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
