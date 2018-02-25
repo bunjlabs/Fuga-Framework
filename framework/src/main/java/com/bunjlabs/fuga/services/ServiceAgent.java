@@ -15,14 +15,26 @@ package com.bunjlabs.fuga.services;
 
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledFuture;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 class ServiceAgent<T extends Service> {
+
+    private final Logger log = LogManager.getLogger(this.getClass());
 
     private final T service;
     private ScheduledFuture scheduledFuture;
 
     ServiceAgent(T service) {
         this.service = service;
+    }
+
+    public void fireUpdate() {
+        try {
+            this.service.onUpdate();
+        } catch (Exception e) {
+            log.fatal("Catching exception from service {}: {}", this.service.getClass().getName(), e);
+        }
     }
 
     public T getService() {
