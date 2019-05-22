@@ -1,3 +1,7 @@
+| WARNING: project is deprecated! |
+| --- |
+
+
 Fuga Framework
 =======
 Java MVC Web Framework.
