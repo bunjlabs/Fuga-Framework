@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.bunjlabs.fuga</groupId>
         <artifactId>fuga-parent</artifactId>
-        <version>0.7.2-SNAPSHOT</version>
+        <version>0.7.3-SNAPSHOT</version>
     </parent>
     <artifactId>fuga-examples</artifactId>
     <packaging>jar</packaging>

@@ -46,6 +46,7 @@ import io.netty.handler.stream.ChunkedStream;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -168,8 +169,9 @@ class NettyHttpServerHandler extends SimpleChannelInboundHandler<HttpObject> {
                             .collect(Collectors.toList());
 
                     requestBuilder.acceptLocales(acceptLocales);
+                } else {
+                    requestBuilder.acceptLocales(Collections.EMPTY_LIST);
                 }
-                //
 
                 if (httprequest.method().equals(HttpMethod.GET)) {
                     processResponse(ctx);
